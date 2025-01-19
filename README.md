@@ -1,4 +1,3 @@
-````markdown
 # Global Nomad
 
 여행자들을 위한 글로벌 커뮤니티 플랫폼입니다.
@@ -31,6 +30,7 @@ npm install
 # 개발 서버 실행
 npm run dev
 ```
+
 ````
 
 ### 스크립트
@@ -77,6 +77,4 @@ npm run test:coverage
 - 커밋 메시지: [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
 
 ```
-
-
-```
+````
