@@ -31,8 +31,6 @@ npm install
 npm run dev
 ```
 
-````
-
 ### 스크립트
 
 - `npm run dev`: 개발 서버 실행
@@ -77,4 +75,5 @@ npm run test:coverage
 - 커밋 메시지: [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
 
 ```
-````
+
+```
