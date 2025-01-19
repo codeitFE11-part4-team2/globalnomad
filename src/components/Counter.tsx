@@ -1,8 +1,8 @@
 // 테스트 예시를 위한 컴포넌트
-"use client";
+'use client';
 
-import useCounter from "@/hooks/useCounter";
-import Button from "@/components/Button";
+import useCounter from '@/hooks/useCounter';
+import Button from '@/components/Button';
 
 interface CounterProps {
   initialValue?: number;
