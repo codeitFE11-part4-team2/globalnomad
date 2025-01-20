@@ -3,30 +3,28 @@ import Image from 'next/image';
 export default function SideNavMenu() {
   return (
     <div className="w-[384px] h-[432px] rounded-xl p-6 flex flex-col bg-red-200 items-center">
-      <div className="w-40 h-40 bg-gray-200 relative">
-        <div className="w-full h-full rounded-full bg-blue-500"></div>
+      <div className="w-40 h-40 relative">
+        <div className="w-full h-full rounded-full">
+          <Image src="/icons/defaultuser_icon.svg" fill alt="프로필사진" />
+        </div>
         <div className="w-11 h-11 rounded-full bg-green-3 absolute bottom-0 right-3 flex justify-center items-center cursor-pointer">
           <svg width="24" height="24" viewBox="0 0 24 24">
             <path
               d="M16.8103 6.05983L4.05422 18.8473L3.28125 20.7186L5.1525 19.9456L17.94 7.18952L16.8103 6.05983ZM19.3627 3.50795L18.81 4.06014L19.9397 5.18983L20.4923 4.63717C20.6374 4.49205 20.7188 4.29529 20.7188 4.09014C20.7188 3.88499 20.6374 3.68823 20.4923 3.54311L20.4572 3.50795C20.3853 3.43608 20.3 3.37907 20.2061 3.34017C20.1122 3.30127 20.0116 3.28125 19.9099 3.28125C19.8083 3.28125 19.7076 3.30127 19.6137 3.34017C19.5198 3.37907 19.4345 3.43608 19.3627 3.50795Z"
               stroke="white"
-              stroke-width="2.0625"
-              stroke-linecap="round"
-              stroke-linejoin="round"
+              strokeWidth="2.0625"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
           </svg>
         </div>
       </div>
       <div>
         <ul>
-          <li>
-            <Image
-              src="/icons/sidemenu_icon1.svg"
-              width={24}
-              height={24}
-              alt="내정보아이콘"
-              className="fill-white"
-            />
+          <li className="flex">
+            <svg width="24" height="24" viewBox="0 0 24 24">
+              <path d="M21.1 12.5L22.5 13.91L15.97 20.5L12.5 17L13.9 15.59L15.97 17.67L21.1 12.5ZM11 4C12.0609 4 13.0783 4.42143 13.8284 5.17157C14.5786 5.92172 15 6.93913 15 8C15 9.06087 14.5786 10.0783 13.8284 10.8284C13.0783 11.5786 12.0609 12 11 12C9.93913 12 8.92172 11.5786 8.17157 10.8284C7.42143 10.0783 7 9.06087 7 8C7 6.93913 7.42143 5.92172 8.17157 5.17157C8.92172 4.42143 9.93913 4 11 4ZM11 6C10.4696 6 9.96086 6.21071 9.58579 6.58579C9.21071 6.96086 9 7.46957 9 8C9 8.53043 9.21071 9.03914 9.58579 9.41421C9.96086 9.78929 10.4696 10 11 10C11.5304 10 12.0391 9.78929 12.4142 9.41421C12.7893 9.03914 13 8.53043 13 8C13 7.46957 12.7893 6.96086 12.4142 6.58579C12.0391 6.21071 11.5304 6 11 6ZM11 13C11.68 13 12.5 13.09 13.41 13.26L11.74 14.93L11 14.9C8.03 14.9 4.9 16.36 4.9 17V18.1H11.1L13 20H3V17C3 14.34 8.33 13 11 13Z" />
+            </svg>
             <div>내 정보</div>
           </li>
         </ul>
