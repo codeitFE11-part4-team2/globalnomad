@@ -1,7 +1,13 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
+import { useSelectedLayoutSegment } from 'next/navigation';
 
 export default function SideNavMenu() {
+  // 메뉴 선택되는 상태변화를 segment로 하려고 생각중
+  const segment = useSelectedLayoutSegment();
+
   return (
     <div className="w-[384px] h-[432px] rounded-xl p-6 flex flex-col items-center gap-6 border border-gray-300">
       <div className="w-40 h-40 relative">
