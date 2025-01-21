@@ -1,8 +1,7 @@
-// 테스트 예시를 위한 컴포넌트
 'use client';
 
 import useCounter from '@/hooks/useCounter';
-import Button from '@/components/Button';
+import { Button } from './common/Button';
 
 interface CounterProps {
   initialValue?: number;
@@ -21,11 +20,13 @@ export default function Counter({ initialValue, min, max }: CounterProps) {
     <div className="flex flex-col items-center gap-4">
       <div className="text-2xl font-bold">{count}</div>
       <div className="flex gap-2">
-        <Button onClick={decrement} variant="secondary">
+        <Button onClick={decrement} variant="white" size="small">
           -
         </Button>
-        <Button onClick={increment}>+</Button>
-        <Button onClick={reset} variant="secondary">
+        <Button onClick={increment} variant="nomad-black" size="small">
+          +
+        </Button>
+        <Button onClick={reset} variant="gray-600" size="small">
           Reset
         </Button>
       </div>
