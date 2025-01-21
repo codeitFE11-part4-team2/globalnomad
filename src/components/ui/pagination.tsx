@@ -1,9 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
-import Left from '../../../public/icons/left.svg';
-import LeftActive from '../../../public/icons/left_active.svg';
-import Right from '../../../public/icons/right.svg';
-import RightActive from '../../../public/icons/right_active.svg';
+import Left from '../../../public/icons/left_active.svg';
+import Right from '../../../public/icons/right_active.svg';
 
 interface PaginationProps {
   totalPageNum: number;
@@ -44,11 +42,13 @@ export default function Pagination({
         disabled={activePageNum <= 1}
       >
         <Image
-          src={activePageNum > 1 ? LeftActive : Left}
+          src={Left}
           width={55}
           height={55}
           alt="Previous"
-          className="md:w-[55px] md:h-[55px] w-[40px] h-[40px]"
+          className={`md:w-[55px] md:h-[55px] w-[40px] h-[40px] ${
+            activePageNum > 1 ? 'opacity-100' : 'opacity-50'
+          }`}
         />
       </button>
 
@@ -57,11 +57,11 @@ export default function Pagination({
         <button
           key={page}
           onClick={() => onPageChange(page)}
-          className={`lg:w-[48px] lg:h-[48px] w-[34px] h-[34px] text-2lg font-regular flex items-center justify-center border-[1.5px] border-green-3 rounded-[15px] ${
+          className={`md:w-[55px] md:h-[55px] w-[40px] h-[40px] text-2lg font-regular flex items-center justify-center border-[1.5px] border-green-3 rounded-[15px] ${
             activePageNum === page
               ? 'bg-green-3 text-[#ffffff]'
               : 'bg-[#ffffff] text-green-3'
-          } md:w-[55px] md:h-[55px] w-[40px] h-[40px]`}
+          }`}
         >
           {page}
         </button>
@@ -76,11 +76,13 @@ export default function Pagination({
         disabled={activePageNum >= totalPageNum}
       >
         <Image
-          src={activePageNum < totalPageNum ? RightActive : Right}
+          src={Right}
           width={55}
           height={55}
           alt="Next"
-          className="md:w-[55px] md:h-[55px] w-[40px] h-[40px]"
+          className={`md:w-[55px] md:h-[55px] w-[40px] h-[40px] ${
+            activePageNum < totalPageNum ? 'opacity-100' : 'opacity-50'
+          }`}
         />
       </button>
     </div>
