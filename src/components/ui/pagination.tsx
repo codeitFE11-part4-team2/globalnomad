@@ -57,7 +57,7 @@ export default function Pagination({
         <button
           key={page}
           onClick={() => onPageChange(page)}
-          className={`lg:w-[48px] lg:h-[48px] w-[34px] h-[34px] lg:text-[18px] text-[16px] flex items-center justify-center border-[1px] border-[#0B3B2D] rounded-[15px] ${
+          className={`lg:w-[48px] lg:h-[48px] w-[34px] h-[34px] lg:text-[18px] text-[18px] flex items-center justify-center border-[1px] border-[#0B3B2D] rounded-[15px] ${
             activePageNum === page
               ? 'bg-[#0B3B2D] text-[#ffffff]'
               : 'bg-[#ffffff] text-[#0B3B2D]'
