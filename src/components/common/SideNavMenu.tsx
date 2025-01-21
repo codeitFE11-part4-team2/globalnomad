@@ -22,13 +22,17 @@ export default function SideNavMenu() {
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const imageURL = URL.createObjectURL(file);
-      setProfileImage({
-        file,
-        preview: imageURL,
-      });
+      const reader = new FileReader();
+      reader.onload = () => {
+        setProfileImage({
+          file,
+          preview: reader.result as string,
+        });
+      };
+      reader.readAsDataURL(file);
     }
   };
+
   const handleImage = () => {
     imageRef.current?.click();
   };
