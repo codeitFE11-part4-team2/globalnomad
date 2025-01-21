@@ -39,7 +39,7 @@ export default function Pagination({
       <button
         onClick={() => onPageChange(activePageNum - 1)}
         className={`flex items-center justify-center rounded-[15px] ${
-          activePageNum > 1 ? 'text-[#0B3B2D]' : 'pointer-events-none'
+          activePageNum > 1 ? 'text-green-3' : 'pointer-events-none'
         }`}
         disabled={activePageNum <= 1}
       >
@@ -57,10 +57,10 @@ export default function Pagination({
         <button
           key={page}
           onClick={() => onPageChange(page)}
-          className={`lg:w-[48px] lg:h-[48px] w-[34px] h-[34px] lg:text-[18px] text-[18px] flex items-center justify-center border-[1px] border-[#0B3B2D] rounded-[15px] ${
+          className={`lg:w-[48px] lg:h-[48px] w-[34px] h-[34px] text-2lg font-regular flex items-center justify-center border-[1.5px] border-green-3 rounded-[15px] ${
             activePageNum === page
-              ? 'bg-[#0B3B2D] text-[#ffffff]'
-              : 'bg-[#ffffff] text-[#0B3B2D]'
+              ? 'bg-green-3 text-[#ffffff]'
+              : 'bg-[#ffffff] text-green-3'
           } md:w-[55px] md:h-[55px] w-[40px] h-[40px]`}
         >
           {page}
@@ -71,9 +71,7 @@ export default function Pagination({
       <button
         onClick={() => onPageChange(activePageNum + 1)}
         className={`flex items-center justify-center rounded-[15px] ${
-          activePageNum < totalPageNum
-            ? 'text-[#0B3B2D]'
-            : 'pointer-events-none'
+          activePageNum < totalPageNum ? 'text-green-3' : 'pointer-events-none'
         }`}
         disabled={activePageNum >= totalPageNum}
       >
