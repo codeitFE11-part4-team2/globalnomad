@@ -1,11 +1,40 @@
+'use client';
+
 // import Header from '@/components/common/Header';
 import Loginform from '../../../components/login/loginform';
 import Container from '@/components/login/container';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
+import { useState } from 'react';
+import { useAuthStore } from '@/store';
+import { authApi } from '@/services/auth';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
+  const router = useRouter();
+  const { login } = useAuthStore();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const response = await authApi.login({
+        email,
+        password,
+      });
+
+      console.log('Login response:', response.data);
+
+      const { user, accessToken } = response.data;
+      login(user, accessToken);
+
+      router.push('/');
+    } catch (error) {
+      console.error('Login error:', error);
+    }
+  };
   return (
     <div className="bg-gray-100 min-h-screen">
       <Container
