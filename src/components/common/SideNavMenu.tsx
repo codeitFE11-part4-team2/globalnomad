@@ -26,8 +26,18 @@ export default function SideNavMenu() {
   const imageRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const MAX_FILE_SIZE = 5 * 1024 * 1024;
+    const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
     const file = e.target.files?.[0];
     if (file) {
+      if (file.size > MAX_FILE_SIZE) {
+        console.log('파일크기 5mb 초과');
+        return;
+      }
+      if (!ALLOWED_FILE_TYPES.includes(file.type)) {
+        console.log('지원하는 이미지형식이 아님');
+        return;
+      }
       const reader = new FileReader();
       reader.onload = () => {
         setProfileImage({
