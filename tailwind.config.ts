@@ -8,9 +8,9 @@ export default {
   ],
   theme: {
     screens: {
-      sm: '360px', // 모바일
-      md: '768px', // 태블릿
-      lg: '1024px', // 데스크탑
+      sm: '375px', // 모바일
+      md: '744px', // 태블릿
+      lg: '1440px', // 데스크탑
     },
     extend: {
       colors: {
