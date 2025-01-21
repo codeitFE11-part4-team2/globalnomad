@@ -1,7 +1,9 @@
+import SearchBar from '@/components/ui/SearchBar';
+
 export default function Home() {
   return (
     <div>
-      <p>홈페이지</p>
+      <SearchBar />
     </div>
   );
 }
