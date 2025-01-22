@@ -22,7 +22,7 @@ interface SignUpResponse {
   };
 }
 
-export default function SignUpForm() {
+function SignUpForm() {
   const [email, setEmail] = useState('');
   const [nickname, setNickname] = useState('');
   const [password, setPassword] = useState('');
@@ -146,13 +146,13 @@ export default function SignUpForm() {
       </div>
       <div className="flex gap-[16px] flex justify-center items-center ">
         <Image
-          src="/icons/logo_google.svg"
+          src="/icons/icon-logo-google.svg"
           alt="구글 로고"
           width={72}
           height={72}
         />
         <Image
-          src="/icons/logo_kakao.svg"
+          src="/icons/icon-logo-kakao.svg"
           alt="카카오 로고"
           width={72}
           height={72}
@@ -161,3 +161,5 @@ export default function SignUpForm() {
     </div>
   );
 }
+
+export default SignUpForm;
