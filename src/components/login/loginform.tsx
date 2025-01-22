@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import Button from '../Button';
+import { Button } from '../common/Button';
 import InputItem from './logininputitem';
 import Image from 'next/image';
 
@@ -19,7 +19,7 @@ export default function SignInForm() {
           type="password"
           placeholder="비밀번호를 입력해주세요"
         />
-        <Button type="submit" color="primary">
+        <Button type="submit" variant="nomad-black" size="full">
           로그인 하기
         </Button>
       </form>
