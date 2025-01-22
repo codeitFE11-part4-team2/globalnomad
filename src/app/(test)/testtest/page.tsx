@@ -1,6 +1,6 @@
 'use client';
 
-import Button from '@/components/Button';
+import { Button } from '@/components/common/Button';
 import Counter from '@/components/Counter';
 
 export default function counterbutton() {
@@ -9,7 +9,9 @@ export default function counterbutton() {
       <Counter />
       <br />
       <div className="flex justify-center">
-        <Button />
+        <Button variant="white" size="small">
+          버튼
+        </Button>
       </div>
     </div>
   );
