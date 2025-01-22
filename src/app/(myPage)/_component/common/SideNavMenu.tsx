@@ -4,12 +4,12 @@ import Link from 'next/link';
 import { useSelectedLayoutSegment } from 'next/navigation';
 import { useRef, useState, ChangeEvent } from 'react';
 import {
-  editProfileIcon,
+  EditProfileIcon,
   SideMenuIcon1,
-  SideMenuICon2,
-  SideMenuICon3,
-  SideMenuICon4,
-} from '@/lib/icons';
+  SideMenuIcon2,
+  SideMenuIcon3,
+  SideMenuIcon4,
+} from '@/lib/constants/icons';
 
 interface ProfileImage {
   file: File | null;
@@ -75,7 +75,7 @@ export default function SideNavMenu() {
           className="w-11 h-11 rounded-full bg-green-3 absolute bottom-0 right-3 flex justify-center items-center cursor-pointer"
           onClick={handleImage}
         >
-          {editProfileIcon}
+          <EditProfileIcon className="fill-gray-700" />
         </div>
       </div>
       <div className="w-full">
@@ -85,7 +85,7 @@ export default function SideNavMenu() {
               href=""
               className="flex gap-3.5 px-4 py-2.5 items-center h-11 w-full rounded-xl text-gray-700 fill-gray-700"
             >
-              {SideMenuIcon1}
+              <SideMenuIcon1 className="fill-gray-700" />
               <span className="text-lg font-bold">내 정보</span>
             </Link>
           </li>
@@ -94,7 +94,7 @@ export default function SideNavMenu() {
               href=""
               className="flex gap-3.5 px-4 py-2.5 items-center h-11 w-full rounded-xl text-nomad-black fill-nomad-black bg-green-2"
             >
-              {SideMenuICon2}
+              <SideMenuIcon2 className="fill-gray-700" />
 
               <span className="text-lg font-bold">예약 내역</span>
             </Link>
@@ -104,7 +104,7 @@ export default function SideNavMenu() {
               href=""
               className="flex gap-3.5 px-4 py-2.5 items-center h-11 w-full rounded-xl text-gray-700 fill-gray-700"
             >
-              {SideMenuICon3}
+              <SideMenuIcon3 className="fill-gray-700" />
 
               <span className="text-lg font-bold">내 체험 관리</span>
             </Link>
@@ -114,7 +114,7 @@ export default function SideNavMenu() {
               href=""
               className="flex gap-3.5 px-4 py-2.5 items-center h-11 w-full rounded-xl text-gray-700 fill-gray-700"
             >
-              {SideMenuICon4}
+              <SideMenuIcon4 className="fill-gray-700" />
 
               <span className="text-lg font-bold">예약 현황</span>
             </Link>

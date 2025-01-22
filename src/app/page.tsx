@@ -4,7 +4,6 @@ import Footer from '@/components/common/Footer';
 export default function Home() {
   return (
     <div>
-      <Header />
       <p>홈페이지</p>
       <Footer />
     </div>
