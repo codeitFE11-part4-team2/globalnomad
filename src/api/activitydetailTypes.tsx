@@ -45,6 +45,8 @@ export interface ReviewsResponse {
   averageRating: number;
   totalCount: number;
   reviews: Review[];
+  totalPages: number; // 총 페이지 수
+  currentPage: number; // 현재 페이지 번호
 }
 
 export interface Review {
