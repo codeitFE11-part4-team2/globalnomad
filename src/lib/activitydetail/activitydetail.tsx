@@ -1,4 +1,5 @@
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
+import { axiosInstance } from '@/lib/axios';
 import {
   ActivityDetailResponse,
   AvailableScheduleResponse,
@@ -19,20 +20,12 @@ const PATHS = {
   AUTH: `/teamId/auth/tokens`.replace('teamId', TEAMID),
 };
 
-const instance: AxiosInstance = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
 // 체험 상세 조회
 export const fetchActivityDetails = async (
   activityId: number
 ): Promise<ActivityDetailResponse> => {
-  const response: AxiosResponse<ActivityDetailResponse> = await instance.get(
-    `${PATHS.ACTIVITIES}${activityId}`
-  );
+  const response: AxiosResponse<ActivityDetailResponse> =
+    await axiosInstance.get(`${PATHS.ACTIVITIES}${activityId}`);
   return response.data;
 };
 
@@ -41,7 +34,9 @@ export const fetchAvailableSchedules = async (
   activityId: number
 ): Promise<AvailableScheduleResponse[]> => {
   const response: AxiosResponse<AvailableScheduleResponse[]> =
-    await instance.get(`${PATHS.ACTIVITIES}${activityId}/available-schedule`);
+    await axiosInstance.get(
+      `${PATHS.ACTIVITIES}${activityId}/available-schedule`
+    );
   return response.data;
 };
 
@@ -50,7 +45,7 @@ export const fetchReviews = async (
   activityId: number,
   page: number
 ): Promise<ReviewsResponse> => {
-  const response: AxiosResponse<ReviewsResponse> = await instance.get(
+  const response: AxiosResponse<ReviewsResponse> = await axiosInstance.get(
     `${PATHS.ACTIVITIES}${activityId}/reviews`,
     {
       params: { page },
@@ -66,15 +61,16 @@ export const bookActivity = async (
   headCount: number,
   accessToken: string
 ): Promise<BookReservationResponse> => {
-  const response: AxiosResponse<BookReservationResponse> = await instance.post(
-    `${PATHS.ACTIVITIES}${activityId}/reservations`,
-    { scheduleId, headCount },
-    {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    }
-  );
+  const response: AxiosResponse<BookReservationResponse> =
+    await axiosInstance.post(
+      `${PATHS.ACTIVITIES}${activityId}/reservations`,
+      { scheduleId, headCount },
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
   return response.data;
 };
 
@@ -82,12 +78,10 @@ export const bookActivity = async (
 export const createImageUrl = async (
   imageUrl: string
 ): Promise<CreateImageUrlResponse> => {
-  const response: AxiosResponse<CreateImageUrlResponse> = await instance.post(
-    `${PATHS.ACTIVITIES}image`,
-    {
+  const response: AxiosResponse<CreateImageUrlResponse> =
+    await axiosInstance.post(`${PATHS.ACTIVITIES}image`, {
       activityImageUrl: imageUrl,
-    }
-  );
+    });
   return response.data;
 };
 
@@ -96,14 +90,12 @@ export const deleteActivity = async (
   activityId: number,
   accessToken: string
 ): Promise<DeleteActivityResponse> => {
-  const response: AxiosResponse<DeleteActivityResponse> = await instance.delete(
-    `${PATHS.MY_ACTIVITIES}${activityId}`,
-    {
+  const response: AxiosResponse<DeleteActivityResponse> =
+    await axiosInstance.delete(`${PATHS.MY_ACTIVITIES}${activityId}`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
-    }
-  );
+    });
   return response.data;
 };
 
@@ -113,14 +105,11 @@ export const updateActivity = async (
   updateData: UpdateActivityRequest,
   accessToken: string
 ): Promise<UpdateActivityResponse> => {
-  const response: AxiosResponse<UpdateActivityResponse> = await instance.put(
-    `${PATHS.MY_ACTIVITIES}${activityId}`,
-    updateData,
-    {
+  const response: AxiosResponse<UpdateActivityResponse> =
+    await axiosInstance.put(`${PATHS.MY_ACTIVITIES}${activityId}`, updateData, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
-    }
-  );
+    });
   return response.data;
 };
