@@ -5,11 +5,10 @@ import Link from 'next/link';
 import { Button } from '../common/Button';
 import InputItem from '../login/logininputitem';
 import Image from 'next/image';
-import { api } from '@/lib/axios'; // api 객체 임포트
-import { useRouter } from 'next/navigation'; // useRouter 임포트
-import { useAuthStore } from '@/store/auth'; // 경로 수정
+import { api } from '@/lib/axios';
+import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/store/auth';
 
-// 응답 데이터 타입 정의
 interface SignUpResponse {
   access_token: string;
   user: {
@@ -30,15 +29,14 @@ function SignUpForm() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const [isClient, setIsClient] = useState(false); // 클라이언트 사이드 확인용 상태
-  const router = useRouter(); // useRouter 훅 사용
+  const [isClient, setIsClient] = useState(false);
+  const router = useRouter();
 
-  // zustand 상태 업데이트 함수 가져오기
   const setToken = useAuthStore((state) => state.setToken);
   const setUser = useAuthStore((state) => state.setUser);
 
   useEffect(() => {
-    setIsClient(true); // 클라이언트에서만 실행되도록 설정
+    setIsClient(true);
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -53,7 +51,6 @@ function SignUpForm() {
     setError('');
 
     try {
-      // 응답 타입을 SignUpResponse로 지정
       const response = await api.post<SignUpResponse>('/users', {
         email,
         nickname,
@@ -62,17 +59,14 @@ function SignUpForm() {
 
       console.log('회원가입 성공:', response.data);
 
-      // 회원가입 성공 시 토큰과 유저 정보 zustand 상태에 저장
       const { access_token, user } = response.data;
       if (access_token) {
-        setToken(access_token); // zustand 상태에 토큰 저장
-        setUser(user); // zustand 상태에 유저 정보 저장
+        setToken(access_token);
+        setUser(user);
       }
 
-      // 회원가입 성공 후 홈 페이지로 리다이렉트
       if (isClient) {
-        // 클라이언트 사이드에서만 router.push 호출
-        router.push('/'); // 홈 페이지로 이동
+        router.push('/');
       }
     } catch (err) {
       setError('회원가입에 실패했습니다.');
@@ -83,7 +77,7 @@ function SignUpForm() {
   };
 
   if (!isClient) {
-    return null; // 클라이언트에서만 렌더링하도록 하기
+    return null;
   }
 
   return (
