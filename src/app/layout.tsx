@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import '@/styles/globals.css';
 import { pretendard } from './fonts';
 import QueryProvider from '@/providers/query-provider';
-import Header from '@/components/common/Header';
 
 export const metadata: Metadata = {
   title: 'GlobalNomad',
@@ -17,7 +16,6 @@ export default function RootLayout({
   return (
     <html lang="en" className={pretendard.variable}>
       <body className="antialiased">
-        <Header />
         <QueryProvider>{children}</QueryProvider>
       </body>
     </html>
