@@ -12,7 +12,6 @@ import {
 } from '@/lib/activitydetail/activitydetailTypes';
 
 const TEAMID = '11-2';
-const API_BASE_URL = 'https://sp-globalnomad-api.vercel.app';
 
 const PATHS = {
   ACTIVITIES: `/teamId/activities/`.replace('teamId', TEAMID),
