@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import Button from '../Button';
+import { Button } from '../common/Button';
 import InputItem from '../login/logininputitem';
 import Image from 'next/image';
 
@@ -31,7 +31,7 @@ export default function SignUpForm() {
           type="password"
           placeholder="비밀번호를 한번 더 입력해 주세요"
         />
-        <Button type="submit" color="primary">
+        <Button type="submit" variant="nomad-black" size="full">
           회원가입 하기
         </Button>
       </form>
