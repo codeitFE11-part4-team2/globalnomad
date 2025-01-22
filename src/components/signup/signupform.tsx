@@ -5,8 +5,8 @@ import Image from 'next/image';
 
 export default function SignUpForm() {
   return (
-    <div className="flex flex-col gap-[32px]">
-      <form className="gap-[32px] flex flex-col">
+    <div className="flex flex-col gap-[10px]">
+      <form className="gap-[28px] flex flex-col">
         <InputItem
           label="이메일"
           id="email"
