@@ -34,6 +34,14 @@ export default function ButtonTest() {
         로딩 버튼
       </Button>
 
+      <div className="w-full max-w-md">
+        <Button size="full">전체 버튼(size=full 사용)</Button>
+      </div>
+
+      <div className="w-full max-w-md">
+        <Button size="full">전체 버튼(fullWidth porp 사용)</Button>
+      </div>
+
       <Button variant="white" size="medium" disabled>
         비활성화 버튼
       </Button>
