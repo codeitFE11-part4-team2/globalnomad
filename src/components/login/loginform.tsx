@@ -106,13 +106,13 @@ export default function SignInForm() {
       </div>
       <div className="flex gap-[16px] flex justify-center items-center ">
         <Image
-          src="/icons/logo_google.svg"
+          src="/icons/icon-logo-google.svg"
           alt="구글 로고"
           width={72}
           height={72}
         />
         <Image
-          src="/icons/logo_kakao.svg"
+          src="/icons/icon-logo-kakao.svg"
           alt="카카오 로고"
           width={72}
           height={72}
