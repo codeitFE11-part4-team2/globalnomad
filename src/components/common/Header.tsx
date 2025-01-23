@@ -14,8 +14,8 @@ export default function Header() {
   const { user, isAuthenticated, logout } = useAuthStore();
 
   return (
-    <header className="w-[1920px] h-[70px] p-[10px] flex justify-center items-center border-b border-gray-300 gap-0">
-      <nav className="w-[1200px] h-[30px] flex justify-between items-center">
+    <header className="w-full h-[70px] p-[10px] flex justify-center items-center border-b border-gray-300 gap-0">
+      <nav className="w-full max-w-[1200px] h-[30px] flex justify-between items-center">
         <Link href="/" onClick={handleLogoClick}>
           <Image width={172} height={30} src={logo} alt="노마드 로고" />
         </Link>
