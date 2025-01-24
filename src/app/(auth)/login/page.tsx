@@ -1,40 +1,56 @@
 'use client';
 
-// import Header from '@/components/common/Header';
 import Loginform from '../../../components/login/loginform';
 import Container from '@/components/login/container';
 import Image from 'next/image';
 import Link from 'next/link';
-import React from 'react';
-import { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store';
-import { authApi } from '@/services/auth';
-import { useRouter } from 'next/navigation';
+import { authApi } from '@/services/auth'; // 수정: authApi로 변경
+// import { useRouter } from 'next/navigation'; // 수정: useRouter 추가
 
-export default function LoginPage() {
-  const router = useRouter();
-  const { login } = useAuthStore();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+export default function Signin() {
+  const [isLoading, setIsLoading] = useState(false);
+  const setToken = useAuthStore((state) => state.setToken); // zustand에서 setToken 가져오기
+  // const router = useRouter(); // 리디렉션을 위해 useRouter 추가
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const response = await authApi.login({
-        email,
-        password,
-      });
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const kakaoCode = params.get('code');
 
-      console.log('Login response:', response.data);
-
-      const { user, accessToken } = response.data;
-      login(user, accessToken);
-
-      router.push('/');
-    } catch (error) {
-      console.error('Login error:', error);
+    if (kakaoCode) {
+      setIsLoading(true);
+      authApi
+        .signInWithKakao({
+          redirectUri: 'http://localhost:3000/login',
+          token: kakaoCode,
+        })
+        .then((response) => {
+          const data = response.data as { accessToken: string }; // 응답 타입을 명시적으로 지정
+          // 응답받은 토큰을 zustand 상태에 저장
+          setToken(data.accessToken); // 'accessToken'을 사용
+          window.location.href = '/'; // 로그인 후 홈으로 리디렉션
+        })
+        .catch((error) => {
+          console.error('카카오 로그인 오류', error);
+          if (error.response) {
+            // 서버 응답 오류
+            console.error('서버 오류 응답:', error.response.data);
+          } else if (error.request) {
+            // 요청이 서버에 도달했지만 응답을 받지 못한 경우
+            console.error('요청 오류:', error.request);
+          } else {
+            // 다른 오류
+            console.error('일반 오류:', error.message);
+          }
+          alert('카카오 로그인에 실패했습니다.');
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
     }
-  };
+  }, []); // router 추가
+
   return (
     <div className="bg-gray-100 min-h-screen">
       <Container
@@ -51,7 +67,12 @@ export default function LoginPage() {
               className="block mx-auto"
             />
           </Link>
-          <Loginform />
+
+          {isLoading ? (
+            <div className="text-center text-gray-500">로그인 중...</div>
+          ) : (
+            <Loginform />
+          )}
         </div>
       </Container>
     </div>
