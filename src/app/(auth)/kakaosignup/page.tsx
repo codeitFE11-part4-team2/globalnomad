@@ -1,24 +1,24 @@
 'use client';
 
-import React, { useEffect, useState } from 'react'; // React와 useEffect, useState를 한 번에 임포트
+import React, { useEffect, useState } from 'react';
 import InputItem from '@/components/login/logininputitem';
 import { Button } from '../../../components/common/Button';
-import { authApi } from '@/services/auth'; // authApi import
-import { AxiosError } from 'axios'; // AxiosError를 import
+import { authApi } from '@/services/auth';
+import { AxiosError } from 'axios';
 
 const KakaoSignup = () => {
-  const [kakaoCode, setKakaoCode] = useState<string | null>(null); // 타입을 string | null로 설정
+  const [kakaoCode, setKakaoCode] = useState<string | null>(null);
   const [nickname, setNickname] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search); // URL에서 쿼리 파라미터 추출
-    const code = params.get('code'); // 'code' 파라미터 추출
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
 
     if (code) {
-      setKakaoCode(code); // 카카오 인가코드 저장
+      setKakaoCode(code);
     }
-  }, []); // 컴포넌트 마운트 시 한 번만 실행
+  }, []);
 
   const handleSignup = async () => {
     if (!nickname || !kakaoCode) {
@@ -27,8 +27,7 @@ const KakaoSignup = () => {
     }
     setLoading(true);
     try {
-      // 간편회원가입 API 호출
-      const redirectUri = 'http://localhost:3000/kakaosignup'; // 회원가입 후 리디렉션될 URI
+      const redirectUri = 'http://localhost:3000/kakaosignup';
       console.log('카카오 간편회원가입 요청 데이터:', {
         nickname,
         redirectUri,
@@ -40,18 +39,16 @@ const KakaoSignup = () => {
         token: kakaoCode,
       });
 
-      // 응답 데이터 사용 (예: 로그인 성공 후 토큰 저장)
       console.log('회원가입 성공:', response);
 
       // 예시로 상태 관리나 로그인 상태 저장을 할 수 있습니다.
       // 예: setToken(response.accessToken);
 
       // 회원가입 성공 후 리디렉션
-      window.location.href = '/'; // 홈으로 리디렉션
+      window.location.href = '/';
     } catch (error: unknown) {
       console.error('회원가입 실패', error);
 
-      // error가 AxiosError인지 확인하고 처리
       if (error instanceof AxiosError) {
         console.error('서버 응답 오류:', error.response);
         console.error('응답 데이터:', error.response?.data);
@@ -76,14 +73,14 @@ const KakaoSignup = () => {
         type="text"
         placeholder="닉네임을 입력해 주세요"
         value={nickname}
-        onChange={(e) => setNickname(e.target.value)} // 닉네임 상태 업데이트
+        onChange={(e) => setNickname(e.target.value)}
       />
       <Button
         type="button"
         variant="nomad-black"
         size="full"
-        onClick={handleSignup} // 회원가입 버튼 클릭 시 호출
-        disabled={loading} // 로딩 중일 때 버튼 비활성화
+        onClick={handleSignup}
+        disabled={loading}
       >
         {loading ? '가입 중...' : '회원가입 하기'}
       </Button>

@@ -1,59 +1,77 @@
 'use client';
 
-import Loginform from '../../../components/login/loginform';
-import Container from '@/components/login/container';
+import { useEffect, useState } from 'react';
+import { authApi } from '@/services/auth';
+import { useAuthStore } from '@/store';
 import Image from 'next/image';
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
-import { useAuthStore } from '@/store';
-import { authApi } from '@/services/auth'; // 수정: authApi로 변경
+import Loginform from '../../../components/login/loginform';
+import Container from '@/components/login/container';
 
 export default function Signin() {
   const [isLoading, setIsLoading] = useState(false);
-  const setToken = useAuthStore((state) => state.setToken); // zustand에서 setToken 가져오기
+  const login = useAuthStore((state) => state.login);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const kakaoCode = params.get('code');
+    setIsClient(true);
+  }, []);
 
-    if (kakaoCode) {
-      setIsLoading(true);
-      authApi
-        .signInWithKakao({
-          redirectUri: 'http://localhost:3000/login',
-          token: kakaoCode,
-        })
-        .then((response) => {
-          const data = response.data as { accessToken: string }; // 응답 타입을 명시적으로 지정
-          // 응답받은 토큰을 zustand 상태에 저장
-          setToken(data.accessToken); // 'accessToken'을 사용
-          window.location.href = '/'; // 로그인 후 홈으로 리디렉션
-        })
-        .catch((error) => {
-          console.error('카카오 로그인 오류', error);
-          if (error.response) {
-            // 서버 응답 오류
-            if (error.response.status === 403) {
-              // 카카오 인가코드를 쿼리 파라미터로 전달
-              alert('회원가입이 필요합니다.');
-              window.location.href = `/kakaosignup?code=${kakaoCode}`;
+  useEffect(() => {
+    if (isClient) {
+      const params = new URLSearchParams(window.location.search);
+      const kakaoCode = params.get('code');
+
+      if (kakaoCode) {
+        setIsLoading(true);
+        authApi
+          .signInWithKakao({
+            redirectUri: 'http://localhost:3000/login',
+            token: kakaoCode,
+          })
+          .then((response) => {
+            const { accessToken, user } = response.data as {
+              accessToken: string;
+              user: {
+                id: number;
+                email: string;
+                nickname: string;
+                profileImageUrl: string;
+                createdAt: string;
+                updatedAt: string;
+              };
+            };
+
+            login(user, accessToken);
+
+            window.location.href = '/';
+          })
+          .catch((error) => {
+            console.error('카카오 로그인 오류', error);
+            if (error.response) {
+              if (error.response.status === 403) {
+                alert('회원가입이 필요합니다.');
+                const clientId = process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID;
+                const redirectUri = 'http://localhost:3000/kakaosignup';
+                const kakaoLoginUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}`;
+
+                // 403 에러 발생 시 카카오 로그인 페이지로 리디렉션하여 새로운 인가 코드를 받음
+                window.location.href = kakaoLoginUrl;
+              } else {
+                console.error('서버 오류 응답:', error.response.data);
+              }
+            } else if (error.request) {
+              console.error('요청 오류:', error.request);
             } else {
-              console.error('서버 오류 응답:', error.response.data);
+              console.error('일반 오류:', error.message);
             }
-          } else if (error.request) {
-            // 요청이 서버에 도달했지만 응답을 받지 못한 경우
-            console.error('요청 오류:', error.request);
-          } else {
-            // 다른 오류
-            console.error('일반 오류:', error.message);
-          }
-          // alert('카카오 로그인에 실패했습니다.');
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
+          })
+          .finally(() => {
+            setIsLoading(false);
+          });
+      }
     }
-  }, []); // router 추가
+  }, [isClient]);
 
   return (
     <div className="bg-gray-100 min-h-screen">
