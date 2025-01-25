@@ -7,12 +7,10 @@ import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store';
 import { authApi } from '@/services/auth'; // 수정: authApi로 변경
-// import { useRouter } from 'next/navigation'; // 수정: useRouter 추가
 
 export default function Signin() {
   const [isLoading, setIsLoading] = useState(false);
   const setToken = useAuthStore((state) => state.setToken); // zustand에서 setToken 가져오기
-  // const router = useRouter(); // 리디렉션을 위해 useRouter 추가
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -35,7 +33,13 @@ export default function Signin() {
           console.error('카카오 로그인 오류', error);
           if (error.response) {
             // 서버 응답 오류
-            console.error('서버 오류 응답:', error.response.data);
+            if (error.response.status === 403) {
+              // 카카오 인가코드를 쿼리 파라미터로 전달
+              alert('회원가입이 필요합니다.');
+              window.location.href = `/kakaosignup?code=${kakaoCode}`;
+            } else {
+              console.error('서버 오류 응답:', error.response.data);
+            }
           } else if (error.request) {
             // 요청이 서버에 도달했지만 응답을 받지 못한 경우
             console.error('요청 오류:', error.request);
@@ -43,7 +47,7 @@ export default function Signin() {
             // 다른 오류
             console.error('일반 오류:', error.message);
           }
-          alert('카카오 로그인에 실패했습니다.');
+          // alert('카카오 로그인에 실패했습니다.');
         })
         .finally(() => {
           setIsLoading(false);

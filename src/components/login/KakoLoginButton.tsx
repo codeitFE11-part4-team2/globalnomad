@@ -27,9 +27,10 @@ const KakaoLoginButton = () => {
   };
 
   return (
-    <div
+    <a
+      href={kakaoLoginUrl}
       onClick={handleKakaoLogin} // 이미지 클릭 시 OAuth 앱 등록 후 리디렉션
-      className="cursor-pointer"
+      // className="cursor-pointer"
     >
       <Image
         src="/icons/icon-logo-kakao.svg"
@@ -37,7 +38,7 @@ const KakaoLoginButton = () => {
         width={72}
         height={72}
       />
-    </div>
+    </a>
   );
 };
 
