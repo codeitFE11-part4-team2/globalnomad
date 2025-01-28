@@ -42,12 +42,16 @@ export const fetchAvailableSchedules = async (
 // 체험 리뷰 조회
 export const fetchReviews = async (
   activityId: number,
-  page: number
+  page: number,
+  pageSize: number
 ): Promise<ReviewsResponse> => {
   const response: AxiosResponse<ReviewsResponse> = await axiosInstance.get(
     `${PATHS.ACTIVITIES}${activityId}/reviews`,
     {
-      params: { page },
+      params: {
+        page,
+        pageSize,
+      },
     }
   );
   return response.data;
