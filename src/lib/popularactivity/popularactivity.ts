@@ -2,10 +2,8 @@ import { AxiosResponse } from 'axios';
 import { axiosInstance } from '@/lib/axios';
 import { PopularActivityResponse } from './popularactivityTypes';
 
-const TEAMID = '11-2';
-
 const PATHS = {
-  ACTIVITIES: `https://sp-globalnomad-api.vercel.app/${TEAMID}/activities`,
+  ACTIVITIES: `https://sp-globalnomad-api.vercel.app/11-2/activities`,
 };
 
 // 인기 체험 목록 조회 (리뷰 수 기준 정렬)
