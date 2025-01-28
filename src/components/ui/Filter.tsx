@@ -45,7 +45,7 @@ export default function Filter({ onFilterChange }: FilterProps) {
 
       {/* 드롭다운이 열려 있는 경우에만 필터 목록 표시 */}
       {isOpen && (
-        <div className="absolute mt-2 w-[90px] lg:w-[127px] md:w-[120px]">
+        <div className="absolute mt-2 w-[90px] lg:w-[127px] md:w-[120px] z-50">
           {filters.map((filter, index) => (
             <button
               key={filter}
