@@ -27,7 +27,7 @@ export default function Category({ onSelectCategory }: CategoryProps) {
   };
 
   return (
-    <div className="flex justify-center gap-4 py-6 flex-wrap">
+    <div className="flex w-[882px] overflow-x-auto scrollbar-hide justify-start gap-4">
       {categories.map((category) => (
         <button
           key={category.id}

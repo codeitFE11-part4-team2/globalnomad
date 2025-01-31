@@ -27,7 +27,7 @@ const socialLinks = [
 
 export default function Footer() {
   return (
-    <footer className="fixed bottom-0 w-full">
+    <footer className="position:sticky bottom-0 w-full">
       {/* 상단 푸터 */}
       <div className="w-full h-[120px] bg-[#FAFBFC] mx-auto" />
 
