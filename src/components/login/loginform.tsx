@@ -165,7 +165,7 @@ export default function SignInForm() {
 
         <Button
           type="submit"
-          variant="nomad-black"
+          variant="green"
           size="full"
           disabled={isButtonDisabled} // 이메일 또는 비밀번호에 에러가 있으면 버튼 비활성화
         >
