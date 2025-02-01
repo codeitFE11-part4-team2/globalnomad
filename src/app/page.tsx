@@ -18,7 +18,9 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [windowWidth, setWindowWidth] = useState(0);
   const [popularActivityPage, setPopularActivityPage] = useState(1);
-  const [priceFilter, setPriceFilter] = useState<'낮은순' | '높은순' | '가격'>('가격');
+  const [priceFilter, setPriceFilter] = useState<'낮은순' | '높은순' | '가격'>(
+    '가격'
+  );
   const { data: popularData, isFetching } =
     usePopularActivities(popularActivityPage);
 
