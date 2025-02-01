@@ -105,7 +105,8 @@ function SignUpForm() {
       }
 
       if (isClient) {
-        router.push('/');
+        alert('가입이 완료되었습니다!');
+        router.push('/login');
       }
     } catch (err) {
       console.error(err);
@@ -215,7 +216,7 @@ function SignUpForm() {
         />
         <Button
           type="submit"
-          variant="nomad-black"
+          variant="green"
           size="full"
           disabled={isButtonDisabled || loading} // 로딩 상태와 유효성 검사 결과에 따라 버튼 활성화
         >
