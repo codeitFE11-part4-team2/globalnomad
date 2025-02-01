@@ -44,11 +44,12 @@ function SignUpForm() {
   const {
     control,
     handleSubmit,
+    trigger,
     formState: { errors, isValid },
-    // setError,
-    // clearErrors,
-    // setValue,
-    getValues, // getValues를 useForm에서 가져옴
+    setValue,
+    setError,
+    clearErrors,
+    getValues,
   } = useForm<FormData>({
     defaultValues: {
       email: '',
@@ -57,38 +58,56 @@ function SignUpForm() {
       confirmPassword: '',
     },
     mode: 'onChange', // onChange로 유효성 검사
+    reValidateMode: 'onChange', // 필드 값이 바뀔 때마다 유효성 재검사
   });
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
     if (!emailRegex.test(email)) {
-      return '이메일 형식으로 작성해 주세요.'; // 문자열 반환
+      setError('email', {
+        type: 'manual',
+        message: '이메일 형식으로 작성해 주세요.',
+      });
+    } else {
+      clearErrors('email');
     }
-    return true; // 유효한 이메일인 경우
   };
 
   const validatePassword = (password: string) => {
     if (password.length < 8) {
-      return '비밀번호는 8자 이상이어야 합니다.';
+      setError('password', {
+        type: 'manual',
+        message: '비밀번호는 8자 이상이어야 합니다.',
+      });
+    } else {
+      clearErrors('password');
     }
-    return true;
   };
 
-  // 비밀번호 확인을 실시간으로 체크하도록 수정
-  const validateConfirmPassword = (
-    confirmPassword: string,
-    password: string
-  ) => {
+  const validateConfirmPassword = (confirmPassword: string) => {
+    const password = getValues('password');
     if (confirmPassword !== password) {
-      return '비밀번호가 일치하지 않습니다.';
+      setError('confirmPassword', {
+        type: 'manual',
+        message: '비밀번호가 일치하지 않습니다.',
+      });
+    } else {
+      clearErrors('confirmPassword');
     }
-    return true;
   };
 
   const handleSubmitForm = async (data: FormData) => {
     const { email, nickname, password } = data;
 
     try {
+      // 폼 전체 유효성 검사를 다시 실행
+      const isValidForm = await trigger(); // trigger()를 통해 모든 필드의 유효성 검사를 실행
+
+      if (!isValidForm) {
+        // 유효성 검사 실패 시 아무 작업도 하지 않음
+        return;
+      }
+
       setLoading(true);
       const response = await api.post<SignUpResponse>('/users', {
         email,
@@ -115,9 +134,12 @@ function SignUpForm() {
     }
   };
 
-  // 버튼 비활성화 상태 체크
   const isButtonDisabled =
-    !isValid || !!errors.email || !!errors.password || !!errors.confirmPassword;
+    !isValid ||
+    !!errors.email ||
+    !!errors.password ||
+    !!errors.confirmPassword ||
+    loading;
 
   return (
     <div className="flex flex-col gap-[10px]">
@@ -130,7 +152,6 @@ function SignUpForm() {
           control={control}
           rules={{
             required: '이메일은 필수 입력 사항입니다.',
-            validate: (value) => validateEmail(value), // 유효성 검사
           }}
           render={({ field }) => (
             <InputItem
@@ -143,6 +164,7 @@ function SignUpForm() {
                 field.onChange(e);
                 validateEmail(e.target.value); // 이메일 유효성 검사
               }}
+              onBlur={() => validateEmail(field.value)} // 포커스 아웃 시 이메일 유효성 검사
               error={!!errors.email}
               errorMessage={errors.email?.message}
             />
@@ -172,7 +194,6 @@ function SignUpForm() {
           control={control}
           rules={{
             required: '비밀번호는 필수 입력 사항입니다.',
-            validate: (value) => validatePassword(value), // 비밀번호 유효성 검사
           }}
           render={({ field }) => (
             <InputItem
@@ -185,6 +206,7 @@ function SignUpForm() {
                 field.onChange(e);
                 validatePassword(e.target.value); // 비밀번호 유효성 검사
               }}
+              onBlur={() => validatePassword(field.value)} // 포커스 아웃 시 비밀번호 유효성 검사
               error={!!errors.password}
               errorMessage={errors.password?.message}
             />
@@ -195,8 +217,6 @@ function SignUpForm() {
           control={control}
           rules={{
             required: '비밀번호 확인은 필수 입력 사항입니다.',
-            validate: (value) =>
-              validateConfirmPassword(value, getValues('password')), // 비밀번호 확인 유효성 검사
           }}
           render={({ field }) => (
             <InputItem
@@ -207,8 +227,9 @@ function SignUpForm() {
               value={field.value || ''}
               onChange={(e) => {
                 field.onChange(e);
-                validateConfirmPassword(e.target.value, getValues('password')); // 비밀번호 확인 유효성 검사
+                validateConfirmPassword(e.target.value); // 비밀번호 확인 유효성 검사
               }}
+              onBlur={() => validateConfirmPassword(field.value)} // 포커스 아웃 시 비밀번호 확인 유효성 검사
               error={!!errors.confirmPassword}
               errorMessage={errors.confirmPassword?.message}
             />
@@ -218,7 +239,7 @@ function SignUpForm() {
           type="submit"
           variant="green"
           size="full"
-          disabled={isButtonDisabled || loading} // 로딩 상태와 유효성 검사 결과에 따라 버튼 활성화
+          disabled={isButtonDisabled} // 버튼 활성화 조건
         >
           {loading ? '가입 중...' : '회원가입 하기'}
         </Button>
