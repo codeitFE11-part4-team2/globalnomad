@@ -38,7 +38,7 @@ export default function SignInForm() {
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid }, // isValid 상태 추가
     setValue,
     setError: setFormError,
     clearErrors,
@@ -47,6 +47,8 @@ export default function SignInForm() {
       email: '',
       password: '',
     },
+    mode: 'onChange', // onChange로 유효성 검사
+    reValidateMode: 'onChange', // 필드 값이 바뀔 때마다 유효성 재검사
   });
 
   useEffect(() => {
@@ -102,6 +104,10 @@ export default function SignInForm() {
   if (!isMounted) {
     return null;
   }
+
+  // 이메일과 비밀번호 오류 상태가 있을 때 버튼 비활성화
+  const isButtonDisabled =
+    loading || !isValid || !!errors.email || !!errors.password;
 
   return (
     <div className="flex flex-col gap-[32px]">
@@ -161,7 +167,7 @@ export default function SignInForm() {
           type="submit"
           variant="nomad-black"
           size="full"
-          disabled={loading}
+          disabled={isButtonDisabled} // 이메일 또는 비밀번호에 에러가 있으면 버튼 비활성화
         >
           {loading ? '로그인 중...' : '로그인 하기'}
         </Button>
