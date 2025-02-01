@@ -73,6 +73,17 @@ function SignUpForm() {
     }
   };
 
+  const validateNickname = (nickname: string) => {
+    if (nickname.length > 10) {
+      setError('nickname', {
+        type: 'manual',
+        message: '열 자 이하로 작성해주세요.',
+      });
+    } else {
+      clearErrors('nickname');
+    }
+  };
+
   const validatePassword = (password: string) => {
     if (password.length < 8) {
       setError('password', {
@@ -183,7 +194,11 @@ function SignUpForm() {
               type="text"
               placeholder="닉네임을 입력해 주세요"
               value={field.value || ''}
-              onChange={field.onChange}
+              onChange={(e) => {
+                field.onChange(e);
+                validateNickname(e.target.value); // 비밀번호 유효성 검사
+              }}
+              onBlur={() => validateNickname(field.value)} // 포커스 아웃 시 비밀번호 유효성 검사
               error={!!errors.nickname}
               errorMessage={errors.nickname?.message}
             />
