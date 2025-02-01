@@ -128,10 +128,10 @@ export default function SignInForm() {
               }}
               onBlur={() => validateEmail(field.value)} // 포커스 아웃 시 이메일 검증
               error={!!errors.email} // error 상태 전달
+              errorMessage={errors.email?.message} // 에러 메시지 전달
             />
           )}
         />
-        {errors.email && <p className="text-red-500">{errors.email.message}</p>}
 
         <Controller
           name="password"
@@ -152,12 +152,10 @@ export default function SignInForm() {
               }}
               onBlur={() => validatePassword(field.value)} // 포커스 아웃 시 비밀번호 길이 검증
               error={!!errors.password} // error 상태 전달
+              errorMessage={errors.password?.message} // 에러 메시지 전달
             />
           )}
         />
-        {errors.password && (
-          <p className="text-red-500">{errors.password.message}</p>
-        )}
 
         <Button
           type="submit"
