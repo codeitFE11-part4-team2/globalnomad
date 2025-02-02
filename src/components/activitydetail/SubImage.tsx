@@ -20,6 +20,8 @@ const SubImageBanner = ({ subImages }: SubImageBannerProps) => {
         key={subImages[0].id}
         src={subImages[0].imageUrl}
         alt="서브 이미지"
+        width={293.5}
+        height={263}
       />
     );
     return <div>{newSubImages}</div>;
@@ -33,6 +35,8 @@ const SubImageBanner = ({ subImages }: SubImageBannerProps) => {
           key={subImages[index].id}
           src={subImages[index].imageUrl}
           alt={`서브 이미지 ${index + 1}`}
+          width={293.5}
+          height={263}
         />
       );
     }
@@ -48,6 +52,8 @@ const SubImageBanner = ({ subImages }: SubImageBannerProps) => {
             key={subImages[index].id}
             src={subImages[index].imageUrl}
             alt={`서브 이미지 ${index + 1}`}
+            width={293.5}
+            height={263}
           />
         );
         break;
@@ -57,6 +63,8 @@ const SubImageBanner = ({ subImages }: SubImageBannerProps) => {
           key={subImages[index].id}
           src={subImages[index].imageUrl}
           alt={`서브 이미지 ${index + 1}`}
+          width={293.5}
+          height={263}
         />
       );
     }
@@ -71,6 +79,8 @@ const SubImageBanner = ({ subImages }: SubImageBannerProps) => {
           key={subImages[index].id}
           src={subImages[index].imageUrl}
           alt={`서브 이미지 ${index + 1}`}
+          width={293.5}
+          height={534}
         />
       );
     }

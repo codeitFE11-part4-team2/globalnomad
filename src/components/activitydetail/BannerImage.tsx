@@ -13,9 +13,19 @@ const BannerImage = ({ bannerImages, subImages }: BannerImageProps) => {
     <div>
       <div>
         {subImages.length === 0 ? (
-          <Image src={bannerImages} alt="배너 이미지" />
+          <Image
+            src={bannerImages}
+            alt="배너 이미지"
+            width={1198}
+            height={534}
+          />
         ) : (
-          <Image src={bannerImages} alt="배너 이미지" />
+          <Image
+            src={bannerImages}
+            alt="배너 이미지"
+            width={595}
+            height={534}
+          />
         )}
         <SubImageBanner subImages={subImages} />
       </div>

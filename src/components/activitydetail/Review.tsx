@@ -7,6 +7,7 @@ import {
   Review,
 } from '@/lib/activitydetail/activitydetailTypes';
 import { format } from 'date-fns';
+import rating from '@/lib/activitydetail/rating';
 
 interface ReviewListProps {
   activityId: number;
@@ -54,9 +55,10 @@ const ReviewList = ({ activityId, pageSize = 3 }: ReviewListProps) => {
     <div>
       <div>
         <h2>후기</h2>
-        {totalCount > 0 ? (
+        {totalCount ? (
           <div>
-            <span>{averageRating.toFixed(1)}</span>
+            <span>{averageRating}</span>
+            <span>{rating(averageRating)}</span>
             <span>({totalCount}개 후기)</span>
           </div>
         ) : (
