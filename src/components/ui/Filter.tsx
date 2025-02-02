@@ -27,7 +27,7 @@ export default function Filter({ onFilterChange }: FilterProps) {
     <div ref={filterRef} className="relative">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex w-[90px] lg:w-[127px] md:w-[120px] h-[53px] px-3 lg:px-5 md:px-5 py-4 justify-between items-center border border-green-3 rounded-[15px] bg-white"
+        className="flex w-[90px] lg:w-[127px] md:w-[120px] h-[41px] md:h-[53px] px-3 lg:px-5 md:px-5 py-4 justify-between items-center border border-green-3 rounded-[15px] bg-white"
       >
         <span
           className={`text-green-3 text-md lg:text-2lg font-medium leading-[26px] ${selectedFilter === '가격' ? 'text-2lg' : 'lg:text-2lg md:text-lg'}`}
@@ -45,7 +45,7 @@ export default function Filter({ onFilterChange }: FilterProps) {
 
       {/* 드롭다운이 열려 있는 경우에만 필터 목록 표시 */}
       {isOpen && (
-        <div className="absolute mt-2 w-[90px] lg:w-[127px] md:w-[120px]">
+        <div className="absolute mt-2 w-[90px] lg:w-[127px] md:w-[120px] z-50">
           {filters.map((filter, index) => (
             <button
               key={filter}

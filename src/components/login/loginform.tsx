@@ -6,6 +6,7 @@ import { api } from '@/lib/axios';
 import { useAuthStore } from '@/store/auth';
 import Image from 'next/image';
 import Link from 'next/link';
+import KakaoLoginButton from './KakoLoginButton';
 
 interface User {
   id: number;
@@ -111,12 +112,7 @@ export default function SignInForm() {
           width={72}
           height={72}
         />
-        <Image
-          src="/icons/icon-logo-kakao.svg"
-          alt="카카오 로고"
-          width={72}
-          height={72}
-        />
+        <KakaoLoginButton />
       </div>
     </div>
   );

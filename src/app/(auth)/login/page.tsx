@@ -1,40 +1,78 @@
 'use client';
 
-// import Header from '@/components/common/Header';
-import Loginform from '../../../components/login/loginform';
-import Container from '@/components/login/container';
+import { useEffect, useState } from 'react';
+import { authApi } from '@/services/auth';
+import { useAuthStore } from '@/store';
 import Image from 'next/image';
 import Link from 'next/link';
-import React from 'react';
-import { useState } from 'react';
-import { useAuthStore } from '@/store';
-import { authApi } from '@/services/auth';
-import { useRouter } from 'next/navigation';
+import Loginform from '../../../components/login/loginform';
+import Container from '@/components/login/container';
 
-export default function LoginPage() {
-  const router = useRouter();
-  const { login } = useAuthStore();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+export default function Signin() {
+  const [isLoading, setIsLoading] = useState(false);
+  const login = useAuthStore((state) => state.login);
+  const [isClient, setIsClient] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const response = await authApi.login({
-        email,
-        password,
-      });
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
-      console.log('Login response:', response.data);
+  useEffect(() => {
+    if (isClient) {
+      const params = new URLSearchParams(window.location.search);
+      const kakaoCode = params.get('code');
 
-      const { user, accessToken } = response.data;
-      login(user, accessToken);
+      if (kakaoCode) {
+        setIsLoading(true);
+        authApi
+          .signInWithKakao({
+            redirectUri: 'http://localhost:3000/login',
+            token: kakaoCode,
+          })
+          .then((response) => {
+            const { accessToken, user } = response.data as {
+              accessToken: string;
+              user: {
+                id: number;
+                email: string;
+                nickname: string;
+                profileImageUrl: string;
+                createdAt: string;
+                updatedAt: string;
+              };
+            };
 
-      router.push('/');
-    } catch (error) {
-      console.error('Login error:', error);
+            login(user, accessToken);
+
+            window.location.href = '/';
+          })
+          .catch((error) => {
+            console.error('카카오 로그인 오류', error);
+            if (error.response) {
+              if (error.response.status === 403) {
+                alert('회원가입이 필요합니다.');
+                const clientId = process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID;
+                const redirectUri = 'http://localhost:3000/kakaosignup';
+                const kakaoLoginUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}`;
+
+                // 403 에러 발생 시 카카오 로그인 페이지로 리디렉션하여 새로운 인가 코드를 받음
+                window.location.href = kakaoLoginUrl;
+              } else {
+                console.error('서버 오류 응답:', error.response.data);
+              }
+            } else if (error.request) {
+              console.error('요청 오류:', error.request);
+            } else {
+              console.error('일반 오류:', error.message);
+            }
+          })
+          .finally(() => {
+            setIsLoading(false);
+          });
+      }
     }
-  };
+  }, [isClient]);
+
   return (
     <div className="bg-gray-100 min-h-screen">
       <Container
@@ -51,7 +89,12 @@ export default function LoginPage() {
               className="block mx-auto"
             />
           </Link>
-          <Loginform />
+
+          {isLoading ? (
+            <div className="text-center text-gray-500">로그인 중...</div>
+          ) : (
+            <Loginform />
+          )}
         </div>
       </Container>
     </div>

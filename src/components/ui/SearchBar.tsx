@@ -23,8 +23,8 @@ export default function SearchBar() {
   };
 
   return (
-    <div className="flex flex-col max-w-[1200px] h-[178px] px-6 py-8 rounded-2xl bg-white shadow-[0px_4px_16px_0px_rgba(17,34,17,0.05)]">
-      <div className="flex gap-5 flex-col self-stretch">
+    <div className="flex flex-col max-w-[1200px] h-[129px] md:h-[184px] px-6 md:py-8 py-4 rounded-2xl bg-white shadow-[0px_4px_16px_0px_rgba(17,34,17,0.05)]">
+      <div className="flex md:gap-8 gap-[15px] flex-col self-stretch">
         <label
           htmlFor="search-input"
           className="text-nomad-black sm:text-lg md:text-xl font-bold leading-[32px] self-stretch"
