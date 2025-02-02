@@ -54,7 +54,7 @@ const ReviewList = ({ activityId, pageSize = 3 }: ReviewListProps) => {
   return (
     <div>
       <div>
-        <h2>후기</h2>
+        <p className="lg:text-2lg text-xl font-bold">후기</p>
         {totalCount ? (
           <div>
             <span>{averageRating}</span>
@@ -62,7 +62,7 @@ const ReviewList = ({ activityId, pageSize = 3 }: ReviewListProps) => {
             <span>({totalCount}개 후기)</span>
           </div>
         ) : (
-          <p>후기가 없습니다.</p>
+          <p className="text-lg">후기가 없습니다.</p>
         )}
       </div>
 
@@ -91,17 +91,22 @@ const ReviewList = ({ activityId, pageSize = 3 }: ReviewListProps) => {
                     </div>
                   </div>
                   <p>{review.content}</p>
+                  <hr className="w-full border-t-[1px] border-nomad-black" />
                 </div>
               ))}
             </div>
           )}
 
           {/* 페이지네이션 */}
-          <Pagination
-            totalPageNum={totalPages}
-            activePageNum={currentPage}
-            onPageChange={handlePageChange}
-          />
+          {totalCount > 3 && (
+            <div className="lg:mt-[72px] md:mt-[90px] mt-[40px]">
+              <Pagination
+                totalPageNum={totalPages}
+                activePageNum={currentPage}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
         </div>
       )}
     </div>

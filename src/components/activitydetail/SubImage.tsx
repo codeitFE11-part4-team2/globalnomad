@@ -25,7 +25,7 @@ const SubImageBanner = ({ subImages }: SubImageBannerProps) => {
         className="w-full h-full object-cover"
       />
     );
-    return <div>{newSubImages}</div>;
+    return <div className="w-full h-full">{newSubImages}</div>;
   }
 
   // 서브 이미지가 2개일 때
@@ -38,11 +38,15 @@ const SubImageBanner = ({ subImages }: SubImageBannerProps) => {
           alt={`서브 이미지 ${index + 1}`}
           width={595}
           height={263}
-          className="w-full object-cover lg:h-[263px] md:h-[152.68px] h-[310px]"
+          className="w-full h-full object-cover"
         />
       );
     }
-    return <div className="w-full grid grid-cols-1">{newSubImages}</div>;
+    return (
+      <div className="grid grid-cols-1 lg:h-[534px] h-[310px]">
+        {newSubImages}
+      </div>
+    );
   }
 
   // 서브 이미지가 3개일 때
@@ -56,23 +60,27 @@ const SubImageBanner = ({ subImages }: SubImageBannerProps) => {
             alt={`서브 이미지 ${index + 1}`}
             width={293.5}
             height={263}
-            className="w-full object-cover lg:h-[263px] md:h-[152.68px] h-[310px] col-span-2"
+            className="w-full object-cover col-span-2"
           />
         );
         break;
       }
       newSubImages.push(
-        <img
+        <Image
           key={subImages[index].id}
           src={subImages[index].imageUrl}
           alt={`서브 이미지 ${index + 1}`}
           width={293.5}
           height={263}
-          className="w-full object-cover lg:h-[263px] md:h-[152.68px] h-[310px]"
+          className="w-full object-cover"
         />
       );
     }
-    return <div className="grid grid-cols-2">{newSubImages}</div>;
+    return (
+      <div className="grid grid-cols-2 lg:h-[534px] h-[310px]">
+        {newSubImages}
+      </div>
+    );
   }
 
   // 서브 이미지가 4개일 때
@@ -85,13 +93,18 @@ const SubImageBanner = ({ subImages }: SubImageBannerProps) => {
           alt={`서브 이미지 ${index + 1}`}
           width={293.5}
           height={263}
-          className="w-full object-cover lg:h-[263px] md:h-[152.68px] h-[310px]"
+          className="w-full object-cover"
         />
       );
     }
+    return (
+      <div className="grid grid-cols-2 lg:h-[534px] h-[310px]">
+        {newSubImages}
+      </div>
+    );
   }
 
-  return <div className="grid grid-cols-2">{newSubImages}</div>;
+  return null;
 };
 
 export default SubImageBanner;
