@@ -39,22 +39,31 @@ const ActivityDetail = () => {
 
   return (
     <div>
-      <h1>{activity.title}</h1>
+      <p>{activity.category}</p>
+      <p>{activity.title}</p>
 
       <div>
-        <BannerImage
-          bannerImages={activity.bannerImageUrl}
-          subImages={activity.subImages}
-        />
-      </div>
+        <div>
+          <BannerImage
+            bannerImages={activity.bannerImageUrl}
+            subImages={activity.subImages}
+          />
+        </div>
 
-      <div>
-        <h2>체험 설명</h2>
-        <p>{activity.description}</p>
-      </div>
+        <div>
+          <div>
+            <h2>체험 설명</h2>
+            <p>{activity.description}</p>
+          </div>
 
-      <div>
-        <ReviewList activityId={activityId} pageSize={3} />
+          <div>{/* 지도 */}</div>
+
+          <div>
+            <ReviewList activityId={activityId} pageSize={3} />
+          </div>
+        </div>
+
+        <div>{/* 예약 모달 */}</div>
       </div>
     </div>
   );
