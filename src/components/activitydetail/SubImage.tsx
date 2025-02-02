@@ -20,8 +20,9 @@ const SubImageBanner = ({ subImages }: SubImageBannerProps) => {
         key={subImages[0].id}
         src={subImages[0].imageUrl}
         alt="서브 이미지"
-        width={293.5}
-        height={263}
+        width={595}
+        height={534}
+        className="w-full h-full object-cover"
       />
     );
     return <div>{newSubImages}</div>;
@@ -35,12 +36,13 @@ const SubImageBanner = ({ subImages }: SubImageBannerProps) => {
           key={subImages[index].id}
           src={subImages[index].imageUrl}
           alt={`서브 이미지 ${index + 1}`}
-          width={293.5}
+          width={595}
           height={263}
+          className="w-full object-cover lg:h-[263px] md:h-[152.68px] h-[310px]"
         />
       );
     }
-    return <div>{newSubImages}</div>;
+    return <div className="w-full grid grid-cols-1">{newSubImages}</div>;
   }
 
   // 서브 이미지가 3개일 때
@@ -54,6 +56,7 @@ const SubImageBanner = ({ subImages }: SubImageBannerProps) => {
             alt={`서브 이미지 ${index + 1}`}
             width={293.5}
             height={263}
+            className="w-full object-cover lg:h-[263px] md:h-[152.68px] h-[310px] col-span-2"
           />
         );
         break;
@@ -65,10 +68,11 @@ const SubImageBanner = ({ subImages }: SubImageBannerProps) => {
           alt={`서브 이미지 ${index + 1}`}
           width={293.5}
           height={263}
+          className="w-full object-cover lg:h-[263px] md:h-[152.68px] h-[310px]"
         />
       );
     }
-    return <div>{newSubImages}</div>;
+    return <div className="grid grid-cols-2">{newSubImages}</div>;
   }
 
   // 서브 이미지가 4개일 때
@@ -80,13 +84,14 @@ const SubImageBanner = ({ subImages }: SubImageBannerProps) => {
           src={subImages[index].imageUrl}
           alt={`서브 이미지 ${index + 1}`}
           width={293.5}
-          height={534}
+          height={263}
+          className="w-full object-cover lg:h-[263px] md:h-[152.68px] h-[310px]"
         />
       );
     }
   }
 
-  return <div>{newSubImages}</div>;
+  return <div className="grid grid-cols-2">{newSubImages}</div>;
 };
 
 export default SubImageBanner;

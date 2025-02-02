@@ -10,8 +10,8 @@ interface BannerImageProps {
 
 const BannerImage = ({ bannerImages, subImages }: BannerImageProps) => {
   return (
-    <div>
-      <div>
+    <div className="flex flex-row lg:w-[1198px] lg:h-[534px] md:w-[696px] w-[375px] h-[310px] lg:gap-[8px] md:gap-[4.65px] gap-0 rounded-[12px] overflow-hidden">
+      <div className="lg:w-[595px] lg:h-[534px] md:w-[348px] md:h-[300px] w-[187.5px] h-[310px]">
         {subImages.length === 0 ? (
           <Image
             src={bannerImages}
@@ -27,6 +27,8 @@ const BannerImage = ({ bannerImages, subImages }: BannerImageProps) => {
             height={534}
           />
         )}
+      </div>
+      <div className="lg:w-[595px] lg:h-[534px] md:w-[348px] md:h-[300px] w-[187.5px] h-[310px]">
         <SubImageBanner subImages={subImages} />
       </div>
     </div>
