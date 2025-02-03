@@ -27,7 +27,7 @@ const onRefreshed = (token: string) => {
 
 // 토큰 갱신 요청을 구독하는 함수
 const addRefreshSubscriber = (callback: (token: string) => void) => {
-  refreshSubscribers = [];
+  refreshSubscribers.push(callback);
 };
 
 // 인증이 필요한 api
@@ -63,7 +63,7 @@ if (isClient) {
         return Promise.reject(error);
       }
 
-      if (error.response.status === 401) {
+      if (error.response?.status === 401) {
         if (!isRefreshing) {
           isRefreshing = true;
 
@@ -71,8 +71,8 @@ if (isClient) {
             // 현재 토큰으로 토큰 갱신 시도
             const {
               data: { accessToken },
-            } = await axios.post(
-              `${baseURL}/auth/tokens`,
+            } = await axiosInstance.post(
+              `/auth/tokens`,
               {},
               {
                 headers: {
