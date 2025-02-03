@@ -27,9 +27,9 @@ const socialLinks = [
 
 export default function Footer() {
   return (
-    <footer className="fixed bottom-0 w-full">
+    <footer className="position:sticky bottom-0 w-full">
       {/* 상단 푸터 */}
-      <div className="w-full h-[120px] bg-white mx-auto" />
+      <div className="w-full h-[120px] bg-[#FAFBFC] mx-auto" />
 
       {/* 하단 푸터 */}
       <div className="flex flex-col items-center bg-nomad-black h-[160px] pt-[32px] pb-[64px]">
