@@ -27,6 +27,8 @@ const ActivityDetail = () => {
       try {
         const data: ActivityDetailResponse =
           await fetchActivityDetails(activityId);
+
+        console.log('Fetched Activity Data:', data);
         setActivity(data);
       } catch (error) {
         setError('에러 발생');
