@@ -6,6 +6,9 @@ import SubImageBanner from '@/components/activitydetail/SubImage';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
+import PreviousIcon from '../../../public/icons/icon-previous.svg';
+import NextIcon from '../../../public/icons/icon-next.svg';
+
 interface BannerImageProps {
   bannerImages: string;
   subImages: SubImage[];
@@ -16,11 +19,36 @@ const BannerImage = ({ bannerImages, subImages }: BannerImageProps) => {
 
   const images = [{ id: 0, imageUrl: bannerImages }, ...subImages];
 
-  const settings = {
+  const CustomArrow = ({
+    direction,
+    onClick,
+  }: {
+    direction: 'next' | 'prev';
+    onClick?: () => void;
+  }) => (
+    <button
+      className={`absolute top-1/2 -translate-y-1/2 z-10 ${
+        direction === 'next' ? 'right-4' : 'left-4'
+      }`}
+      onClick={onClick}
+    >
+      <Image
+        src={direction === 'next' ? NextIcon : PreviousIcon}
+        alt={direction === 'next' ? 'Next' : 'Previous'}
+        width={24}
+        height={24}
+        className="cursor-pointer"
+      />
+    </button>
+  );
+
+  const sliderSettings = {
     infinite: true,
     speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
+    nextArrow: <CustomArrow direction="next" />,
+    prevArrow: <CustomArrow direction="prev" />,
   };
 
   return (
@@ -28,7 +56,7 @@ const BannerImage = ({ bannerImages, subImages }: BannerImageProps) => {
       {/* 모바일에서는 슬라이더 적용 */}
       {subImages.length > 0 ? (
         <div className="md:hidden block w-full h-[310px]">
-          <Slider {...settings}>
+          <Slider {...sliderSettings}>
             {images.map((image) => (
               <div key={image.id} className="relative w-full h-[310px]">
                 <Image
