@@ -6,24 +6,26 @@ interface CategoryItem {
 }
 
 const categories: CategoryItem[] = [
-  { id: 1, title: '문화 · 예술' },
-  { id: 2, title: '식음료' },
-  { id: 3, title: '스포츠' },
-  { id: 4, title: '투어' },
-  { id: 5, title: '관광' },
-  { id: 6, title: '웰빙' },
+  { id: 1, title: '전체' },
+  { id: 2, title: '문화 · 예술' },
+  { id: 3, title: '식음료' },
+  { id: 4, title: '스포츠' },
+  { id: 5, title: '투어' },
+  { id: 6, title: '관광' },
+  { id: 7, title: '웰빙' },
 ];
 
 interface CategoryProps {
-  onSelectCategory?: (category: string) => void;
+  selectedCategory: string;
+  onSelectCategory: (category: string) => void;
 }
 
-export default function Category({ onSelectCategory }: CategoryProps) {
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
-
+export default function Category({
+  selectedCategory,
+  onSelectCategory,
+}: CategoryProps) {
   const handleCategoryClick = (title: string) => {
-    setSelectedCategory(title);
-    onSelectCategory?.(title);
+    onSelectCategory(title);
   };
 
   return (

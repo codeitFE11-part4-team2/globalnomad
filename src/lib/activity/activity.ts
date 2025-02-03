@@ -13,6 +13,7 @@ export interface Activity {
   price: number;
   bannerImageUrl: string;
   createdAt: string;
+  category: string;
 }
 
 export interface ActivityResponse {
