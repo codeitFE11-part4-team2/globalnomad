@@ -1,15 +1,16 @@
 'use client';
 
 import { Button } from '@/components/common/Button';
+import { use } from 'react';
 import Modal from '../../../_components/Modal';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 
 interface ReviewModalProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default function ReviewModal({ params }: ReviewModalProps) {
@@ -18,9 +19,11 @@ export default function ReviewModal({ params }: ReviewModalProps) {
   const [content, setContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const { id } = use(params);
+
   const searchParams = useSearchParams();
   const reservationInfo = {
-    id: params.id,
+    id,
     title: searchParams.get('title'),
     date: searchParams.get('date'),
     time: searchParams.get('time'),
@@ -36,7 +39,7 @@ export default function ReviewModal({ params }: ReviewModalProps) {
     // API 통신 시뮬레이션
     setTimeout(() => {
       console.log('제출된 데이터:', {
-        reservationId: params.id,
+        reservationId: id,
         rating,
         content,
       });

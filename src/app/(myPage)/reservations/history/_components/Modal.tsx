@@ -1,4 +1,5 @@
 'use client';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
@@ -37,7 +38,12 @@ export default function Modal({ children, title }: ModalProps) {
             onClick={() => router.back()}
             className="text-gray-400 hover:text-gray-600"
           >
-            ✕
+            <Image
+              src={'/icons/btn_X_40px.png'}
+              alt="closeBtn"
+              width={40}
+              height={40}
+            />
           </button>
         </div>
 
