@@ -1,33 +1,34 @@
 'use client';
 
+import { Filter } from './_components/ReservationFilter';
 import { ReservationList } from './_components/ReservationList';
 import { useState } from 'react';
-
-interface Reservation {
-  id: string;
-  date: string;
-  status: 'completed' | 'cancelled' | 'pending';
-  serviceName: string;
-}
+import { ReservationResponse, Reservation } from '@/lib/reservations/types';
 
 interface ReservationHistoryContainerProps {
-  initialData?: Reservation[];
+  initialData: ReservationResponse;
 }
 
 export const ReservationHistoryContainer = ({
-  initialData = [],
+  initialData,
 }: ReservationHistoryContainerProps) => {
-  // 상태 관리, 이벤트 핸들러 등 로직 추가
-  const [reservations, setReservations] = useState(initialData);
+  const [reservations, setReservations] = useState<Reservation[]>(
+    initialData.reservations
+  );
+  const [selectedStatus, setSelectedStatus] = useState<string>('all');
 
-  const handleSomeAction = () => {
-    alert('리스트');
-  };
+  const filteredReservations = reservations.filter((reservation) =>
+    selectedStatus === 'all' ? true : reservation.status === selectedStatus
+  );
 
   return (
-    <ReservationList
-      reservations={reservations}
-      onSomeAction={handleSomeAction}
-    />
+    <div>
+      <h1 className="text-2xl font-bold mb-6">예약 내역</h1>
+      <Filter
+        selectedStatus={selectedStatus}
+        onStatusChange={setSelectedStatus}
+      />
+      <ReservationList reservations={filteredReservations} />
+    </div>
   );
 };
