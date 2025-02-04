@@ -1,0 +1,113 @@
+'use client';
+
+import BannerImage from '@/components/activitydetail/BannerImage';
+import ReviewList from '@/components/activitydetail/Review';
+import { fetchActivityDetails } from '@/lib/activitydetail/activitydetail';
+import { ActivityDetailResponse } from '@/lib/activitydetail/activitydetailTypes';
+import Image from 'next/image';
+import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import StarIcon from '../../../../public/icons/icon-star.svg';
+import Location from '../../../../public/icons/icon-location.svg';
+import Footer from '@/components/common/Footer';
+
+const ActivityDetail = () => {
+  const { id } = useParams();
+  const activityId = Number(id);
+
+  const [activity, setActivity] = useState<ActivityDetailResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!activityId) return;
+
+    const loadActivity = async () => {
+      setLoading(true); // 로딩 시작
+      try {
+        const data: ActivityDetailResponse =
+          await fetchActivityDetails(activityId);
+
+        console.log('Fetched Activity Data:', data);
+        setActivity(data);
+      } catch (error) {
+        setError('에러 발생');
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadActivity();
+  }, [id]);
+
+  if (loading) return <p>로딩 중...</p>;
+  if (error) return <p>{error}</p>;
+  if (!activity) return <p>데이터가 없습니다.</p>;
+
+  return (
+    <div className="bg-gray-100">
+      <div className="flex justify-center mx-[24px]">
+        <div className="w-full max-w-[1200px] flex flex-col">
+          <div className="flex-1">
+            <p className="text-md font-regular lg:mt-[78px] md:mt-[24px] mt-[16px]">
+              {activity.category}
+            </p>
+            <p className="md:text-3xl text-2xl font-bold mt-[10px]">
+              {activity.title}
+            </p>
+            <div className="flex items-center justify-start mt-[16px] space-x-[12px]">
+              <div className="flex items-center space-x-[2px]">
+                <Image src={StarIcon} alt="별점" width={16} height={16} />
+                <p className="text-md font-regular">
+                  {(activity.rating || 0).toFixed(1)}
+                </p>
+                <p className="text-md font-regular">({activity.reviewCount})</p>
+              </div>
+              <div className="flex items-center space-x-[2px]">
+                <Image src={Location} alt="위치" width={18} height={18} />
+                <p className="text-md font-regular">{activity.address}</p>
+              </div>
+            </div>
+
+            <div>
+              <div className="lg:mt-[24px] md:mt-[15px] mt-0">
+                <BannerImage
+                  bannerImages={activity.bannerImageUrl}
+                  subImages={activity.subImages}
+                />
+              </div>
+
+              <div className="w-full max-w-[740px]">
+                <div className="lg:mt-[85px] md:mt-[32px] mt-0">
+                  <hr className="hidden md:block border-t-[1px] border-nomad-black " />
+                  <p className="text-xl font-bold md:mt-[40px] mt-[15px]">
+                    체험 설명
+                  </p>
+                  <p className="text-lg font-regular mt-[16px]">
+                    {activity.description}
+                  </p>
+                  <hr className="border-t-[1px] border-nomad-black lg:mt-[34px] md:mt-[57px] mt-[16px]" />
+                </div>
+
+                <div>{/* 지도 */}</div>
+
+                <div className="md:mt-[41px] mt-[40px]">
+                  <hr className="hidden md:block border-t-[1px] border-nomad-black md:mb-[40px] mb-0" />
+                  <ReviewList activityId={activityId} pageSize={3} />
+                </div>
+              </div>
+            </div>
+
+            <div className="w-full">
+              <div>{/* 예약 모달 */}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="lg:mt-[293px] md:mt-[144px] mt-[135px]">
+        <Footer />
+      </div>
+    </div>
+  );
+};
+
+export default ActivityDetail;

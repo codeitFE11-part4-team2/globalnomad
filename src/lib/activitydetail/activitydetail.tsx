@@ -12,11 +12,12 @@ import {
 } from '@/lib/activitydetail/activitydetailTypes';
 
 const TEAMID = '11-2';
+const BASEURL = 'https://sp-globalnomad-api.vercel.app';
 
 const PATHS = {
-  ACTIVITIES: `/teamId/activities/`.replace('teamId', TEAMID),
-  MY_ACTIVITIES: `/teamId/my-activities/`.replace('teamId', TEAMID),
-  AUTH: `/teamId/auth/tokens`.replace('teamId', TEAMID),
+  ACTIVITIES: `${BASEURL}/teamId/activities/`.replace('teamId', TEAMID),
+  MY_ACTIVITIES: `${BASEURL}/teamId/my-activities/`.replace('teamId', TEAMID),
+  AUTH: `${BASEURL}/teamId/auth/tokens`.replace('teamId', TEAMID),
 };
 
 // 체험 상세 조회
@@ -42,12 +43,16 @@ export const fetchAvailableSchedules = async (
 // 체험 리뷰 조회
 export const fetchReviews = async (
   activityId: number,
-  page: number
+  page: number,
+  pageSize: number
 ): Promise<ReviewsResponse> => {
   const response: AxiosResponse<ReviewsResponse> = await axiosInstance.get(
     `${PATHS.ACTIVITIES}${activityId}/reviews`,
     {
-      params: { page },
+      params: {
+        page,
+        pageSize,
+      },
     }
   );
   return response.data;
