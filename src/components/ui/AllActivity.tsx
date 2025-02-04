@@ -13,7 +13,7 @@ function ActivityCard({ activity }: { activity: Activity }) {
   const { bannerImageUrl, title, rating, reviewCount, price } = activity;
 
   return (
-    <Link href={`/11-2/activities/${activity.id}`} className="cursor-pointer">
+    <Link href={`/activity/${activity.id}`} className="cursor-pointer">
       <div className="flex flex-col gap-4">
         <div className="relative w-full lg:w-[283px] aspect-square rounded-[20px] overflow-hidden">
           <Image
