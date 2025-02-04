@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { usePopularActivities } from '@/hooks/usePopularActivities';
 import { Activity } from '@/lib/popularactivity/popularactivityTypes';
 import { Spinner } from '../common/Spinner';
+import Link from 'next/link';
 
 const ITEMS_PER_PAGE = 3; // lg 화면에서 한 페이지에 표시할 체험 수
 const PRICE_FORMATTER = new Intl.NumberFormat('ko-KR');
@@ -19,7 +20,10 @@ function ActivityCard({ activity }: ActivityCardProps) {
   const { bannerImageUrl, title, rating, reviewCount, price } = activity;
 
   return (
-    <div className="flex-none w-[186px] md:w-[384px] rounded-[20px] overflow-hidden cursor-pointer">
+    <Link
+      href={`/11-2/activities/${activity.id}`}
+      className="flex-none w-[186px] md:w-[384px] rounded-[20px] overflow-hidden cursor-pointer"
+    >
       <div className="relative h-[186px] md:h-[384px]">
         <Image
           src={bannerImageUrl}
@@ -59,7 +63,7 @@ function ActivityCard({ activity }: ActivityCardProps) {
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
