@@ -1,7 +1,7 @@
 import { ButtonHTMLAttributes, ReactNode } from 'react';
 import { Spinner } from './Spinner';
 
-type ButtonVariant = 'nomad-black' | 'white' | 'gray-600';
+type ButtonVariant = 'nomad-black' | 'white' | 'gray-600' | 'green';
 type ButtonSize = 'small' | 'medium' | 'large' | 'full';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -31,6 +31,8 @@ export function Button({
       'bg-white text-black border border-gray-200 hover:bg-gray-50 focus:ring-2 focus:ring-gray-200',
     'gray-600':
       'bg-gray-600 text-white hover:bg-gray-700 focus:ring-2 focus:ring-gray-400',
+    green:
+      'bg-green-3 text-white hover:bg-gray-800 focus:ring-2 focus:ring-gray-500 disabled:bg-gray-600',
   };
 
   // 크기별 스타일(width, height, 글자 크기)

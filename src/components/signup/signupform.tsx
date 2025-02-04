@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { api } from '@/lib/axios';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth';
+import { useForm, Controller } from 'react-hook-form';
 
 interface SignUpResponse {
   access_token: string;
@@ -21,15 +22,16 @@ interface SignUpResponse {
   };
 }
 
-function SignUpForm() {
-  const [email, setEmail] = useState('');
-  const [nickname, setNickname] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+interface FormData {
+  email: string;
+  nickname: string;
+  password: string;
+  confirmPassword: string;
+}
 
+function SignUpForm() {
   const [isClient, setIsClient] = useState(false);
+  const [loading, setLoading] = useState(false); // loading 상태 추가
   const router = useRouter();
 
   const setToken = useAuthStore((state) => state.setToken);
@@ -39,18 +41,85 @@ function SignUpForm() {
     setIsClient(true);
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const {
+    control,
+    handleSubmit,
+    trigger,
+    formState: { errors, isValid },
+    setValue,
+    setError,
+    clearErrors,
+    getValues,
+  } = useForm<FormData>({
+    defaultValues: {
+      email: '',
+      nickname: '',
+      password: '',
+      confirmPassword: '',
+    },
+    mode: 'onChange', // onChange로 유효성 검사
+    reValidateMode: 'onChange', // 필드 값이 바뀔 때마다 유효성 재검사
+  });
 
-    if (password !== confirmPassword) {
-      setError('비밀번호가 일치하지 않습니다.');
-      return;
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+    if (!emailRegex.test(email)) {
+      setError('email', {
+        type: 'manual',
+        message: '이메일 형식으로 작성해 주세요.',
+      });
+    } else {
+      clearErrors('email');
     }
+  };
 
-    setLoading(true);
-    setError('');
+  const validateNickname = (nickname: string) => {
+    if (nickname.length > 10) {
+      setError('nickname', {
+        type: 'manual',
+        message: '열 자 이하로 작성해주세요.',
+      });
+    } else {
+      clearErrors('nickname');
+    }
+  };
+
+  const validatePassword = (password: string) => {
+    if (password.length < 8) {
+      setError('password', {
+        type: 'manual',
+        message: '비밀번호는 8자 이상이어야 합니다.',
+      });
+    } else {
+      clearErrors('password');
+    }
+  };
+
+  const validateConfirmPassword = (confirmPassword: string) => {
+    const password = getValues('password');
+    if (confirmPassword !== password) {
+      setError('confirmPassword', {
+        type: 'manual',
+        message: '비밀번호가 일치하지 않습니다.',
+      });
+    } else {
+      clearErrors('confirmPassword');
+    }
+  };
+
+  const handleSubmitForm = async (data: FormData) => {
+    const { email, nickname, password } = data;
 
     try {
+      // 폼 전체 유효성 검사를 다시 실행
+      const isValidForm = await trigger(); // trigger()를 통해 모든 필드의 유효성 검사를 실행
+
+      if (!isValidForm) {
+        // 유효성 검사 실패 시 아무 작업도 하지 않음
+        return;
+      }
+
+      setLoading(true);
       const response = await api.post<SignUpResponse>('/users', {
         email,
         nickname,
@@ -66,61 +135,126 @@ function SignUpForm() {
       }
 
       if (isClient) {
-        router.push('/');
+        alert('가입이 완료되었습니다!');
+        router.push('/login');
       }
     } catch (err) {
-      setError('회원가입에 실패했습니다.');
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  if (!isClient) {
-    return null;
-  }
+  const isButtonDisabled =
+    !isValid ||
+    !!errors.email ||
+    !!errors.password ||
+    !!errors.confirmPassword ||
+    loading;
 
   return (
     <div className="flex flex-col gap-[10px]">
-      <form className="gap-[28px] flex flex-col" onSubmit={handleSubmit}>
-        <InputItem
-          label="이메일"
-          id="email"
-          type="email"
-          placeholder="이메일을 입력해 주세요"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+      <form
+        className="gap-[28px] flex flex-col"
+        onSubmit={handleSubmit(handleSubmitForm)}
+      >
+        <Controller
+          name="email"
+          control={control}
+          rules={{
+            required: '이메일은 필수 입력 사항입니다.',
+          }}
+          render={({ field }) => (
+            <InputItem
+              label="이메일"
+              id="email"
+              type="email"
+              placeholder="이메일을 입력해 주세요"
+              value={field.value || ''}
+              onChange={(e) => {
+                field.onChange(e);
+                validateEmail(e.target.value); // 이메일 유효성 검사
+              }}
+              onBlur={() => validateEmail(field.value)} // 포커스 아웃 시 이메일 유효성 검사
+              error={!!errors.email}
+              errorMessage={errors.email?.message}
+            />
+          )}
         />
-        <InputItem
-          label="닉네임"
-          id="nickname"
-          type="text"
-          placeholder="닉네임을 입력해 주세요"
-          value={nickname}
-          onChange={(e) => setNickname(e.target.value)}
+        <Controller
+          name="nickname"
+          control={control}
+          rules={{
+            required: '닉네임은 필수 입력 사항입니다.',
+          }}
+          render={({ field }) => (
+            <InputItem
+              label="닉네임"
+              id="nickname"
+              type="text"
+              placeholder="닉네임을 입력해 주세요"
+              value={field.value || ''}
+              onChange={(e) => {
+                field.onChange(e);
+                validateNickname(e.target.value); // 비밀번호 유효성 검사
+              }}
+              onBlur={() => validateNickname(field.value)} // 포커스 아웃 시 비밀번호 유효성 검사
+              error={!!errors.nickname}
+              errorMessage={errors.nickname?.message}
+            />
+          )}
         />
-        <InputItem
-          label="비밀번호"
-          id="pw"
-          type="password"
-          placeholder="8자 이상 입력해 주세요"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+        <Controller
+          name="password"
+          control={control}
+          rules={{
+            required: '비밀번호는 필수 입력 사항입니다.',
+          }}
+          render={({ field }) => (
+            <InputItem
+              label="비밀번호"
+              id="password"
+              type="password"
+              placeholder="8자 이상 입력해 주세요"
+              value={field.value || ''}
+              onChange={(e) => {
+                field.onChange(e);
+                validatePassword(e.target.value); // 비밀번호 유효성 검사
+              }}
+              onBlur={() => validatePassword(field.value)} // 포커스 아웃 시 비밀번호 유효성 검사
+              error={!!errors.password}
+              errorMessage={errors.password?.message}
+            />
+          )}
         />
-        <InputItem
-          label="비밀번호 확인"
-          id="confirmPassword"
-          type="password"
-          placeholder="비밀번호를 한번 더 입력해 주세요"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
+        <Controller
+          name="confirmPassword"
+          control={control}
+          rules={{
+            required: '비밀번호 확인은 필수 입력 사항입니다.',
+          }}
+          render={({ field }) => (
+            <InputItem
+              label="비밀번호 확인"
+              id="confirmPassword"
+              type="password"
+              placeholder="비밀번호를 한번 더 입력해 주세요"
+              value={field.value || ''}
+              onChange={(e) => {
+                field.onChange(e);
+                validateConfirmPassword(e.target.value); // 비밀번호 확인 유효성 검사
+              }}
+              onBlur={() => validateConfirmPassword(field.value)} // 포커스 아웃 시 비밀번호 확인 유효성 검사
+              error={!!errors.confirmPassword}
+              errorMessage={errors.confirmPassword?.message}
+            />
+          )}
         />
-        {error && <p className="text-red-500">{error}</p>}
         <Button
           type="submit"
-          variant="nomad-black"
+          variant="green"
           size="full"
-          disabled={loading}
+          disabled={isButtonDisabled} // 버튼 활성화 조건
         >
           {loading ? '가입 중...' : '회원가입 하기'}
         </Button>
