@@ -71,9 +71,10 @@ export default {
         semibold: '600',
         bold: '700',
       },
+      boxShadow: {
+        card: '0 4px 16px 0 rgba(17, 34, 17, 0.05)',
+      },
     },
   },
-  plugins: [
-    require('tailwind-scrollbar-hide')
-  ],
+  plugins: [require('tailwind-scrollbar-hide')],
 } satisfies Config;

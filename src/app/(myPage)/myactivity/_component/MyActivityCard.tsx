@@ -1,42 +1,97 @@
-import Image from 'next/image';
+'use client';
 
-export default function MyActivityCard() {
-  const rating = 2;
+import { useState } from 'react';
+import Image from 'next/image';
+import CardDropdown from './CardDropdown';
+import { cardModalStore } from '@/store/cardModal';
+
+interface Props {
+  id: number;
+  bannerImageUrl: string;
+  rating: number;
+  reviewCount: number;
+  price: number;
+  title: string;
+}
+
+export default function MyActivityCard({
+  id,
+  bannerImageUrl,
+  rating,
+  reviewCount,
+  title,
+  price,
+}: Props) {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const { openModal } = cardModalStore();
 
   return (
-    <div className="w-full h-[204px] flex rounded-3xl bg-gray-300 overflow-hidden">
-      <div className="h-full aspect-square relative">
-        <div
-          style={{
-            backgroundImage: `url('/icons/testimg.png')`,
-          }}
-          className="absolute inset-0 bg-cover bg-center"
-        ></div>
+    <div className="w-full h-[128px] md:h-[156px] lg:h-[204px] flex rounded-3xl shadow-card relative">
+      <div className="rounded-l-3xl overflow-hidden">
+        <div className="h-full aspect-square relative">
+          <Image
+            src={bannerImageUrl}
+            alt="테스트 이미지"
+            fill
+            className="object-cover object-center"
+          />
+        </div>
       </div>
-      <div className="flex-1 bg-gray-200 px-6 py-3.5">
+      <div className="flex-1 px-2 py-[9.5px] md:p-3 lg:px-6 lg:py-3.5 flex flex-col justify-between">
         <div>
-          <div className="flex items-center gap-2">
-            <div className="relative w-5 h-5 sm:w-4 sm:h-4">
-              <img
+          <div className="flex items-center gap-1.5">
+            <div className="relative md:w-5 md:h-5 w-4 h-4">
+              <Image
                 src="/icons/emptyStar_icon.svg"
                 alt="빈별아이콘"
-                className="absolute inset-0 w-full h-full object-contain"
+                fill
+                className="object-contain"
               />
-              <img
+              <Image
                 src="/icons/filledStar_icon.svg"
                 alt="꽉찬별아이콘"
-                className="absolute inset-0 w-full h-full object-contain"
+                fill
+                className="object-contain"
                 style={{
                   clipPath: `inset(0 ${(1 - rating / 5) * 100}% 0 0)`,
                 }}
               />
             </div>
-            <span className="text-sm sm:text-xs">3.0 (293)</span>
+            <span className="text-md md:text-lg">
+              {rating} ({reviewCount})
+            </span>
           </div>
-
-          <h3>함께 배우면 즐거운 스트릿 댄스</h3>
+          <h3 className="text-md md:text-lg lg:text-xl font-bold md:mt-1.5">
+            {title}
+          </h3>
         </div>
-        <div></div>
+        <div className="flex justify-between items-center">
+          <div className="text-lg md:text-xl lg:text-2xl text-gray-900 font-medium">
+            ₩{price.toLocaleString('ko-KR')}
+          </div>
+          <div className="relative">
+            <div
+              className="w-8 h-8 md:w-10 md:h-10 cursor-pointer"
+              onClick={() => setIsDropdownOpen((prev) => !prev)}
+            >
+              <Image
+                src="/icons/cardmenu_icon.svg"
+                alt="메뉴아이콘"
+                fill
+                className="object-contain"
+              />
+            </div>
+            <CardDropdown
+              isOpen={isDropdownOpen}
+              onClose={() => setIsDropdownOpen(false)}
+              onEdit={() => setIsDropdownOpen(false)}
+              onDelete={() => {
+                setIsDropdownOpen(false);
+                openModal(id);
+              }}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
