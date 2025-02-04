@@ -1,9 +1,9 @@
 import { AxiosResponse } from 'axios';
-import { axiosInstance } from '@/lib/axios';
+import { publicApi } from '@/lib/axios';
 import { PopularActivityResponse } from './popularactivityTypes';
 
 const PATHS = {
-  ACTIVITIES: `https://sp-globalnomad-api.vercel.app/11-2/activities`,
+  ACTIVITIES: 'https://sp-globalnomad-api.vercel.app/11-2/activities',
 };
 
 // 인기 체험 목록 조회 (리뷰 수 기준 정렬)
@@ -14,7 +14,7 @@ export const fetchPopularActivities = async (
   try {
     console.log('Fetching activities with URL:', PATHS.ACTIVITIES);
     const response: AxiosResponse<PopularActivityResponse> =
-      await axiosInstance.get(PATHS.ACTIVITIES, {
+      await publicApi.get(PATHS.ACTIVITIES, {
         params: {
           method: 'offset',
           page,
