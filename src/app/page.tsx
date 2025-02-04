@@ -11,13 +11,18 @@ import AllActivity from '@/components/ui/AllActivity';
 import { useActivities } from '@/hooks/useActivities';
 import Pagination from '@/components/ui/pagination';
 import { usePopularActivities } from '@/hooks/usePopularActivities';
+import { Spinner } from '@/components/common/Spinner';
 
 export default function Home() {
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('전체');
   const [currentPage, setCurrentPage] = useState(1);
   const [windowWidth, setWindowWidth] = useState(0);
   const [popularActivityPage, setPopularActivityPage] = useState(1);
-  const { data: popularData, isFetching } = usePopularActivities(popularActivityPage);
+  const [priceFilter, setPriceFilter] = useState<'낮은순' | '높은순' | '가격'>(
+    '가격'
+  );
+  const { data: popularData, isFetching } =
+    usePopularActivities(popularActivityPage);
 
   useEffect(() => {
     setWindowWidth(window.innerWidth); // 첫 렌더링 시 창 너비를 설정
@@ -35,13 +40,39 @@ export default function Home() {
 
   const itemsPerPage = getItemsPerPage();
 
-  const { data, isLoading, error } = useActivities(currentPage, itemsPerPage);
+  // 전체 데이터를 가져옴 (페이지 크기를 매우 크게 설정)
+  const { data, isLoading, error } = useActivities(1, 1000);
   const activities = data?.activities || [];
-  const totalPages = Math.ceil((data?.totalCount || 0) / itemsPerPage);
+
+  // 선택된 카테고리에 해당하는 활동만 필터링
+  const filteredActivities = activities.filter((activity) => {
+    if (selectedCategory === '전체') return true;
+    return activity.category === selectedCategory;
+  });
+
+  // 가격 필터 적용
+  const sortedActivities = [...filteredActivities].sort((a, b) => {
+    if (priceFilter === '낮은순') {
+      return a.price - b.price;
+    }
+    if (priceFilter === '높은순') {
+      return b.price - a.price;
+    }
+    // 기본 정렬 (최신순)
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
+
+  // 현재 페이지에 해당하는 데이터만 선택
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentPageActivities = sortedActivities.slice(startIndex, endIndex);
+
+  // 필터링된 전체 데이터 개수를 기반으로 totalPages 계산
+  const totalPages = Math.ceil(sortedActivities.length / itemsPerPage);
 
   const handleCategorySelect = (category: string) => {
     setSelectedCategory(category);
-    // TODO : 여기서 선택된 카테고리에 따라 리스트를 필터링
+    setCurrentPage(1); // 카테고리 변경 시 1페이지로 리셋
   };
 
   const handlePrevPage = useCallback(() => {
@@ -59,7 +90,12 @@ export default function Home() {
     });
   }, [popularData?.activities]);
 
-  if (isLoading) return <div>로딩 중...</div>;
+  if (isLoading)
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Spinner className="w-12 h-12" />
+      </div>
+    );
   if (error) return <div>에러가 발생했습니다.</div>;
 
   return (
@@ -112,12 +148,16 @@ export default function Home() {
       </div>
       <div className="max-w-[1200px] mx-auto px-4 md:px-6 lg:px-0 pt-[40px] pb-[24px] md:pt-[60px] md:pb-[35px]">
         <div className="flex items-center justify-between gap-6 relative">
-          <Category onSelectCategory={handleCategorySelect} />
+          <Category
+            selectedCategory={selectedCategory}
+            onSelectCategory={handleCategorySelect}
+          />
           <div className="absolute right-[90px] md:right-[120px] lg:right-[127px] w-[60px] h-[41px] md:h-[58px] flex-shrink-0 bg-gradient-to-l from-[#FAFBFC] via-[rgba(250,251,252,0.8)] to-transparent" />
 
           <Filter
             onFilterChange={(filter) => {
-              // TODO : 선택된 필터 값으로 정렬
+              setPriceFilter(filter as '낮은순' | '높은순' | '가격');
+              setCurrentPage(1); // 필터 변경 시 1페이지로 리셋
             }}
           />
         </div>
@@ -125,10 +165,13 @@ export default function Home() {
       <div className="max-w-[1200px] mx-auto px-4 md:px-8 lg:px-0 pb-[64px]">
         <div className="flex justify-between items-center md:mb-[32px] mb-[24px]">
           <h2 className="md:text-[36px] text-[18px] font-bold leading-[43px] text-black font-pretendard">
-            🛼 모든 체험
+            {selectedCategory === '전체' ? '🛼 모든 체험' : selectedCategory}
           </h2>
         </div>
-        <AllActivity activities={activities} />
+        <AllActivity
+          activities={currentPageActivities}
+          selectedCategory={selectedCategory}
+        />
       </div>
       <Pagination
         totalPageNum={totalPages}
