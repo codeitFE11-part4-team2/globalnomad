@@ -21,7 +21,7 @@ function ActivityCard({ activity }: ActivityCardProps) {
 
   return (
     <Link
-      href={`/11-2/activities/${activity.id}`}
+      href={`/activity/${activity.id}`}
       className="flex-none w-[186px] md:w-[384px] rounded-[20px] overflow-hidden cursor-pointer"
     >
       <div className="relative h-[186px] md:h-[384px]">
