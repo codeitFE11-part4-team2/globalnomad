@@ -50,6 +50,7 @@ export const fetchReviews = async (
     `${PATHS.ACTIVITIES}${activityId}/reviews`,
     {
       params: {
+        method: 'offset',
         page,
         pageSize,
       },
