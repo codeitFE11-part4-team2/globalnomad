@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import { axiosInstance } from '@/lib/axios';
+import { axiosInstance, publicAxios } from '@/lib/axios';
 import {
   ActivityDetailResponse,
   AvailableScheduleResponse,
@@ -15,38 +15,39 @@ const TEAMID = '11-2';
 const BASEURL = 'https://sp-globalnomad-api.vercel.app';
 
 const PATHS = {
-  ACTIVITIES: `${BASEURL}/teamId/activities/`.replace('teamId', TEAMID),
-  MY_ACTIVITIES: `${BASEURL}/teamId/my-activities/`.replace('teamId', TEAMID),
-  AUTH: `${BASEURL}/teamId/auth/tokens`.replace('teamId', TEAMID),
+  ACTIVITIES: `${BASEURL}/${TEAMID}/activities/`,
+  MY_ACTIVITIES: `${BASEURL}/${TEAMID}/my-activities/`,
+  AUTH: `${BASEURL}/${TEAMID}/auth/tokens`,
 };
 
-// 체험 상세 조회
+// 체험 상세 조회 (인증 불필요)
 export const fetchActivityDetails = async (
   activityId: number
 ): Promise<ActivityDetailResponse> => {
-  const response: AxiosResponse<ActivityDetailResponse> =
-    await axiosInstance.get(`${PATHS.ACTIVITIES}${activityId}`);
+  const response: AxiosResponse<ActivityDetailResponse> = await publicAxios.get(
+    `${PATHS.ACTIVITIES}${activityId}`
+  );
   return response.data;
 };
 
-// 체험 예약 가능일 조회
+// 체험 예약 가능일 조회 (인증 불필요)
 export const fetchAvailableSchedules = async (
   activityId: number
 ): Promise<AvailableScheduleResponse[]> => {
   const response: AxiosResponse<AvailableScheduleResponse[]> =
-    await axiosInstance.get(
+    await publicAxios.get(
       `${PATHS.ACTIVITIES}${activityId}/available-schedule`
     );
   return response.data;
 };
 
-// 체험 리뷰 조회
+// 체험 리뷰 조회 (인증 불필요)
 export const fetchReviews = async (
   activityId: number,
   page: number,
   pageSize: number
 ): Promise<ReviewsResponse> => {
-  const response: AxiosResponse<ReviewsResponse> = await axiosInstance.get(
+  const response: AxiosResponse<ReviewsResponse> = await publicAxios.get(
     `${PATHS.ACTIVITIES}${activityId}/reviews`,
     {
       params: {
@@ -63,19 +64,13 @@ export const fetchReviews = async (
 export const bookActivity = async (
   activityId: number,
   scheduleId: number,
-  headCount: number,
-  accessToken: string
+  headCount: number
 ): Promise<BookReservationResponse> => {
   const response: AxiosResponse<BookReservationResponse> =
-    await axiosInstance.post(
-      `${PATHS.ACTIVITIES}${activityId}/reservations`,
-      { scheduleId, headCount },
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
-    );
+    await axiosInstance.post(`${PATHS.ACTIVITIES}${activityId}/reservations`, {
+      scheduleId,
+      headCount,
+    });
   return response.data;
 };
 
@@ -92,29 +87,19 @@ export const createImageUrl = async (
 
 // 내 체험 삭제 (로그인 필요, userId 일치해야 함)
 export const deleteActivity = async (
-  activityId: number,
-  accessToken: string
+  activityId: number
 ): Promise<DeleteActivityResponse> => {
   const response: AxiosResponse<DeleteActivityResponse> =
-    await axiosInstance.delete(`${PATHS.MY_ACTIVITIES}${activityId}`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+    await axiosInstance.delete(`${PATHS.MY_ACTIVITIES}${activityId}`);
   return response.data;
 };
 
 // 내 체험 수정 (로그인 필요, userId 일치해야 함)
 export const updateActivity = async (
   activityId: number,
-  updateData: UpdateActivityRequest,
-  accessToken: string
+  updateData: UpdateActivityRequest
 ): Promise<UpdateActivityResponse> => {
   const response: AxiosResponse<UpdateActivityResponse> =
-    await axiosInstance.put(`${PATHS.MY_ACTIVITIES}${activityId}`, updateData, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+    await axiosInstance.put(`${PATHS.MY_ACTIVITIES}${activityId}`, updateData);
   return response.data;
 };
