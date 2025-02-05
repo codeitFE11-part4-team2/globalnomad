@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import CardDropdown from './CardDropdown';
-import { cardModalStore } from '@/store/cardModal';
+import { modalStore } from '@/store/modalStore';
 
 interface Props {
   id: number;
@@ -23,7 +23,7 @@ export default function MyActivityCard({
   price,
 }: Props) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const { openModal } = cardModalStore();
+  const { openModal } = modalStore();
 
   return (
     <div className="w-full h-[128px] md:h-[156px] lg:h-[204px] flex rounded-3xl shadow-card relative">
@@ -87,7 +87,7 @@ export default function MyActivityCard({
               onEdit={() => setIsDropdownOpen(false)}
               onDelete={() => {
                 setIsDropdownOpen(false);
-                openModal(id);
+                openModal('card');
               }}
             />
           </div>
