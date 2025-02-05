@@ -22,8 +22,11 @@ export default function InputItem({
       </label>
       <input
         id={id}
-        className={`font-pretendard placeholder-gray-600 text-lg rounded-[6px] w-[640px] h-[58px] pl-[20px] 
-          border ${error ? 'border-red-500' : 'border-gray-600'} ${className}`}
+        className={`font-pretendard placeholder-gray-600 text-lg rounded-[6px] 
+          w-[350px] h-[58px] sm:w-[350px] sm:h-[58px]  
+          md:w-[640px] lg:w-[640px]  
+          pl-[20px] border ${error ? 'border-red-500' : 'border-gray-600'} 
+          ${className}`}
         {...props}
       />
       {error && errorMessage && (

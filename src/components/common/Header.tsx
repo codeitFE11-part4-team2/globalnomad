@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useAuthStore } from '@/store';
 import Link from 'next/link';
 import { useState } from 'react'; // 상태 관리
+import { usePathname } from 'next/navigation'; // usePathname 사용
 import logo from '../../../public/icons/icon-logomd.svg';
 
 const handleLogoClick = () => {
@@ -14,6 +15,12 @@ export default function Header() {
   const { user, isAuthenticated, logout } = useAuthStore();
   const [isNotificationOpen, setNotificationOpen] = useState(false); // 알림 상태 관리
   const [isDropdownOpen, setDropdownOpen] = useState(false); // 드롭다운 상태 관리
+  const pathname = usePathname(); // usePathname 훅을 사용해 현재 경로를 가져옵니다.
+
+  // 현재 페이지가 login 또는 signup일 경우 헤더를 숨기도록 조건을 추가
+  if (pathname === '/login' || pathname === '/signup') {
+    return null; // 로그인 페이지나 회원가입 페이지에서는 헤더를 렌더링하지 않음
+  }
 
   const toggleNotification = () => {
     setNotificationOpen((prev) => !prev); // 알림 토글
