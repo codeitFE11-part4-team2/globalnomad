@@ -21,6 +21,7 @@ export default function Home() {
   const [priceFilter, setPriceFilter] = useState<'낮은순' | '높은순' | '가격'>(
     '가격'
   );
+  const [searchKeyword, setSearchKeyword] = useState<string>('');
   const { data: popularData, isFetching } =
     usePopularActivities(popularActivityPage);
 
@@ -41,7 +42,7 @@ export default function Home() {
   const itemsPerPage = getItemsPerPage();
 
   // 전체 데이터를 가져옴 (페이지 크기를 매우 크게 설정)
-  const { data, isLoading, error } = useActivities(1, 1000);
+  const { data, isLoading, error } = useActivities(1, 1000, searchKeyword);
   const activities = data?.activities || [];
 
   // 선택된 카테고리에 해당하는 활동만 필터링
@@ -90,6 +91,11 @@ export default function Home() {
     });
   }, [popularData?.activities]);
 
+  const handleSearchAction = async (keyword: string) => {
+    setSearchKeyword(keyword);
+    setCurrentPage(1);
+  };
+
   if (isLoading)
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -132,7 +138,7 @@ export default function Home() {
           {/* 검색바 */}
           <div className="absolute w-full flex justify-center md:-bottom-[120px] -bottom-[72px] px-4 md:px-6 lg:px-0">
             <div className="w-[1200px]">
-              <SearchBar />
+              <SearchBar onSearchAction={handleSearchAction} />
             </div>
           </div>
         </div>
@@ -140,33 +146,64 @@ export default function Home() {
       {/* 여백 추가 (검색바가 겹치는 부분만큼) */}
       <div className="lg:h-[158px] md:h-[142px] h-[93px]" />
       <div className="max-w-[1200px] mx-auto pl-4 md:pl-6 lg:px-0">
-        <PopularActivity
-          page={popularActivityPage}
-          onPrevPage={handlePrevPage}
-          onNextPage={handleNextPage}
-        />
-      </div>
-      <div className="max-w-[1200px] mx-auto px-4 md:px-6 lg:px-0 pt-[40px] pb-[24px] md:pt-[60px] md:pb-[35px]">
-        <div className="flex items-center justify-between gap-6 relative">
-          <Category
-            selectedCategory={selectedCategory}
-            onSelectCategory={handleCategorySelect}
+        {!searchKeyword && (
+          <PopularActivity
+            page={popularActivityPage}
+            onPrevPage={handlePrevPage}
+            onNextPage={handleNextPage}
           />
+        )}
+      </div>
+      <div
+        className={`max-w-[1200px] mx-auto px-4 md:px-8 lg:px-0 ${
+          searchKeyword ? 'md:h-[40px] h-[24px]' : 'pb-[0px]'
+        }`}
+      >
+        <div
+          className={
+            searchKeyword
+              ? 'flex justify-between items-center md:mb-[32px] mb-[24px]'
+              : 'flex items-center justify-between gap-6 relative pt-[40px] pb-[24px] md:pt-[60px] md:pb-[35px]'
+          }
+        >
+          {!searchKeyword && (
+            <Category
+              selectedCategory={selectedCategory}
+              onSelectCategory={handleCategorySelect}
+            />
+          )}
           <div className="absolute right-[90px] md:right-[120px] lg:right-[127px] w-[60px] h-[41px] md:h-[58px] flex-shrink-0 bg-gradient-to-l from-[#FAFBFC] via-[rgba(250,251,252,0.8)] to-transparent" />
 
-          <Filter
-            onFilterChange={(filter) => {
-              setPriceFilter(filter as '낮은순' | '높은순' | '가격');
-              setCurrentPage(1); // 필터 변경 시 1페이지로 리셋
-            }}
-          />
+          {!searchKeyword && (
+            <Filter
+              onFilterChange={(filter) => {
+                setPriceFilter(filter as '낮은순' | '높은순' | '가격');
+                setCurrentPage(1); // 필터 변경 시 1페이지로 리셋
+              }}
+            />
+          )}
         </div>
       </div>
       <div className="max-w-[1200px] mx-auto px-4 md:px-8 lg:px-0 pb-[64px]">
         <div className="flex justify-between items-center md:mb-[32px] mb-[24px]">
-          <h2 className="md:text-[36px] text-[18px] font-bold leading-[43px] text-black font-pretendard">
-            {selectedCategory === '전체' ? '🛼 모든 체험' : selectedCategory}
-          </h2>
+          {searchKeyword ? (
+            <div className="flex flex-col gap-3">
+              <h2 className="text-[24px] md:text-[32px] font-pretendard leading-[26px]">
+                <span className="text-black font-bold">{searchKeyword}</span>
+                <span className="text-black font-normal">
+                  {' '}
+                  으로 검색한 결과입니다.
+                </span>
+              </h2>
+              <p className="text-black font-pretendard text-[16px] font-normal leading-[26px]">
+                총 {data?.totalCount || 0}개의 결과
+              </p>
+            </div>
+          ) : (
+            <h2 className="md:text-[36px] text-[18px] font-bold leading-[43px] text-black font-pretendard">
+              {selectedCategory === '전체' ? '🛼 모든 체험' : selectedCategory}
+            </h2>
+          )}
         </div>
         <AllActivity
           activities={currentPageActivities}

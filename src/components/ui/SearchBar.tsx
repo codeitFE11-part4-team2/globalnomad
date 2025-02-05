@@ -3,13 +3,22 @@
 import Image from 'next/image';
 import { useState } from 'react';
 
-export default function SearchBar() {
+interface SearchBarProps {
+  onSearchAction: (keyword: string) => void;
+}
+
+export default function SearchBar({ onSearchAction }: SearchBarProps) {
   const [isFocused, setIsFocused] = useState(false);
   const [inputValue, setInputValue] = useState('');
 
   // 입력값 변경 핸들러
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
+  };
+
+  // 검색 핸들러
+  const handleSearch = () => {
+    onSearchAction(inputValue);
   };
 
   // 포커스 핸들러
@@ -20,6 +29,13 @@ export default function SearchBar() {
   // 블러 핸들러
   const handleBlur = () => {
     setIsFocused(false);
+  };
+
+  // 엔터키 핸들러
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
   };
 
   return (
@@ -41,6 +57,7 @@ export default function SearchBar() {
                 onChange={handleInputChange}
                 onFocus={handleFocus}
                 onBlur={handleBlur}
+                onKeyPress={handleKeyPress}
                 className="
                   w-full
                   rounded
@@ -56,7 +73,7 @@ export default function SearchBar() {
                 className={`absolute left-14 transition-all duration-200 pointer-events-none
                   ${
                     isFocused || inputValue
-                      ? '-top-3 left-[44px] text-lg bg-white px-2 text-gray-600'
+                      ? '-top-3 left-[44px] text-lg bg-white px-2  text-gray-600'
                       : 'top-1/2 -translate-y-1/2 text-[14px] md:text-[16px] text-gray-500'
                   }`}
               >
@@ -74,6 +91,7 @@ export default function SearchBar() {
           </div>
           <button
             type="button"
+            onClick={handleSearch}
             className="
               flex justify-center items-center
               h-[56px]
