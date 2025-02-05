@@ -77,9 +77,19 @@ export default function Signin() {
     <div className="bg-gray-100 min-h-screen">
       <Container
         color="gray"
-        addClassName="max-w-[640px] max-h-[779px] w-full h-auto aspect-[640/779] absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+        addClassName="max-w-[640px] w-full h-auto absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
+        sm:aspect-[350/885] sm:max-w-[350px] sm:max-h-[645px] 
+        md:aspect-[640/1003] md:max-w-[640px] md:max-h-[779px] 
+        lg:aspect-[640/779] lg:max-w-[640px] lg:max-h-[779px] 
+        "
       >
-        <div className="flex flex-col gap-[56px]">
+        <div
+          className="flex flex-col gap-[56px]
+        sm:gap-[40px] sm:w-[350px] sm:max-h-[467px]
+        md:gap-[48px] md:w-[640px] md:max-h-[531px]
+        lg:gap-[48px] lg:w-[640px] lg:max-h-[531px]
+        "
+        >
           <Link href="/" aria-label="홈으로 이동">
             <Image
               src="/icons/logo_big.svg"

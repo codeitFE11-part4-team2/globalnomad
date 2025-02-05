@@ -10,9 +10,19 @@ export default function SignUpPage() {
     <div>
       <Container
         color="white"
-        addClassName="max-w-[640px] w-full mx-auto mt-[25px] "
+        addClassName="max-w-[640px] w-full mx-auto mt-[25px]
+        sm:aspect-[350/885] sm:max-w-[350px] sm:max-h-[885px] sm:px-[12px] 
+        md:aspect-[640/1003] md:max-w-[640px] md:max-h-[1003px]  
+        lg:aspect-[640/1019] lg:max-w-[640px] lg:max-h-[1019px]  
+        "
       >
-        <div className="flex flex-col gap-[30px]">
+        <div
+          className="flex flex-col gap-[30px]
+        sm:gap-[40px] sm:w-[350px] sm:max-h-[707px]
+        md:gap-[48px] md:w-[640px] md:max-h-[771px]
+        lg:gap-[48px] lg:w-[640px] lg:max-h-[771px]
+        "
+        >
           <Link href="/" aria-label="홈으로 이동">
             <Image
               src="/icons/logo_big.svg"
