@@ -8,6 +8,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import KakaoLoginButton from './KakoLoginButton';
 import { useForm, Controller } from 'react-hook-form';
+import { AxiosError } from 'axios'; // AxiosError 타입을 import
 
 interface User {
   id: number;
@@ -28,6 +29,10 @@ interface FormData {
   password: string;
 }
 
+interface ErrorResponse {
+  message: string; // 서버에서 반환하는 에러 메시지 형식
+}
+
 export default function SignInForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +43,7 @@ export default function SignInForm() {
   const {
     control,
     handleSubmit,
-    formState: { errors, isValid }, // isValid 상태 추가
+    formState: { errors, isValid },
     setValue,
     setError: setFormError,
     clearErrors,
@@ -47,8 +52,8 @@ export default function SignInForm() {
       email: '',
       password: '',
     },
-    mode: 'onChange', // onChange로 유효성 검사
-    reValidateMode: 'onChange', // 필드 값이 바뀔 때마다 유효성 재검사
+    mode: 'onChange',
+    reValidateMode: 'onChange',
   });
 
   useEffect(() => {
@@ -57,7 +62,6 @@ export default function SignInForm() {
 
   const onSubmit = async (data: FormData) => {
     setLoading(true);
-    setError(null);
 
     try {
       const response = await api.post<LoginResponse>('auth/login', {
@@ -72,7 +76,15 @@ export default function SignInForm() {
         router.push('/');
       }
     } catch (err) {
-      setError('로그인 실패');
+      const error = err as AxiosError<ErrorResponse>;
+
+      if (error.response?.data?.message === '비밀번호가 일치하지 않습니다.') {
+        alert('비밀번호가 일치하지 않습니다.');
+      } else if (
+        error.response?.data?.message === '존재하지 않는 유저입니다.'
+      ) {
+        alert('이메일을 확인해주세요.');
+      }
     } finally {
       setLoading(false);
     }
