@@ -33,7 +33,7 @@ export default function InputItem({
         {/* passwordinput 여부에 따라 input 다르게 렌더링 */}
         <input
           id={passwordinput ? `${id}-password` : id} // id 다르게 설정
-          className={`font-pretendard placeholder-gray-600 text-lg rounded-[6px] w-full h-[58px] pl-[20px] pr-[40px] 
+          className={`font-pretendard placeholder-gray-600 text-lg rounded-[6px] w-full h-[58px] pl-[20px]
             border ${error ? 'border-red-500' : 'border-gray-600'} ${className}`}
           type={passwordinput && !isPasswordVisible ? 'password' : 'text'}
           {...props}
@@ -60,14 +60,6 @@ export default function InputItem({
       </div>
 
       {/* 에러 메시지 출력 */}
-      <input
-        id={id}
-        className={`font-pretendard placeholder-gray-600 text-lg rounded-[6px] 
-          w-full h-[58px]  
-          pl-[20px] border ${error ? 'border-red-500' : 'border-gray-600'} 
-          ${className}`}
-        {...props}
-      />
       {error && errorMessage && (
         <p className="text-red-3 text-xs font-regular">{errorMessage}</p>
       )}
