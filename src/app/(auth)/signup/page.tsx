@@ -27,9 +27,10 @@ export default function SignUpPage() {
             <Image
               src="/icons/logo_big.svg"
               alt="노마드 로고"
-              width={340}
-              height={160}
-              className="block mx-auto"
+              width={270}
+              height={154}
+              className="block mx-auto 
+              md:w-[340px] md:h-[192px]"
             />
           </Link>
           <Signupform />
