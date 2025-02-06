@@ -55,6 +55,8 @@ export default function SignInForm() {
     setIsMounted(true);
   }, []);
 
+  const [isPasswordVisible, setPasswordVisible] = useState(false); // 비밀번호 표시 상태 추가
+
   const onSubmit = async (data: FormData) => {
     setLoading(true);
     setError(null);
@@ -146,20 +148,38 @@ export default function SignInForm() {
             required: '비밀번호는 필수 입력 사항입니다.',
           }}
           render={({ field }) => (
-            <InputItem
-              label="비밀번호"
-              id="pw"
-              type="password"
-              placeholder="비밀번호를 입력해주세요"
-              value={field.value || ''}
-              onChange={(e) => {
-                field.onChange(e);
-                validatePassword(e.target.value); // 비밀번호 입력 시 검증
-              }}
-              onBlur={() => validatePassword(field.value)} // 포커스 아웃 시 비밀번호 길이 검증
-              error={!!errors.password} // error 상태 전달
-              errorMessage={errors.password?.message} // 에러 메시지 전달
-            />
+            <div className="relative">
+              <InputItem
+                label="비밀번호"
+                id="pw"
+                type={isPasswordVisible ? 'text' : 'password'} // 비밀번호 표시/숨기기
+                placeholder="비밀번호를 입력해주세요"
+                value={field.value || ''}
+                onChange={(e) => {
+                  field.onChange(e);
+                  validatePassword(e.target.value); // 비밀번호 입력 시 검증
+                }}
+                onBlur={() => validatePassword(field.value)} // 포커스 아웃 시 비밀번호 길이 검증
+                error={!!errors.password} // error 상태 전달
+                errorMessage={errors.password?.message} // 에러 메시지 전달
+              />
+              {/* 비밀번호 표시/숨기기 아이콘 */}
+              <span
+                onClick={() => setPasswordVisible(!isPasswordVisible)} // 클릭 시 비밀번호 표시/숨기기
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer"
+              >
+                <Image
+                  src={
+                    isPasswordVisible
+                      ? '/icons/icon-visibility_on.svg'
+                      : '/icons/icon-visibility_off.svg'
+                  } // 경로로 아이콘 지정
+                  alt={isPasswordVisible ? '비밀번호 숨기기' : '비밀번호 표시'}
+                  width={20.47}
+                  height={20.47}
+                />
+              </span>
+            </div>
           )}
         />
 
