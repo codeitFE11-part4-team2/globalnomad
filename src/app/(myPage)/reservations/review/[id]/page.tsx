@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/common/Button';
 import { use, useEffect } from 'react';
-import Modal from '../../_components/Modal';
+import Modal from '../../history/_components/Modal';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';

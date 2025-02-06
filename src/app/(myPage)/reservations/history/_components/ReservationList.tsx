@@ -88,7 +88,7 @@ export default function ReservationList({
       return (
         <Link
           href={{
-            pathname: `/reservations/history/review/${reservation.id}`,
+            pathname: `/reservations/review/${reservation.id}`,
             query: {
               title: reservation.activity.title,
               date: reservation.date,
