@@ -60,6 +60,14 @@ export default function InputItem({
       </div>
 
       {/* 에러 메시지 출력 */}
+      <input
+        id={id}
+        className={`font-pretendard placeholder-gray-600 text-lg rounded-[6px] 
+          w-full h-[58px]  
+          pl-[20px] border ${error ? 'border-red-500' : 'border-gray-600'} 
+          ${className}`}
+        {...props}
+      />
       {error && errorMessage && (
         <p className="text-red-3 text-xs font-regular">{errorMessage}</p>
       )}
