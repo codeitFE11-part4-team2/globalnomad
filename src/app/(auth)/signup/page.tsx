@@ -11,7 +11,7 @@ export default function SignUpPage() {
       <Container
         color="white"
         addClassName="max-w-[640px] w-full mx-auto mt-[25px]
-        sm:aspect-[350/885] sm:max-w-[350px] sm:max-h-[885px] sm:px-[12px] 
+        sm:aspect-[350/885] sm:max-w-[350px] sm:max-h-[885px] 
         md:aspect-[640/1003] md:max-w-[640px] md:max-h-[1003px]  
         lg:aspect-[640/1019] lg:max-w-[640px] lg:max-h-[1019px]  
         "

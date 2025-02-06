@@ -76,9 +76,9 @@ export default function Signin() {
   return (
     <div className="bg-gray-100 min-h-screen">
       <Container
-        color="gray"
+        color="white"
         addClassName="max-w-[640px] w-full h-auto absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
-        sm:aspect-[350/885] sm:max-w-[350px] sm:max-h-[645px] sm:px-[12px] 
+        sm:aspect-[350/885] sm:max-w-[350px] sm:max-h-[645px] 
         md:aspect-[640/1003] md:max-w-[640px] md:max-h-[779px] 
         lg:aspect-[640/779] lg:max-w-[640px] lg:max-h-[779px] 
         "

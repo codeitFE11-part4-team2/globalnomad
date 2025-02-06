@@ -267,7 +267,10 @@ function SignUpForm() {
           </span>
         </Link>
       </p>
-      <div className="flex gap-[40px] text-xl text-gray-800 font-regular flex justify-center items-center whitespace-nowrap">
+      <div
+        className="flex gap-[40px] text-md text-gray-800 font-regular flex justify-center items-center whitespace-nowrap
+      md:text-xl"
+      >
         <div className="w-[180px] h-[1px] bg-gray-300" />
         SNS 계정으로 회원가입하기
         <div className="w-[180px] h-[1px] bg-gray-300" />
