@@ -5,19 +5,18 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   error?: boolean;
   errorMessage?: string;
-  passwordinput?: boolean; // passwordinput으로 이름 변경
+  passwordinput?: boolean;
 }
 
 export default function InputItem({
   label,
   id,
   error,
-  passwordinput, // 변경된 prop 이름
+  passwordinput,
   errorMessage,
   className,
   ...props
 }: InputProps) {
-  // 비밀번호 표시 여부 상태
   const [isPasswordVisible, setPasswordVisible] = useState(false);
 
   return (
@@ -30,19 +29,17 @@ export default function InputItem({
       </label>
 
       <div className="relative">
-        {/* passwordinput 여부에 따라 input 다르게 렌더링 */}
         <input
-          id={passwordinput ? `${id}-password` : id} // id 다르게 설정
+          id={passwordinput ? `${id}-password` : id}
           className={`font-pretendard placeholder-gray-600 text-lg rounded-[6px] w-full h-[58px] pl-[20px]
             border ${error ? 'border-red-500' : 'border-gray-600'} ${className}`}
           type={passwordinput && !isPasswordVisible ? 'password' : 'text'}
           {...props}
         />
 
-        {/* 비밀번호 표시/숨기기 아이콘 */}
         {passwordinput && (
           <span
-            onClick={() => setPasswordVisible(!isPasswordVisible)} // 클릭 시 상태 변경
+            onClick={() => setPasswordVisible(!isPasswordVisible)}
             className="absolute right-4 top-1/2 transform -translate-y-1/2 cursor-pointer"
           >
             <Image
@@ -59,7 +56,6 @@ export default function InputItem({
         )}
       </div>
 
-      {/* 에러 메시지 출력 */}
       {error && errorMessage && (
         <p className="text-red-3 text-xs font-regular">{errorMessage}</p>
       )}
