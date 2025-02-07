@@ -7,10 +7,8 @@ import Form from 'next/form';
 import { Button } from '@/components/common/Button';
 import Image from 'next/image';
 import DaumPostcode from 'react-daum-postcode';
-
-const initialState = {
-  message: '',
-};
+import { useAuthStore } from '@/store';
+import { ImageUrl } from './api/ImageUrl';
 
 interface Schedule {
   id: number;
@@ -20,7 +18,19 @@ interface Schedule {
 }
 
 export default function Page() {
-  const [state, formAction] = useActionState(createActions, null);
+  const { token } = useAuthStore();
+  const [state, formAction] = useActionState(
+    async (_prevState: any, formData: FormData) => {
+      if (!token) {
+        return { error: '인증 토큰이 없습니다. 로그인 후 다시 시도해주세요.' };
+      }
+      console.log(formData);
+      return createActions(formData, token);
+    },
+    null
+  );
+  console.log('🔑 Token:', token);
+
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
@@ -60,12 +70,12 @@ export default function Page() {
   const addSchedule = () => {
     const dateInput = dateInputRef.current?.value;
     if (!dateInput || !startTime || !endTime) {
-      alert('날짜와 시간을 선택해주세요!');
+      alert('날짜와 시간을 선택해주세요');
       return;
     }
     const formattedDate = formatDate(dateInput);
     if (isOverlapping(formattedDate, startTime, endTime)) {
-      alert('이미 예약된 시간과 겹칩니다. 다른 시간을 선택해주세요!');
+      alert('이미 예약된 시간과 겹칩니다. 다른 시간을 선택해주세요');
       return;
     }
     setSchedules([
@@ -136,16 +146,48 @@ export default function Page() {
     setIsOpen(false);
   };
 
+  /** 폼 제출할거 */
+  const handleSubmit = async (formData: FormData) => {
+    formData.append('schedules', JSON.stringify(schedules));
+
+    if (bannerImage) {
+      try {
+        const bannerImageUrl = await ImageUrl(bannerImage, token);
+        formData.append('bannerImageUrl', bannerImageUrl);
+      } catch (error) {
+        console.error('배너 이미지 업로드 실패:', error);
+        return;
+      }
+    }
+
+    try {
+      const subImageUrls = await Promise.all(
+        introImages.map((file) => ImageUrl(file, token))
+      );
+      formData.append('subImageUrls', JSON.stringify(subImageUrls));
+    } catch (error) {
+      console.error('서브 이미지 업로드 실패:', error);
+      return;
+    }
+
+    for (const [key, value] of formData.entries()) {
+      console.log(`${key}:`, value);
+    }
+
+    formAction(formData);
+  };
+
   return (
     <div className="w-full">
-      <Form action={formAction} className="flex flex-col">
+      <Form action={handleSubmit} className="flex flex-col">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold">내 체험 등록</h1>
-          <Button>등록하기</Button>
+          <Button type="submit">등록하기</Button>
         </div>
 
         <input
           type="text"
+          name="title"
           placeholder="제목"
           className="w-full h-14 border border-gray-800 rounded-md px-4 focus:outline-none text-lg placeholder-gray-700 mt-6"
           onChange={(e) => {
@@ -155,7 +197,10 @@ export default function Page() {
           }}
         />
 
-        <select className="w-full text-lg h-14 mt-6 border border-gray-800 rounded-md px-2 focus:outline-none text-gray-800 appearance-none bg-[url('/icons/selectArrow_icon.svg')] bg-no-repeat bg-right">
+        <select
+          name="category"
+          className="w-full text-lg h-14 mt-6 border border-gray-800 rounded-md px-2 focus:outline-none text-gray-800 appearance-none bg-[url('/icons/selectArrow_icon.svg')] bg-no-repeat bg-right"
+        >
           <option value="" disabled selected hidden>
             카테고리
           </option>
@@ -169,12 +214,14 @@ export default function Page() {
 
         <textarea
           placeholder="설명"
+          name="description"
           className="w-full h-[346px] p-4 text-lg border border-gray-800 rounded-md focus:outline-none resize-none mt-6"
         ></textarea>
 
         <label className="block text-black text-2xl font-bold mt-6">가격</label>
         <input
           type="number"
+          name="price"
           placeholder="가격"
           className="w-full h-14 border border-gray-800 rounded-md px-4 mt-4 focus:outline-none"
           onChange={(e) => {
@@ -203,7 +250,6 @@ export default function Page() {
               <label className="text-xl font-medium">날짜</label>
               <input
                 type="date"
-                name="new_schedule_date"
                 ref={dateInputRef}
                 className="border h-14 border-gray-800 rounded-md text-lg peer pl-4"
               />
