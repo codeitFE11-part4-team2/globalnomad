@@ -1,11 +1,12 @@
 'use client';
 
-import { useRef, useState } from 'react';
-import { useFormState } from 'react-dom';
+import { useEffect, useRef, useState } from 'react';
+import { useActionState } from 'react';
 import { createActions } from './_actions/createActions';
 import Form from 'next/form';
 import { Button } from '@/components/common/Button';
 import Image from 'next/image';
+import DaumPostcode from 'react-daum-postcode';
 
 const initialState = {
   message: '',
@@ -19,13 +20,15 @@ interface Schedule {
 }
 
 export default function Page() {
-  const [state, formAction] = useFormState(createActions, initialState);
+  const [state, formAction] = useActionState(createActions, null);
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
   const dateInputRef = useRef<HTMLInputElement>(null);
   const [bannerImage, setBannerImage] = useState<File | null>(null);
   const [introImages, setIntroImages] = useState<File[]>([]);
+  const [address, setAddress] = useState('');
+  const [isOpen, setIsOpen] = useState(false);
 
   /** 예약 날짜 관련 함수들들 */
   const formatDate = (date: string) => {
@@ -114,6 +117,25 @@ export default function Page() {
     setIntroImages((prevImages) => prevImages.filter((_, i) => i !== index));
   };
 
+  /** 주소입력 관련 함수 */
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [isOpen]);
+
+  const handleComplete = (data: any) => {
+    setAddress(data.address);
+    setIsOpen(false);
+  };
+
   return (
     <div className="w-full">
       <Form action={formAction} className="flex flex-col">
@@ -166,6 +188,9 @@ export default function Page() {
         <input
           type="text"
           placeholder="주소를 입력해주세요"
+          value={address}
+          readOnly
+          onClick={() => setIsOpen(true)}
           className="w-full h-14 border border-gray-800 rounded-md px-4 mt-4 focus:outline-none"
         />
 
@@ -348,6 +373,19 @@ export default function Page() {
           </div>
         </div>
       </Form>
+      {isOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50">
+          <div className="bg-white md:w-[450px]  p-2 md:p-4 rounded-md">
+            <DaumPostcode onComplete={handleComplete} />
+            <button
+              className="mt-2 w-full bg-red-500 text-white py-2 rounded"
+              onClick={() => setIsOpen(false)}
+            >
+              닫기
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
