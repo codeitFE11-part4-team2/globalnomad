@@ -9,6 +9,7 @@ import Link from 'next/link';
 import KakaoLoginButton from './KakoLoginButton';
 import { useForm, Controller } from 'react-hook-form';
 import { AxiosError } from 'axios'; // AxiosError 타입을 import
+import { modalStore } from '@/store/modalStore';
 
 interface User {
   id: number;
@@ -39,6 +40,7 @@ export default function SignInForm() {
   const { login } = useAuthStore();
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
+  const { openModal } = modalStore();
 
   const {
     control,
@@ -79,11 +81,11 @@ export default function SignInForm() {
       const error = err as AxiosError<ErrorResponse>;
 
       if (error.response?.data?.message === '비밀번호가 일치하지 않습니다.') {
-        alert('비밀번호가 일치하지 않습니다.');
+        openModal('pwerror');
       } else if (
         error.response?.data?.message === '존재하지 않는 유저입니다.'
       ) {
-        alert('이메일을 확인해주세요.');
+        openModal('emailerror');
       }
     } finally {
       setLoading(false);
