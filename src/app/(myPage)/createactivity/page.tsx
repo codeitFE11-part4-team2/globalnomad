@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useActionState } from 'react';
 import { createActions } from './_actions/createActions';
 import Form from 'next/form';
 import { Button } from '@/components/common/Button';
@@ -19,28 +18,19 @@ interface Schedule {
 
 export default function Page() {
   const { token } = useAuthStore();
-  const [state, formAction] = useActionState(
-    async (_prevState: any, formData: FormData) => {
-      if (!token) {
-        return { error: '인증 토큰이 없습니다. 로그인 후 다시 시도해주세요.' };
-      }
-      console.log(formData);
-      return createActions(formData, token);
-    },
-    null
-  );
-  console.log('🔑 Token:', token);
+  console.log('Token:', token);
 
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
   const dateInputRef = useRef<HTMLInputElement>(null);
-  const [bannerImage, setBannerImage] = useState<File | null>(null);
-  const [introImages, setIntroImages] = useState<File[]>([]);
+  const [bannerImage, setBannerImage] = useState<string | null>(null);
+  const [introImages, setIntroImages] = useState<string[]>([]);
   const [address, setAddress] = useState('');
+  const [category, setCategory] = useState('');
   const [isOpen, setIsOpen] = useState(false);
 
-  /** 예약 날짜 관련 함수들들 */
+  /** 예약 날짜 관련 함수들 */
   const formatDate = (date: string) => {
     if (!date) return '';
     const [year, month, day] = date.split('-');
@@ -97,26 +87,35 @@ export default function Page() {
 
   /** 이미지 관련 함수들 */
 
-  const handleBannerUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setBannerImage(file);
+      try {
+        const uploadedUrl = await ImageUrl(file, token);
+        setBannerImage(uploadedUrl);
+        console.log('배너 이미지 URL:', uploadedUrl);
+      } catch (error) {
+        console.error('배너 이미지 업로드 실패:', error);
+      }
     }
   };
 
-  const handleIntroUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleIntroUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-
     if (files.length === 0) return;
 
-    setIntroImages((prevImages) => {
-      const newImages = [...prevImages, ...files];
-
-      // 최대 4개 유지, 4개 초과 시 앞에서부터 삭제
-      return newImages.length > 4
-        ? newImages.slice(newImages.length - 4)
-        : newImages;
-    });
+    try {
+      const uploadedUrls = await Promise.all(
+        files.map((file) => ImageUrl(file, token))
+      );
+      setIntroImages((prev) => {
+        const newImages = [...prev, ...uploadedUrls];
+        return newImages.length > 4 ? newImages.slice(-4) : newImages;
+      });
+      console.log('상세 이미지 URL들:', uploadedUrls);
+    } catch (error) {
+      console.error('상세 이미지 업로드 실패:', error);
+    }
   };
 
   const removeBannerImage = () => {
@@ -146,40 +145,9 @@ export default function Page() {
     setIsOpen(false);
   };
 
-  /** 폼 제출할거 */
-  const handleSubmit = async (formData: FormData) => {
-    formData.append('schedules', JSON.stringify(schedules));
-
-    if (bannerImage) {
-      try {
-        const bannerImageUrl = await ImageUrl(bannerImage, token);
-        formData.append('bannerImageUrl', bannerImageUrl);
-      } catch (error) {
-        console.error('배너 이미지 업로드 실패:', error);
-        return;
-      }
-    }
-
-    try {
-      const subImageUrls = await Promise.all(
-        introImages.map((file) => ImageUrl(file, token))
-      );
-      formData.append('subImageUrls', JSON.stringify(subImageUrls));
-    } catch (error) {
-      console.error('서브 이미지 업로드 실패:', error);
-      return;
-    }
-
-    for (const [key, value] of formData.entries()) {
-      console.log(`${key}:`, value);
-    }
-
-    formAction(formData);
-  };
-
   return (
     <div className="w-full">
-      <Form action={handleSubmit} className="flex flex-col">
+      <Form action={createActions} className="flex flex-col">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold">내 체험 등록</h1>
           <Button type="submit">등록하기</Button>
@@ -199,17 +167,19 @@ export default function Page() {
 
         <select
           name="category"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
           className="w-full text-lg h-14 mt-6 border border-gray-800 rounded-md px-2 focus:outline-none text-gray-800 appearance-none bg-[url('/icons/selectArrow_icon.svg')] bg-no-repeat bg-right"
         >
-          <option value="" disabled selected hidden>
+          <option value="" disabled hidden>
             카테고리
           </option>
-          <option>문화예술</option>
-          <option>식음료</option>
-          <option>스포츠</option>
-          <option>투어</option>
-          <option>관광</option>
-          <option>웰빙</option>
+          <option value="문화예술">문화예술</option>
+          <option value="식음료">식음료</option>
+          <option value="스포츠">스포츠</option>
+          <option value="투어">투어</option>
+          <option value="관광">관광</option>
+          <option value="웰빙">웰빙</option>
         </select>
 
         <textarea
@@ -234,6 +204,7 @@ export default function Page() {
         <label className="block text-black text-2xl font-bold mt-6">주소</label>
         <input
           type="text"
+          name="address"
           placeholder="주소를 입력해주세요"
           value={address}
           readOnly
@@ -320,6 +291,11 @@ export default function Page() {
           </div>
 
           <div className="w-full border my-5 border-gray-300"></div>
+          <input
+            type="hidden"
+            name="schedules"
+            value={JSON.stringify(schedules)}
+          />
 
           {schedules.map((schedule) => (
             <div key={schedule.id} className="w-full flex items-center mb-5">
@@ -345,7 +321,6 @@ export default function Page() {
         </div>
 
         <div className="w-full space-y-6">
-          {/* 배너 이미지 */}
           <div>
             <p className="text-black text-2xl font-bold mt-6">배너 이미지</p>
             <div className="flex items-center space-x-4 mt-6">
@@ -362,7 +337,7 @@ export default function Page() {
               {bannerImage && (
                 <div className="relative w-[180px] aspect-square">
                   <Image
-                    src={URL.createObjectURL(bannerImage)}
+                    src={bannerImage}
                     alt="배너 이미지"
                     className="rounded-md object-cover"
                     fill
@@ -378,11 +353,9 @@ export default function Page() {
             </div>
           </div>
 
-          {/* 소개 이미지 */}
           <div>
             <p className="text-black text-2xl font-bold mt-6">소개 이미지</p>
             <div className="flex flex-wrap items-center gap-4 mt-6">
-              {/* 이미지 추가 버튼 */}
               <label className="w-[180px] aspect-square flex flex-col items-center justify-center border-2 border-dashed border-gray-400 rounded-md cursor-pointer">
                 <input
                   type="file"
@@ -395,11 +368,10 @@ export default function Page() {
                 </span>
               </label>
 
-              {/* 업로드된 이미지들 */}
-              {introImages.map((file, index) => (
+              {introImages.map((url, index) => (
                 <div key={index} className="relative w-[180px] aspect-square">
                   <Image
-                    src={URL.createObjectURL(file)}
+                    src={url}
                     alt={`소개 이미지 ${index + 1}`}
                     className="rounded-md object-cover"
                     fill
@@ -416,6 +388,19 @@ export default function Page() {
             <p className="text-2lg text-gray-900 mt-6 mb-28">
               *이미지는 최대 4개까지 등록 가능합니다.
             </p>
+
+            {bannerImage && (
+              <input type="hidden" name="bannerImageUrl" value={bannerImage} />
+            )}
+
+            {introImages.length > 0 && (
+              <input
+                type="hidden"
+                name="subImageUrls"
+                value={JSON.stringify(introImages)}
+              />
+            )}
+            <input type="hidden" name="token" value={token ?? ''} />
           </div>
         </div>
       </Form>
