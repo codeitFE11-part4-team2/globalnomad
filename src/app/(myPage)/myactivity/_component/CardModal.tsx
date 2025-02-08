@@ -1,9 +1,9 @@
 'use client';
 
-import { cardModalStore } from '@/store/cardModal';
+import { modalStore } from '@/store/modalStore';
 
 export default function CardModal() {
-  const { isOpen, selectedCardId, closeModal } = cardModalStore();
+  const { isOpen, closeModal } = modalStore();
 
   if (!isOpen) return null;
 

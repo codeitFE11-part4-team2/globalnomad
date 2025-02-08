@@ -3,7 +3,8 @@
 import Image from 'next/image';
 import { useAuthStore } from '@/store';
 import Link from 'next/link';
-import { useState } from 'react'; // 상태 관리
+import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import logo from '../../../public/icons/icon-logomd.svg';
 
 const handleLogoClick = () => {
@@ -12,15 +13,24 @@ const handleLogoClick = () => {
 
 export default function Header() {
   const { user, isAuthenticated, logout } = useAuthStore();
-  const [isNotificationOpen, setNotificationOpen] = useState(false); // 알림 상태 관리
-  const [isDropdownOpen, setDropdownOpen] = useState(false); // 드롭다운 상태 관리
+  const [isNotificationOpen, setNotificationOpen] = useState(false);
+  const [isDropdownOpen, setDropdownOpen] = useState(false);
+  const pathname = usePathname();
+
+  if (
+    pathname === '/login' ||
+    pathname === '/signup' ||
+    pathname === '/kakaosignup'
+  ) {
+    return null;
+  }
 
   const toggleNotification = () => {
-    setNotificationOpen((prev) => !prev); // 알림 토글
+    setNotificationOpen((prev) => !prev);
   };
 
   const toggleDropdown = () => {
-    setDropdownOpen((prev) => !prev); // 닉네임 드롭다운 토글
+    setDropdownOpen((prev) => !prev);
   };
 
   return (
@@ -44,7 +54,7 @@ export default function Header() {
                 height={20}
               />
               {isNotificationOpen && (
-                <div className="absolute right-0 top-8 w-[200px] bg-white border border-gray-300 shadow-lg p-4">
+                <div className="absolute right-0 top-8 w-[200px] bg-white border border-gray-300 shadow-lg p-4 z-20 ">
                   <p>알림</p>
                   {/* 알림 내용을 여기에 추가할 수 있음 */}
                 </div>
@@ -69,7 +79,6 @@ export default function Header() {
                 </div>
               )}
 
-              {/* 닉네임 클릭 시 드롭다운 표시 */}
               <span
                 className="cursor-pointer text-black text-md font-medium font-pretendard"
                 onClick={toggleDropdown}
@@ -77,11 +86,10 @@ export default function Header() {
                 {user?.nickname}
               </span>
 
-              {/* 드롭다운 메뉴 */}
               {isDropdownOpen && (
                 <div
                   className="absolute top-full right-0 w-[160px] bg-white border border-gray-300 rounded-[6px] 
-                py-2 mt-2 text-center font-mediume text-2lg font-pretendard"
+                py-2 mt-2 text-center font-mediume text-2lg font-pretendard z-20"
                 >
                   <Link
                     href="/mypage"

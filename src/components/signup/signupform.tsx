@@ -9,6 +9,8 @@ import { api } from '@/lib/axios';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth';
 import { useForm, Controller } from 'react-hook-form';
+import { AxiosError } from 'axios';
+import { modalStore } from '@/store/modalStore';
 
 interface SignUpResponse {
   access_token: string;
@@ -29,10 +31,15 @@ interface FormData {
   confirmPassword: string;
 }
 
+interface ErrorResponse {
+  message: string; // 서버에서 반환하는 에러 메시지 형식
+}
+
 function SignUpForm() {
   const [isClient, setIsClient] = useState(false);
-  const [loading, setLoading] = useState(false); // loading 상태 추가
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { openModal } = modalStore();
 
   const setToken = useAuthStore((state) => state.setToken);
   const setUser = useAuthStore((state) => state.setUser);
@@ -57,8 +64,8 @@ function SignUpForm() {
       password: '',
       confirmPassword: '',
     },
-    mode: 'onChange', // onChange로 유효성 검사
-    reValidateMode: 'onChange', // 필드 값이 바뀔 때마다 유효성 재검사
+    mode: 'onChange',
+    reValidateMode: 'onChange',
   });
 
   const validateEmail = (email: string) => {
@@ -111,11 +118,9 @@ function SignUpForm() {
     const { email, nickname, password } = data;
 
     try {
-      // 폼 전체 유효성 검사를 다시 실행
-      const isValidForm = await trigger(); // trigger()를 통해 모든 필드의 유효성 검사를 실행
+      const isValidForm = await trigger();
 
       if (!isValidForm) {
-        // 유효성 검사 실패 시 아무 작업도 하지 않음
         return;
       }
 
@@ -139,7 +144,11 @@ function SignUpForm() {
         router.push('/login');
       }
     } catch (err) {
-      console.error(err);
+      const error = err as AxiosError<ErrorResponse>;
+
+      if (error.response?.data?.message === '중복된 이메일입니다.') {
+        openModal('checkemail');
+      }
     } finally {
       setLoading(false);
     }
@@ -173,9 +182,9 @@ function SignUpForm() {
               value={field.value || ''}
               onChange={(e) => {
                 field.onChange(e);
-                validateEmail(e.target.value); // 이메일 유효성 검사
+                validateEmail(e.target.value);
               }}
-              onBlur={() => validateEmail(field.value)} // 포커스 아웃 시 이메일 유효성 검사
+              onBlur={() => validateEmail(field.value)}
               error={!!errors.email}
               errorMessage={errors.email?.message}
             />
@@ -196,9 +205,9 @@ function SignUpForm() {
               value={field.value || ''}
               onChange={(e) => {
                 field.onChange(e);
-                validateNickname(e.target.value); // 비밀번호 유효성 검사
+                validateNickname(e.target.value);
               }}
-              onBlur={() => validateNickname(field.value)} // 포커스 아웃 시 비밀번호 유효성 검사
+              onBlur={() => validateNickname(field.value)}
               error={!!errors.nickname}
               errorMessage={errors.nickname?.message}
             />
@@ -214,14 +223,14 @@ function SignUpForm() {
             <InputItem
               label="비밀번호"
               id="password"
-              type="password"
+              passwordinput
               placeholder="8자 이상 입력해 주세요"
               value={field.value || ''}
               onChange={(e) => {
                 field.onChange(e);
-                validatePassword(e.target.value); // 비밀번호 유효성 검사
+                validatePassword(e.target.value);
               }}
-              onBlur={() => validatePassword(field.value)} // 포커스 아웃 시 비밀번호 유효성 검사
+              onBlur={() => validatePassword(field.value)}
               error={!!errors.password}
               errorMessage={errors.password?.message}
             />
@@ -237,14 +246,14 @@ function SignUpForm() {
             <InputItem
               label="비밀번호 확인"
               id="confirmPassword"
-              type="password"
+              passwordinput
               placeholder="비밀번호를 한번 더 입력해 주세요"
               value={field.value || ''}
               onChange={(e) => {
                 field.onChange(e);
-                validateConfirmPassword(e.target.value); // 비밀번호 확인 유효성 검사
+                validateConfirmPassword(e.target.value);
               }}
-              onBlur={() => validateConfirmPassword(field.value)} // 포커스 아웃 시 비밀번호 확인 유효성 검사
+              onBlur={() => validateConfirmPassword(field.value)}
               error={!!errors.confirmPassword}
               errorMessage={errors.confirmPassword?.message}
             />
@@ -254,7 +263,7 @@ function SignUpForm() {
           type="submit"
           variant="green"
           size="full"
-          disabled={isButtonDisabled} // 버튼 활성화 조건
+          disabled={isButtonDisabled}
         >
           {loading ? '가입 중...' : '회원가입 하기'}
         </Button>
@@ -267,7 +276,10 @@ function SignUpForm() {
           </span>
         </Link>
       </p>
-      <div className="flex gap-[40px] text-xl text-gray-800 font-regular flex justify-center items-center whitespace-nowrap">
+      <div
+        className="flex gap-[40px] text-md text-gray-800 font-regular flex justify-center items-center whitespace-nowrap
+      md:text-xl"
+      >
         <div className="w-[180px] h-[1px] bg-gray-300" />
         SNS 계정으로 회원가입하기
         <div className="w-[180px] h-[1px] bg-gray-300" />
