@@ -1,7 +1,10 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import InputItem from '@/components/login/logininputitem';
+import KakaoSignUpForm from '@/components/signup/kakaosignupform';
+import Container from '@/components/login/container';
+import Image from 'next/image';
+import Link from 'next/link';
 import { Button } from '../../../components/common/Button';
 import { authApi } from '@/services/auth';
 import { AxiosError } from 'axios';
@@ -67,23 +70,43 @@ const KakaoSignup = () => {
 
   return (
     <div>
-      <InputItem
-        label="닉네임"
-        id="nickname"
-        type="text"
-        placeholder="닉네임을 입력해 주세요"
-        value={nickname}
-        onChange={(e) => setNickname(e.target.value)}
-      />
-      <Button
-        type="button"
-        variant="nomad-black"
-        size="full"
-        onClick={handleSignup}
-        disabled={loading}
+      <Container
+        color="white"
+        addClassName="max-w-[640px] w-full h-auto absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
+        sm:aspect-[350/885] sm:max-w-[350px] sm:max-h-[645px] 
+        md:aspect-[640/1003] md:max-w-[640px] md:max-h-[779px] 
+        lg:aspect-[640/779] lg:max-w-[640px] lg:max-h-[779px] 
+        "
       >
-        {loading ? '가입 중...' : '회원가입 하기'}
-      </Button>
+        <div
+          className="flex flex-col gap-[56px]
+        sm:gap-[40px] sm:w-[350px] sm:max-h-[467px]
+        md:gap-[48px] md:w-[640px] md:max-h-[531px]
+        lg:gap-[48px] lg:w-[640px] lg:max-h-[531px]
+        "
+        >
+          <Link href="/" aria-label="홈으로 이동">
+            <Image
+              src="/icons/logo_big.svg"
+              alt="노마드 로고"
+              width={270}
+              height={154}
+              className="block mx-auto 
+              md:w-[340px] md:h-[192px]"
+            />
+          </Link>
+          <KakaoSignUpForm />
+          <Button
+            type="button"
+            variant="nomad-black"
+            size="full"
+            onClick={handleSignup}
+            disabled={loading}
+          >
+            {loading ? '가입 중...' : '회원가입 하기'}
+          </Button>
+        </div>
+      </Container>
     </div>
   );
 };

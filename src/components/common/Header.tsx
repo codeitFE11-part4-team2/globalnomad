@@ -17,7 +17,11 @@ export default function Header() {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const pathname = usePathname();
 
-  if (pathname === '/login' || pathname === '/signup') {
+  if (
+    pathname === '/login' ||
+    pathname === '/signup' ||
+    pathname === '/kakaosignup'
+  ) {
     return null;
   }
 
