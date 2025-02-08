@@ -26,7 +26,7 @@ export default function Signin() {
         setIsLoading(true);
         authApi
           .signInWithKakao({
-            redirectUri: 'https://globalnomad-11-2.vercel.app/login',
+            redirectUri: 'https://globalnomad-11-2-test.vercel.app/login',
             token: kakaoCode,
           })
           .then((response) => {
@@ -53,7 +53,7 @@ export default function Signin() {
                 alert('회원가입이 필요합니다.');
                 const clientId = process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID;
                 const redirectUri =
-                  'https://globalnomad-11-2.vercel.app/kakaosignup';
+                  'https://globalnomad-11-2-test.vercel.app/kakaosignup';
                 const kakaoLoginUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}`;
 
                 // 403 에러 발생 시 카카오 로그인 페이지로 리디렉션하여 새로운 인가 코드를 받음
