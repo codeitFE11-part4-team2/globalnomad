@@ -6,7 +6,7 @@ import { authApi } from '../../services/auth';
 
 const KakaoLoginButton = () => {
   const clientId = process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID;
-  const redirectUri = 'http://localhost:3000/login';
+  const redirectUri = 'https://globalnomad-11-2.vercel.app/login';
 
   const kakaoLoginUrl = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${clientId}&redirect_uri=${redirectUri}`;
 
