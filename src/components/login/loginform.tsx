@@ -38,7 +38,7 @@ export default function SignInForm() {
   const {
     control,
     handleSubmit,
-    formState: { errors, isValid }, // isValid 상태 추가
+    formState: { errors, isValid },
     setValue,
     setError: setFormError,
     clearErrors,
@@ -47,8 +47,8 @@ export default function SignInForm() {
       email: '',
       password: '',
     },
-    mode: 'onChange', // onChange로 유효성 검사
-    reValidateMode: 'onChange', // 필드 값이 바뀔 때마다 유효성 재검사
+    mode: 'onChange',
+    reValidateMode: 'onChange',
   });
 
   useEffect(() => {
@@ -86,7 +86,7 @@ export default function SignInForm() {
         message: '이메일 형식으로 작성해 주세요.',
       });
     } else {
-      clearErrors('email'); // 정상적인 이메일 입력 시 에러 지우기
+      clearErrors('email');
     }
   };
 
@@ -97,7 +97,7 @@ export default function SignInForm() {
         message: '8자 이상 작성해 주세요.',
       });
     } else {
-      clearErrors('password'); // 정상적인 비밀번호 입력 시 에러 지우기
+      clearErrors('password');
     }
   };
 
@@ -105,7 +105,6 @@ export default function SignInForm() {
     return null;
   }
 
-  // 이메일과 비밀번호 오류 상태가 있을 때 버튼 비활성화
   const isButtonDisabled =
     loading || !isValid || !!errors.email || !!errors.password;
 
@@ -130,11 +129,11 @@ export default function SignInForm() {
               value={field.value || ''}
               onChange={(e) => {
                 field.onChange(e);
-                validateEmail(e.target.value); // 이메일 입력 시 검증
+                validateEmail(e.target.value);
               }}
-              onBlur={() => validateEmail(field.value)} // 포커스 아웃 시 이메일 검증
-              error={!!errors.email} // error 상태 전달
-              errorMessage={errors.email?.message} // 에러 메시지 전달
+              onBlur={() => validateEmail(field.value)}
+              error={!!errors.email}
+              errorMessage={errors.email?.message}
             />
           )}
         />
@@ -149,16 +148,16 @@ export default function SignInForm() {
             <InputItem
               label="비밀번호"
               id="pw"
-              type="password"
+              passwordinput
               placeholder="비밀번호를 입력해주세요"
               value={field.value || ''}
               onChange={(e) => {
                 field.onChange(e);
-                validatePassword(e.target.value); // 비밀번호 입력 시 검증
+                validatePassword(e.target.value);
               }}
-              onBlur={() => validatePassword(field.value)} // 포커스 아웃 시 비밀번호 길이 검증
-              error={!!errors.password} // error 상태 전달
-              errorMessage={errors.password?.message} // 에러 메시지 전달
+              onBlur={() => validatePassword(field.value)}
+              error={!!errors.password}
+              errorMessage={errors.password?.message}
             />
           )}
         />
@@ -167,7 +166,7 @@ export default function SignInForm() {
           type="submit"
           variant="green"
           size="full"
-          disabled={isButtonDisabled} // 이메일 또는 비밀번호에 에러가 있으면 버튼 비활성화
+          disabled={isButtonDisabled}
         >
           {loading ? '로그인 중...' : '로그인 하기'}
         </Button>
@@ -181,7 +180,10 @@ export default function SignInForm() {
           </span>
         </Link>
       </p>
-      <div className="flex gap-[40px] text-xl text-gray-800 font-regular flex justify-center items-center whitespace-nowrap">
+      <div
+        className="flex gap-[40px] text-md text-gray-800 font-regular flex justify-center items-center whitespace-nowrap
+      md:text-xl"
+      >
         <div className="w-[180px] h-[1px] bg-gray-300" />
         SNS 계정으로 로그인하기
         <div className="w-[180px] h-[1px] bg-gray-300" />
