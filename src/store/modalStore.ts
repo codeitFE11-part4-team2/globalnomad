@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-type ModalType = 'alert' | 'card' | null;
+type ModalType = 'pwerror' | 'card' | 'emailerror' | 'checkemail' | null;
 
 interface ModalState {
   isOpen: boolean;
