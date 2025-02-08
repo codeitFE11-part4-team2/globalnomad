@@ -22,7 +22,7 @@ interface User {
 
 interface LoginResponse {
   user: User;
-  token: string;
+  accessToken: string;
 }
 
 interface FormData {
@@ -71,8 +71,8 @@ export default function SignInForm() {
         password: data.password,
       });
 
-      const { user, token } = response.data;
-      login(user, token);
+      const { user, accessToken } = response.data;
+      login(user, accessToken);
 
       if (isMounted) {
         router.push('/');
