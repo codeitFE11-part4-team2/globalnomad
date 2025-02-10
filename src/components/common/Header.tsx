@@ -92,7 +92,7 @@ export default function Header() {
                 py-2 mt-2 text-center font-mediume text-2lg font-pretendard z-20"
                 >
                   <Link
-                    href="/mypage"
+                    href="/myinformation"
                     className="block px-4 py-2 text-gray-900 hover:bg-gray-200"
                   >
                     마이페이지

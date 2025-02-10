@@ -1,5 +1,6 @@
 'use client';
 
+import { useAuthStore } from '@/store/auth'; // Zustand store import
 import Link from 'next/link';
 import { useSelectedLayoutSegment } from 'next/navigation';
 import { useRef, useState, ChangeEvent } from 'react';
@@ -16,6 +17,29 @@ interface ProfileImage {
   preview: string;
 }
 
+export async function ProfileImageUrl(file: File, token: string | null) {
+  const formData = new FormData();
+  formData.append('image', file);
+
+  const response = await fetch(
+    'https://sp-globalnomad-api.vercel.app/11-2/users/me/image',
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error('이미지 업로드 실패!');
+  }
+
+  const data = await response.json();
+  return data.ProfileImageUrl;
+}
+
 export default function SideNavMenu() {
   // 메뉴 선택되는 상태변화를 segment로 추적하려고 생각중
   const segment = useSelectedLayoutSegment();
@@ -25,26 +49,44 @@ export default function SideNavMenu() {
     preview: '/icons/defaultuser_icon.svg',
   });
   const imageRef = useRef<HTMLInputElement>(null);
+  const token = useAuthStore((state) => state.token); // Zustand에서 access-token 가져오기
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const MAX_FILE_SIZE = 5 * 1024 * 1024;
     const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
     const file = e.target.files?.[0];
     if (file) {
+      // 파일 크기 체크
       if (file.size > MAX_FILE_SIZE) {
-        console.log('파일크기 5mb 초과');
+        console.log('파일크기 5MB 초과');
         return;
       }
+
+      // 파일 형식 체크
       if (!ALLOWED_FILE_TYPES.includes(file.type)) {
         console.log('지원하는 이미지형식이 아님');
         return;
       }
+
+      // 로컬 미리보기 이미지 업데이트
       const reader = new FileReader();
-      reader.onload = () => {
+      reader.onload = async () => {
         setProfileImage({
           file,
           preview: reader.result as string,
         });
+
+        // 서버에 이미지 업로드
+        try {
+          const uploadedUrl = await ProfileImageUrl(file, token);
+          setProfileImage((prev) => ({
+            ...prev,
+            preview: uploadedUrl, // 업로드된 이미지 URL로 미리보기 업데이트
+          }));
+          console.log('업로드된 프로필 이미지 URL:', uploadedUrl);
+        } catch (error) {
+          console.error('프로필 이미지 업로드 실패:', error);
+        }
       };
       reader.readAsDataURL(file);
     }
@@ -95,7 +137,6 @@ export default function SideNavMenu() {
               className="flex gap-3.5 px-4 py-2.5 items-center h-11 w-full rounded-xl text-nomad-black fill-nomad-black bg-green-2"
             >
               <SideMenuIcon2 className="fill-gray-700" />
-
               <span className="text-lg font-bold">예약 내역</span>
             </Link>
           </li>
@@ -105,7 +146,6 @@ export default function SideNavMenu() {
               className="flex gap-3.5 px-4 py-2.5 items-center h-11 w-full rounded-xl text-gray-700 fill-gray-700"
             >
               <SideMenuIcon3 className="fill-gray-700" />
-
               <span className="text-lg font-bold">내 체험 관리</span>
             </Link>
           </li>
@@ -115,7 +155,6 @@ export default function SideNavMenu() {
               className="flex gap-3.5 px-4 py-2.5 items-center h-11 w-full rounded-xl text-gray-700 fill-gray-700"
             >
               <SideMenuIcon4 className="fill-gray-700" />
-
               <span className="text-lg font-bold">예약 현황</span>
             </Link>
           </li>
