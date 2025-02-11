@@ -11,6 +11,7 @@ import {
   SideMenuIcon3,
   SideMenuIcon4,
 } from '@/lib/constants/icons';
+import { useFixProfile } from '@/store/fixprofile';
 
 interface ProfileImage {
   file: File | null;
@@ -33,15 +34,24 @@ export async function ProfileImageUrl(file: File, token: string | null) {
   );
 
   if (!response.ok) {
+    const errorData = await response.json();
+    console.error('서버 응답 오류:', errorData); // 서버 응답 오류 내용
     throw new Error('이미지 업로드 실패!');
   }
 
   const data = await response.json();
-  return data.ProfileImageUrl;
+  console.log(data); // 응답 데이터 확인
+  if (data && data.profileImageUrl) {
+    return data.profileImageUrl;
+  } else {
+    console.error('ProfileImageUrl이 응답에 없음:', data); // 응답에서 ProfileImageUrl이 없는 경우
+    throw new Error('ProfileImageUrl을 찾을 수 없습니다.');
+  }
 }
 
 export default function SideNavMenu() {
   // 메뉴 선택되는 상태변화를 segment로 추적하려고 생각중
+  const { setImageurl } = useFixProfile();
   const segment = useSelectedLayoutSegment();
 
   const [profileImage, setProfileImage] = useState<ProfileImage>({
@@ -83,6 +93,9 @@ export default function SideNavMenu() {
             ...prev,
             preview: uploadedUrl, // 업로드된 이미지 URL로 미리보기 업데이트
           }));
+
+          setImageurl(uploadedUrl);
+
           console.log('업로드된 프로필 이미지 URL:', uploadedUrl);
         } catch (error) {
           console.error('프로필 이미지 업로드 실패:', error);
