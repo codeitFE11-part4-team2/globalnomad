@@ -74,6 +74,7 @@ export default function CreateActivityForm() {
         setIntroImages={setIntroImages}
         token={token}
       />
+
       <input type="hidden" name="token" value={token ?? ''} />
     </Form>
   );

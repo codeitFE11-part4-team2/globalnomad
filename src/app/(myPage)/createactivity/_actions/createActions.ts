@@ -1,6 +1,5 @@
 'use server';
 
-import { error } from 'console';
 import { activitySchema, ActivityFormData } from '../_schemas/activitySchema';
 
 export async function createActions(formData: FormData): Promise<void> {

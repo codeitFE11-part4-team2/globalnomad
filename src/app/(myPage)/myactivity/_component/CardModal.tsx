@@ -14,14 +14,14 @@ export default function CardModal() {
         <div className="flex justify-center gap-3 mt-4">
           <button
             className="px-4 py-1 rounded-lg text-xl border border-nomad-black text-nomad-black"
-            onClick={closeModal}
+            onClick={() => closeModal('card')}
           >
             취소
           </button>
           <button
             className="px-4 py-1 bg-nomad-black text-xl text-white rounded-lg"
             onClick={() => {
-              closeModal();
+              closeModal('card');
             }}
           >
             삭제
