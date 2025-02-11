@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import logo from '../../../public/icons/icon-logomd.svg';
+import NotificationPopup from './NotificationPopup';
 
 const handleLogoClick = () => {
   location.replace('/');
@@ -54,10 +55,7 @@ export default function Header() {
                 height={20}
               />
               {isNotificationOpen && (
-                <div className="absolute right-0 top-8 w-[200px] bg-white border border-gray-300 shadow-lg p-4 z-20 ">
-                  <p>알림</p>
-                  {/* 알림 내용을 여기에 추가할 수 있음 */}
-                </div>
+                <NotificationPopup onClose={() => setNotificationOpen(false)} />
               )}
             </div>
 
