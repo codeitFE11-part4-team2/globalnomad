@@ -4,11 +4,10 @@ import { useState } from 'react';
 import { createActions } from '../_actions/createActions';
 import Form from 'next/form';
 import { Button } from '@/components/common/Button';
-import Image from 'next/image';
 import { useAuthStore } from '@/store';
-import { ImageUrl } from '../api/ImageUrl';
 import AddressInput from './AddressInput';
 import ScheduleInput from './ScheduleInput';
+import ImageSelector from './ImageSelector';
 
 interface Schedule {
   id: number;
@@ -24,47 +23,6 @@ export default function CreateActivityForm() {
   const [introImages, setIntroImages] = useState<string[]>([]);
   const [address, setAddress] = useState('');
   const [category, setCategory] = useState('');
-
-  /** 이미지 관련 함수들 */
-
-  const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      try {
-        const uploadedUrl = await ImageUrl(file, token);
-        setBannerImage(uploadedUrl);
-        console.log('배너 이미지 URL:', uploadedUrl);
-      } catch (error) {
-        console.error('배너 이미지 업로드 실패:', error);
-      }
-    }
-  };
-
-  const handleIntroUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length === 0) return;
-
-    try {
-      const uploadedUrls = await Promise.all(
-        files.map((file) => ImageUrl(file, token))
-      );
-      setIntroImages((prev) => {
-        const newImages = [...prev, ...uploadedUrls];
-        return newImages.length > 4 ? newImages.slice(-4) : newImages;
-      });
-      console.log('상세 이미지 URL들:', uploadedUrls);
-    } catch (error) {
-      console.error('상세 이미지 업로드 실패:', error);
-    }
-  };
-
-  const removeBannerImage = () => {
-    setBannerImage(null);
-  };
-
-  const removeIntroImage = (index: number) => {
-    setIntroImages((prevImages) => prevImages.filter((_, i) => i !== index));
-  };
 
   return (
     <Form action={createActions} className="flex flex-col">
@@ -123,90 +81,14 @@ export default function CreateActivityForm() {
 
       <AddressInput address={address} setAddress={setAddress} />
       <ScheduleInput schedules={schedules} setSchedules={setSchedules} />
-
-      <div className="w-full">
-        <div>
-          <p className="text-black text-2xl font-bold mt-6">배너 이미지</p>
-          <div className="flex items-center space-x-4 mt-6">
-            <label className="w-[180px] aspect-square flex flex-col items-center justify-center border-2 border-dashed border-gray-400 rounded-md cursor-pointer">
-              <input
-                type="file"
-                className="hidden"
-                onChange={handleBannerUpload}
-              />
-              <span className="flex flex-col items-center gap-6 text-2xl text-gray-900">
-                <span className="text-[50px]">+</span> 이미지 등록
-              </span>
-            </label>
-            {bannerImage && (
-              <div className="relative w-[180px] aspect-square">
-                <Image
-                  src={bannerImage}
-                  alt="배너 이미지"
-                  className="rounded-md object-cover"
-                  fill
-                />
-                <button
-                  className="absolute top-1 right-1 bg-black/50 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center"
-                  onClick={removeBannerImage}
-                >
-                  ✕
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div>
-          <p className="text-black text-2xl font-bold mt-6">소개 이미지</p>
-          <div className="flex flex-wrap items-center gap-4 mt-6">
-            <label className="w-[180px] aspect-square flex flex-col items-center justify-center border-2 border-dashed border-gray-400 rounded-md cursor-pointer">
-              <input
-                type="file"
-                className="hidden"
-                multiple
-                onChange={handleIntroUpload}
-              />
-              <span className="flex flex-col items-center gap-6 text-2xl text-gray-900">
-                <span className="text-[50px]">+</span> 이미지 등록
-              </span>
-            </label>
-
-            {introImages.map((url, index) => (
-              <div key={index} className="relative w-[180px] aspect-square">
-                <Image
-                  src={url}
-                  alt={`소개 이미지 ${index + 1}`}
-                  className="rounded-md object-cover"
-                  fill
-                />
-                <button
-                  className="absolute top-1 right-1 bg-black/50 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center"
-                  onClick={() => removeIntroImage(index)}
-                >
-                  ✕
-                </button>
-              </div>
-            ))}
-          </div>
-          <p className="text-2lg text-gray-900 mt-6 mb-28">
-            *이미지는 최대 4개까지 등록 가능합니다.
-          </p>
-
-          {bannerImage && (
-            <input type="hidden" name="bannerImageUrl" value={bannerImage} />
-          )}
-
-          {introImages.length > 0 && (
-            <input
-              type="hidden"
-              name="subImageUrls"
-              value={JSON.stringify(introImages)}
-            />
-          )}
-          <input type="hidden" name="token" value={token ?? ''} />
-        </div>
-      </div>
+      <ImageSelector
+        bannerImage={bannerImage}
+        setBannerImage={setBannerImage}
+        introImages={introImages}
+        setIntroImages={setIntroImages}
+        token={token}
+      />
+      <input type="hidden" name="token" value={token ?? ''} />
     </Form>
   );
 }
