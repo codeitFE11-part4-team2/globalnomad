@@ -31,7 +31,7 @@ export default function PwErrorModal() {
             type="submit"
             variant="nomad-black"
             size="medium"
-            onClick={closeModal}
+            onClick={() => closeModal('pwerror')}
           >
             확인
           </Button>

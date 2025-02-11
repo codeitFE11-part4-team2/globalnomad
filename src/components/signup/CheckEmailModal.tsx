@@ -31,7 +31,7 @@ export default function CheckEmailModal() {
             type="submit"
             variant="nomad-black"
             size="medium"
-            onClick={closeModal}
+            onClick={() => closeModal('checkemail')}
           >
             확인
           </Button>
