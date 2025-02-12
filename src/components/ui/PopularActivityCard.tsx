@@ -20,7 +20,7 @@ function PopularActivityCard({ activity }: PopularActivityCardProps) {
       href={`/activity/${activity.id}`}
       className="flex-none w-[186px] md:w-[384px] rounded-[20px] overflow-hidden cursor-pointer"
     >
-      <div className="relative h-[186px] md:h-[384px]">
+      <div className="relative h-[186px] md:h-[384px] transition-transform duration-300 hover:scale-105">
         <Image
           src={bannerImageUrl}
           alt={title}
