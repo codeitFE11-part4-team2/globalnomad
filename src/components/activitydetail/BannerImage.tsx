@@ -3,11 +3,9 @@ import Image from 'next/image';
 import Slider from 'react-slick';
 import { SubImage } from '@/lib/activitydetail/activitydetailTypes';
 import SubImageBanner from '@/components/activitydetail/SubImage';
+import CustomArrow from '@/components/activitydetail/CustomArrow';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-
-import PreviousIcon from '../../../public/icons/icon-previous.svg';
-import NextIcon from '../../../public/icons/icon-next.svg';
 
 interface BannerImageProps {
   bannerImages: string;
@@ -17,30 +15,7 @@ interface BannerImageProps {
 const BannerImage = ({ bannerImages, subImages }: BannerImageProps) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  const images = [{ id: 0, imageUrl: bannerImages }, ...subImages];
-
-  const CustomArrow = ({
-    direction,
-    onClick,
-  }: {
-    direction: 'next' | 'prev';
-    onClick?: () => void;
-  }) => (
-    <button
-      className={`absolute top-1/2 -translate-y-1/2 z-10 ${
-        direction === 'next' ? 'right-4' : 'left-4'
-      }`}
-      onClick={onClick}
-    >
-      <Image
-        src={direction === 'next' ? NextIcon : PreviousIcon}
-        alt={direction === 'next' ? 'Next' : 'Previous'}
-        width={24}
-        height={24}
-        className="cursor-pointer"
-      />
-    </button>
-  );
+  const images = [{ imageUrl: bannerImages }, ...subImages];
 
   const sliderSettings = {
     infinite: true,
@@ -54,14 +29,14 @@ const BannerImage = ({ bannerImages, subImages }: BannerImageProps) => {
   return (
     <div className="relative">
       {/* 모바일에서는 슬라이더 적용 */}
-      {subImages.length > 0 ? (
+      {images.length > 1 ? (
         <div className="md:hidden block w-full h-[310px]">
           <Slider {...sliderSettings}>
-            {images.map((image) => (
-              <div key={image.id} className="relative w-full h-[310px]">
+            {images.map((image, index) => (
+              <div key={index} className="relative w-full h-[310px]">
                 <Image
                   src={image.imageUrl}
-                  alt={`Image ${image.id}`}
+                  alt={`Image ${index}`}
                   layout="fill"
                   objectFit="cover"
                   className="object-cover rounded-[12px]"
@@ -87,25 +62,14 @@ const BannerImage = ({ bannerImages, subImages }: BannerImageProps) => {
       {/* 데스크탑 및 태블릿 */}
       <div className="hidden md:flex flex-row lg:w-[1198px] lg:h-[534px] md:w-[696px] w-[375px] h-[310px] lg:gap-[8px] md:gap-[4.65px] gap-0 overflow-hidden rounded-[12px]">
         <div className="lg:w-[595px] lg:h-[534px] md:w-[348px] md:h-[300px] w-[187.5px] h-[310px]">
-          {subImages.length === 0 ? (
-            <Image
-              src={bannerImages}
-              alt="배너 이미지"
-              width={1198}
-              height={534}
-              className="w-full h-full object-cover"
-              onClick={() => setSelectedImage(bannerImages)}
-            />
-          ) : (
-            <Image
-              src={bannerImages}
-              alt="배너 이미지"
-              width={595}
-              height={534}
-              className="w-full h-full object-cover"
-              onClick={() => setSelectedImage(bannerImages)}
-            />
-          )}
+          <Image
+            src={bannerImages}
+            alt="배너 이미지"
+            width={subImages.length === 0 ? 1198 : 595}
+            height={534}
+            className="w-full h-full object-cover"
+            onClick={() => setSelectedImage(bannerImages)}
+          />
         </div>
         <div className="lg:w-[595px] lg:h-[534px] md:w-[348px] md:h-[300px] w-[187.5px] h-[310px]">
           <SubImageBanner

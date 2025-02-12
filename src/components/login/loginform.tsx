@@ -8,6 +8,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import KakaoLoginButton from './KakoLoginButton';
 import { useForm, Controller } from 'react-hook-form';
+import { AxiosError } from 'axios'; // AxiosError 타입을 import
+import { modalStore } from '@/store/modalStore';
 
 interface User {
   id: number;
@@ -20,12 +22,16 @@ interface User {
 
 interface LoginResponse {
   user: User;
-  token: string;
+  accessToken: string;
 }
 
 interface FormData {
   email: string;
   password: string;
+}
+
+interface ErrorResponse {
+  message: string; // 서버에서 반환하는 에러 메시지 형식
 }
 
 export default function SignInForm() {
@@ -34,6 +40,7 @@ export default function SignInForm() {
   const { login } = useAuthStore();
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
+  const { openModal } = modalStore();
 
   const {
     control,
@@ -57,7 +64,6 @@ export default function SignInForm() {
 
   const onSubmit = async (data: FormData) => {
     setLoading(true);
-    setError(null);
 
     try {
       const response = await api.post<LoginResponse>('auth/login', {
@@ -65,14 +71,22 @@ export default function SignInForm() {
         password: data.password,
       });
 
-      const { user, token } = response.data;
-      login(user, token);
+      const { user, accessToken } = response.data;
+      login(user, accessToken);
 
       if (isMounted) {
         router.push('/');
       }
     } catch (err) {
-      setError('로그인 실패');
+      const error = err as AxiosError<ErrorResponse>;
+
+      if (error.response?.data?.message === '비밀번호가 일치하지 않습니다.') {
+        openModal('pwerror');
+      } else if (
+        error.response?.data?.message === '존재하지 않는 유저입니다.'
+      ) {
+        openModal('emailerror');
+      }
     } finally {
       setLoading(false);
     }

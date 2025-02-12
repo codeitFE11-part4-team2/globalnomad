@@ -17,7 +17,11 @@ export default function Header() {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const pathname = usePathname();
 
-  if (pathname === '/login' || pathname === '/signup') {
+  if (
+    pathname === '/login' ||
+    pathname === '/signup' ||
+    pathname === '/kakaosignup'
+  ) {
     return null;
   }
 
@@ -50,7 +54,7 @@ export default function Header() {
                 height={20}
               />
               {isNotificationOpen && (
-                <div className="absolute right-0 top-8 w-[200px] bg-white border border-gray-300 shadow-lg p-4">
+                <div className="absolute right-0 top-8 w-[200px] bg-white border border-gray-300 shadow-lg p-4 z-20 ">
                   <p>알림</p>
                   {/* 알림 내용을 여기에 추가할 수 있음 */}
                 </div>
@@ -85,10 +89,10 @@ export default function Header() {
               {isDropdownOpen && (
                 <div
                   className="absolute top-full right-0 w-[160px] bg-white border border-gray-300 rounded-[6px] 
-                py-2 mt-2 text-center font-mediume text-2lg font-pretendard"
+                py-2 mt-2 text-center font-mediume text-2lg font-pretendard z-20"
                 >
                   <Link
-                    href="/mypage"
+                    href="/myinformation"
                     className="block px-4 py-2 text-gray-900 hover:bg-gray-200"
                   >
                     마이페이지

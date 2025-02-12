@@ -1,6 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
+import { usePopularActivities } from '@/hooks/usePopularActivities';
+import { useSearchActivities } from '@/hooks/useSearchActivities';
 import Image from 'next/image';
 import Footer from '@/components/common/Footer';
 import Category from '@/components/ui/Category';
@@ -8,73 +10,18 @@ import Filter from '@/components/ui/Filter';
 import SearchBar from '@/components/ui/SearchBar';
 import PopularActivity from '@/components/ui/PopularActivity';
 import AllActivity from '@/components/ui/AllActivity';
-import { useActivities } from '@/hooks/useActivities';
-import Pagination from '@/components/ui/pagination';
-import { usePopularActivities } from '@/hooks/usePopularActivities';
-import { Spinner } from '@/components/common/Spinner';
 
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [windowWidth, setWindowWidth] = useState(0);
-  const [popularActivityPage, setPopularActivityPage] = useState(1);
-  const [priceFilter, setPriceFilter] = useState<'낮은순' | '높은순' | '가격'>(
-    '가격'
-  );
+  const [priceFilter, setPriceFilter] = useState<'낮은순' | '높은순' | '가격'>('가격');
   const [searchKeyword, setSearchKeyword] = useState<string>('');
-  const { data: popularData, isFetching } =
-    usePopularActivities(popularActivityPage);
-
-  useEffect(() => {
-    setWindowWidth(window.innerWidth); // 첫 렌더링 시 창 너비를 설정
-    const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  // 디바이스 크기에 따라 페이지당 아이템 수 계산
-  const getItemsPerPage = () => {
-    if (windowWidth >= 1440) return 8; // lg: 4열 x 2행 = 8개
-    if (windowWidth >= 744) return 9; // md: 3열 x 3행 = 9개
-    return 4; // 모바일: 2열 x 2행 = 4개
-  };
-
-  const itemsPerPage = getItemsPerPage();
-
-  // 전체 데이터를 가져옴 (페이지 크기를 매우 크게 설정)
-  const { data, isLoading, error } = useActivities(1, 1000, searchKeyword);
-  const activities = data?.activities || [];
-
-  // 선택된 카테고리에 해당하는 활동만 필터링
-  const filteredActivities = activities.filter((activity) => {
-    if (selectedCategory === '전체') return true;
-    return activity.category === selectedCategory;
-  });
-
-  // 가격 필터 적용
-  const sortedActivities = [...filteredActivities].sort((a, b) => {
-    if (priceFilter === '낮은순') {
-      return a.price - b.price;
-    }
-    if (priceFilter === '높은순') {
-      return b.price - a.price;
-    }
-    // 기본 정렬 (최신순)
-    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-  });
-
-  // 현재 페이지에 해당하는 데이터만 선택
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentPageActivities = sortedActivities.slice(startIndex, endIndex);
-
-  // 필터링된 전체 데이터 개수를 기반으로 totalPages 계산
-  const totalPages = Math.ceil(sortedActivities.length / itemsPerPage);
 
   const handleCategorySelect = (category: string) => {
     setSelectedCategory(category);
-    setCurrentPage(1); // 카테고리 변경 시 1페이지로 리셋
   };
+
+  const [popularActivityPage, setPopularActivityPage] = useState(1);
+  const { data: popularData, isFetching } = usePopularActivities(popularActivityPage);
 
   const handlePrevPage = useCallback(() => {
     if (isFetching) return; // 데이터 로딩 중에는 페이지 변경 방지
@@ -93,16 +40,9 @@ export default function Home() {
 
   const handleSearchAction = async (keyword: string) => {
     setSearchKeyword(keyword);
-    setCurrentPage(1);
   };
 
-  if (isLoading)
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <Spinner className="w-12 h-12" />
-      </div>
-    );
-  if (error) return <div>에러가 발생했습니다.</div>;
+  const { data, isLoading } = useSearchActivities(searchKeyword, selectedCategory);
 
   return (
     <div className="relative bg-gray-100">
@@ -178,7 +118,7 @@ export default function Home() {
             <Filter
               onFilterChange={(filter) => {
                 setPriceFilter(filter as '낮은순' | '높은순' | '가격');
-                setCurrentPage(1); // 필터 변경 시 1페이지로 리셋
+                setPopularActivityPage(1); // 필터 변경 시 1페이지로 리셋
               }}
             />
           )}
@@ -206,15 +146,11 @@ export default function Home() {
           )}
         </div>
         <AllActivity
-          activities={currentPageActivities}
           selectedCategory={selectedCategory}
+          priceFilter={priceFilter}
+          searchKeyword={searchKeyword}
         />
       </div>
-      <Pagination
-        totalPageNum={totalPages}
-        activePageNum={currentPage}
-        onPageChange={(page: number) => setCurrentPage(page)}
-      />
       <Footer />
     </div>
   );

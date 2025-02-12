@@ -9,6 +9,8 @@ import { api } from '@/lib/axios';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth';
 import { useForm, Controller } from 'react-hook-form';
+import { AxiosError } from 'axios';
+import { modalStore } from '@/store/modalStore';
 
 interface SignUpResponse {
   access_token: string;
@@ -29,10 +31,15 @@ interface FormData {
   confirmPassword: string;
 }
 
+interface ErrorResponse {
+  message: string; // 서버에서 반환하는 에러 메시지 형식
+}
+
 function SignUpForm() {
   const [isClient, setIsClient] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { openModal } = modalStore();
 
   const setToken = useAuthStore((state) => state.setToken);
   const setUser = useAuthStore((state) => state.setUser);
@@ -137,7 +144,11 @@ function SignUpForm() {
         router.push('/login');
       }
     } catch (err) {
-      console.error(err);
+      const error = err as AxiosError<ErrorResponse>;
+
+      if (error.response?.data?.message === '중복된 이메일입니다.') {
+        openModal('checkemail');
+      }
     } finally {
       setLoading(false);
     }
