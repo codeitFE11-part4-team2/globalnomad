@@ -31,7 +31,7 @@ export default function EmailErrorModal() {
             type="submit"
             variant="nomad-black"
             size="medium"
-            onClick={closeModal}
+            onClick={() => closeModal('emailerror')}
           >
             확인
           </Button>

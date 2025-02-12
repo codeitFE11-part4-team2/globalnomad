@@ -1,6 +1,5 @@
 'use server';
 
-import { error } from 'console';
 import { activitySchema, ActivityFormData } from '../_schemas/activitySchema';
 
 export async function createActions(formData: FormData): Promise<void> {
@@ -44,7 +43,8 @@ export async function createActions(formData: FormData): Promise<void> {
   );
 
   if (!response.ok) {
-    console.error(error);
+    const errorData = await response.json().catch(() => ({}));
+    console.error('폼 제출 실패:', response.status, errorData);
   } else {
     console.log('폼 제출 성공');
   }
