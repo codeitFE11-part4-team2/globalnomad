@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import StarIcon from '../../../../public/icons/icon-star.svg';
 import Location from '../../../../public/icons/icon-location.svg';
 import Footer from '@/components/common/Footer';
+import Reservation from '@/components/activitydetail/Reservation';
 
 const ActivityDetail = () => {
   const { id } = useParams();
@@ -45,9 +46,9 @@ const ActivityDetail = () => {
 
   return (
     <div className="bg-gray-100">
-      <div className="flex justify-center mx-[24px]">
+      <div className="flex justify-center mx-auto px-[24px]">
         <div className="w-full max-w-[1200px] flex flex-col">
-          <div className="flex-1">
+          <div>
             <p className="text-md font-regular lg:mt-[78px] md:mt-[24px] mt-[16px]">
               {activity.category}
             </p>
@@ -75,8 +76,10 @@ const ActivityDetail = () => {
                   subImages={activity.subImages}
                 />
               </div>
+            </div>
 
-              <div className="w-full max-w-[740px]">
+            <div className="w-full lg:max-w-[1200px] md:max-w-[696px] flex flex-row justify-between ">
+              <div className="lg:w-[740px] md:w-[428px] w-[327px] ">
                 <div className="lg:mt-[85px] md:mt-[32px] mt-0">
                   <hr className="hidden md:block border-t-[1px] border-nomad-black " />
                   <p className="text-xl font-bold md:mt-[40px] mt-[15px]">
@@ -95,10 +98,10 @@ const ActivityDetail = () => {
                   <ReviewList activityId={activityId} pageSize={3} />
                 </div>
               </div>
-            </div>
 
-            <div className="w-full">
-              <div>{/* 예약 모달 */}</div>
+              <div className="lg:mt-[78px] md:mt-[24px] mt-[16px]">
+                <Reservation activity={activity} />
+              </div>
             </div>
           </div>
         </div>
