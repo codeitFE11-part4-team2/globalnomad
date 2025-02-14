@@ -170,7 +170,7 @@ const Reservation = ({ activity }: ReservationProps) => {
       </div>
 
       {/* 모바일 전용 하단 바 */}
-      <div className="fixed bottom-0 left-0 w-full h-[83px] bg-white border-t border-gray-300 p-4 flex justify-between items-center md:hidden">
+      <div className="fixed z-10 bottom-0 left-0 w-full h-[83px] bg-white border-t border-gray-300 p-4 flex justify-between items-center md:hidden">
         <div className="flex flex-col items-start">
           <div className="flex items-center gap-[6px]">
             <p className="font-bold text-xl text-nomad-black">
