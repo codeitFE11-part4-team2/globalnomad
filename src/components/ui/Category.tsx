@@ -37,12 +37,12 @@ export default function Category({
           className={`
             w-[80px] lg:w-[127px] md:w-[120px] lg:h-[58px] md:h-[58px] h-[41px] px-[30px] py-4
             flex justify-center items-center
-            rounded-[15px] transition-all
+            rounded-[15px] transition-all duration-300
             lg:text-2lg md:text-2lg text-lg font-medium leading-[26px]
             ${
               selectedCategory === category.title
-                ? 'bg-green-3 text-white'
-                : 'bg-white text-green-3 border border-green-3'
+                ? 'bg-green-3 text-white hover:bg-green-4'
+                : 'bg-white text-green-3 border border-green-3 hover:bg-green-2'
             }
           `}
         >
