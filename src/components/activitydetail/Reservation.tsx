@@ -10,6 +10,7 @@ import router from 'next/router';
 import ParticipantSelectionModal from './ParticipantSelectionModal';
 import DateSelectionModal from './DateSelectionModal';
 import { bookActivity } from '@/lib/activitydetail/activitydetail';
+import { useAuthStore } from '@/store';
 
 interface ReservationProps {
   activity: ActivityDetailResponse;
@@ -18,7 +19,8 @@ interface ReservationProps {
 const Reservation = ({ activity }: ReservationProps) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
-  const [participants, setParticipants] = useState(1);
+  const [headCount, setHeadCount] = useState(1);
+  const [loading, setLoading] = useState(false);
 
   // 모달 상태
   const [showDateModal, setShowDateModal] = useState(false); // 날짜 선택 모달
@@ -63,16 +65,23 @@ const Reservation = ({ activity }: ReservationProps) => {
     setSelectedTime(time);
   };
 
-  const totalPrice = pricePerPerson * participants; // 총 가격
+  const totalPrice = pricePerPerson * headCount; // 총 가격
 
-  // 예약하기 버튼 클릭 시 실행되는 함수
+  // 예약하기
   const handleReservation = async () => {
-    if (!selectedDate || !selectedTime) {
-      alert('날짜와 시간을 선택해주세요.');
+    const token = useAuthStore.getState().token; // 현재 로그인 상태 확인
+
+    if (!token) {
+      alert('로그인이 필요합니다.');
+      window.location.href = '/login'; // 로그인 페이지로 이동
       return;
     }
 
-    // 선택한 시간을 기반으로 해당 스케줄 ID 찾기
+    if (!selectedDate || !selectedTime) {
+      alert('날짜와 시간을 선택해 주세요.');
+      return;
+    }
+
     const selectedSchedule = schedules.find(
       (schedule) =>
         format(new Date(schedule.date), 'yyyy-MM-dd') ===
@@ -81,32 +90,19 @@ const Reservation = ({ activity }: ReservationProps) => {
     );
 
     if (!selectedSchedule) {
-      alert('선택한 시간에 대한 예약 정보를 찾을 수 없습니다.');
+      alert('선택한 시간에 대한 예약이 불가능합니다.');
       return;
     }
 
     try {
-      const accessToken = localStorage.getItem('accessToken');
-      if (!accessToken) {
-        alert('로그인이 필요합니다.');
-        return;
-      }
-
-      // 예약 요청 API 호출
-      const response = await bookActivity(
-        activity.id,
-        selectedSchedule.id,
-        participants,
-        accessToken
-      );
-
-      console.log('예약 성공:', response);
-
-      // 예약 성공 시, 확인 모달 표시
+      setLoading(true);
+      await bookActivity(activity.id, selectedSchedule.id, headCount);
       setShowConfirmationModal(true);
     } catch (error) {
-      console.error('예약 실패:', error);
-      alert('예약 중 오류가 발생했습니다. 다시 시도해주세요.');
+      console.error('예약 실패', error);
+      alert('예약에 실패했습니다. 다시 시도해주세요.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -154,9 +150,9 @@ const Reservation = ({ activity }: ReservationProps) => {
           참여 인원 수
         </p>
         <Participant
-          participants={participants}
+          headCount={headCount}
           onParticipantsChange={(step) =>
-            setParticipants((prev) => Math.max(1, prev + step))
+            setHeadCount((prev) => Math.max(1, prev + step))
           }
         />
         <Button
@@ -184,7 +180,7 @@ const Reservation = ({ activity }: ReservationProps) => {
               className="font-bold text-lg underline text-nomad-black"
               onClick={() => setShowParticipantModal(true)}
             >
-              {participants}명
+              {headCount}명
             </button>
           </div>
           <button
@@ -223,9 +219,9 @@ const Reservation = ({ activity }: ReservationProps) => {
       {/* 인원 선택 모달 */}
       {showParticipantModal && (
         <ParticipantSelectionModal
-          participants={participants}
+          headCount={headCount}
           onParticipantsChange={(step) =>
-            setParticipants((prev) => Math.max(1, prev + step))
+            setHeadCount((prev) => Math.max(1, prev + step))
           }
           closeModal={() => setShowParticipantModal(false)}
         />

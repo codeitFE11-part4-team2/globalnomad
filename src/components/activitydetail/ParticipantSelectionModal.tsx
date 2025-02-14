@@ -5,13 +5,13 @@ import x from '../../../public/icons/icon-x.svg';
 import { Button } from '../common/Button';
 
 interface ParticipantSelectionModalProps {
-  participants: number;
+  headCount: number;
   onParticipantsChange: (step: number) => void;
   closeModal: () => void;
 }
 
 const ParticipantSelectionModal = ({
-  participants,
+  headCount,
   onParticipantsChange,
   closeModal,
 }: ParticipantSelectionModalProps) => {
@@ -29,7 +29,7 @@ const ParticipantSelectionModal = ({
           <Image src={x} alt="x" width={40} height={40} />
         </button>
         <Participant
-          participants={participants}
+          headCount={headCount}
           onParticipantsChange={onParticipantsChange}
         />
         <div className="flex items-center justify-center">

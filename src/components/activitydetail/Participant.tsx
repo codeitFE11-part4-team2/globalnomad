@@ -4,14 +4,11 @@ import Minus from '../../../public/icons/icon-minus.svg';
 import Plus from '../../../public/icons/icon-plus.svg';
 
 interface ParticipantProps {
-  participants: number; // 현재 참가자 수.
+  headCount: number; // 현재 참가자 수.
   onParticipantsChange: (step: number) => void; // 참가자 수 변경을 처리.
 }
 
-const Participant = ({
-  participants,
-  onParticipantsChange,
-}: ParticipantProps) => {
+const Participant = ({ headCount, onParticipantsChange }: ParticipantProps) => {
   const handleOnParticipantsChange = (step: number) => {
     onParticipantsChange(step);
   };
@@ -26,7 +23,7 @@ const Participant = ({
       </button>
       <input
         type="text"
-        value={participants} // 현재 참가자 수를 입력 필드에 표시.
+        value={headCount} // 현재 참가자 수를 입력 필드에 표시.
         onChange={(e) =>
           onParticipantsChange(Math.max(1, parseInt(e.target.value)))
         } // 참가자 수가 최소 1이 되도록 설정.

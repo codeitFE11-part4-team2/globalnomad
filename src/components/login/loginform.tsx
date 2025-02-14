@@ -8,6 +8,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import KakaoLoginButton from './KakoLoginButton';
 import { useForm, Controller } from 'react-hook-form';
+import { AxiosError } from 'axios'; // AxiosError 타입을 import
+import { modalStore } from '@/store/modalStore';
 
 interface User {
   id: number;
@@ -20,12 +22,16 @@ interface User {
 
 interface LoginResponse {
   user: User;
-  token: string;
+  accessToken: string;
 }
 
 interface FormData {
   email: string;
   password: string;
+}
+
+interface ErrorResponse {
+  message: string; // 서버에서 반환하는 에러 메시지 형식
 }
 
 export default function SignInForm() {
@@ -34,11 +40,12 @@ export default function SignInForm() {
   const { login } = useAuthStore();
   const router = useRouter();
   const [isMounted, setIsMounted] = useState(false);
+  const { openModal } = modalStore();
 
   const {
     control,
     handleSubmit,
-    formState: { errors, isValid }, // isValid 상태 추가
+    formState: { errors, isValid },
     setValue,
     setError: setFormError,
     clearErrors,
@@ -47,8 +54,8 @@ export default function SignInForm() {
       email: '',
       password: '',
     },
-    mode: 'onChange', // onChange로 유효성 검사
-    reValidateMode: 'onChange', // 필드 값이 바뀔 때마다 유효성 재검사
+    mode: 'onChange',
+    reValidateMode: 'onChange',
   });
 
   useEffect(() => {
@@ -57,7 +64,6 @@ export default function SignInForm() {
 
   const onSubmit = async (data: FormData) => {
     setLoading(true);
-    setError(null);
 
     try {
       const response = await api.post<LoginResponse>('auth/login', {
@@ -65,14 +71,22 @@ export default function SignInForm() {
         password: data.password,
       });
 
-      const { user, token } = response.data;
-      login(user, token);
+      const { user, accessToken } = response.data;
+      login(user, accessToken);
 
       if (isMounted) {
         router.push('/');
       }
     } catch (err) {
-      setError('로그인 실패');
+      const error = err as AxiosError<ErrorResponse>;
+
+      if (error.response?.data?.message === '비밀번호가 일치하지 않습니다.') {
+        openModal('pwerror');
+      } else if (
+        error.response?.data?.message === '존재하지 않는 유저입니다.'
+      ) {
+        openModal('emailerror');
+      }
     } finally {
       setLoading(false);
     }
@@ -86,7 +100,7 @@ export default function SignInForm() {
         message: '이메일 형식으로 작성해 주세요.',
       });
     } else {
-      clearErrors('email'); // 정상적인 이메일 입력 시 에러 지우기
+      clearErrors('email');
     }
   };
 
@@ -97,7 +111,7 @@ export default function SignInForm() {
         message: '8자 이상 작성해 주세요.',
       });
     } else {
-      clearErrors('password'); // 정상적인 비밀번호 입력 시 에러 지우기
+      clearErrors('password');
     }
   };
 
@@ -105,7 +119,6 @@ export default function SignInForm() {
     return null;
   }
 
-  // 이메일과 비밀번호 오류 상태가 있을 때 버튼 비활성화
   const isButtonDisabled =
     loading || !isValid || !!errors.email || !!errors.password;
 
@@ -130,11 +143,11 @@ export default function SignInForm() {
               value={field.value || ''}
               onChange={(e) => {
                 field.onChange(e);
-                validateEmail(e.target.value); // 이메일 입력 시 검증
+                validateEmail(e.target.value);
               }}
-              onBlur={() => validateEmail(field.value)} // 포커스 아웃 시 이메일 검증
-              error={!!errors.email} // error 상태 전달
-              errorMessage={errors.email?.message} // 에러 메시지 전달
+              onBlur={() => validateEmail(field.value)}
+              error={!!errors.email}
+              errorMessage={errors.email?.message}
             />
           )}
         />
@@ -149,16 +162,16 @@ export default function SignInForm() {
             <InputItem
               label="비밀번호"
               id="pw"
-              type="password"
+              passwordinput
               placeholder="비밀번호를 입력해주세요"
               value={field.value || ''}
               onChange={(e) => {
                 field.onChange(e);
-                validatePassword(e.target.value); // 비밀번호 입력 시 검증
+                validatePassword(e.target.value);
               }}
-              onBlur={() => validatePassword(field.value)} // 포커스 아웃 시 비밀번호 길이 검증
-              error={!!errors.password} // error 상태 전달
-              errorMessage={errors.password?.message} // 에러 메시지 전달
+              onBlur={() => validatePassword(field.value)}
+              error={!!errors.password}
+              errorMessage={errors.password?.message}
             />
           )}
         />
@@ -167,7 +180,7 @@ export default function SignInForm() {
           type="submit"
           variant="green"
           size="full"
-          disabled={isButtonDisabled} // 이메일 또는 비밀번호에 에러가 있으면 버튼 비활성화
+          disabled={isButtonDisabled}
         >
           {loading ? '로그인 중...' : '로그인 하기'}
         </Button>
@@ -181,7 +194,10 @@ export default function SignInForm() {
           </span>
         </Link>
       </p>
-      <div className="flex gap-[40px] text-xl text-gray-800 font-regular flex justify-center items-center whitespace-nowrap">
+      <div
+        className="flex gap-[40px] text-md text-gray-800 font-regular flex justify-center items-center whitespace-nowrap
+      md:text-xl"
+      >
         <div className="w-[180px] h-[1px] bg-gray-300" />
         SNS 계정으로 로그인하기
         <div className="w-[180px] h-[1px] bg-gray-300" />

@@ -11,6 +11,7 @@ import StarIcon from '../../../../public/icons/icon-star.svg';
 import Location from '../../../../public/icons/icon-location.svg';
 import Footer from '@/components/common/Footer';
 import Reservation from '@/components/activitydetail/Reservation';
+import KakaoMap from '@/components/activitydetail/KakaoMap';
 
 const ActivityDetail = () => {
   const { id } = useParams();
@@ -91,7 +92,9 @@ const ActivityDetail = () => {
                   <hr className="border-t-[1px] border-nomad-black lg:mt-[34px] md:mt-[57px] mt-[16px]" />
                 </div>
 
-                <div>{/* 지도 */}</div>
+                <div className="md:mt-[40px] mt-[16px] lg:mb-[40px] md:mb-[42px] mb-0">
+                  <KakaoMap address={activity.address} />
+                </div>
 
                 <div className="md:mt-[41px] mt-[40px]">
                   <hr className="hidden md:block border-t-[1px] border-nomad-black md:mb-[40px] mb-0" />

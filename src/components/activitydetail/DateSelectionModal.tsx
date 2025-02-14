@@ -26,7 +26,7 @@ const DateSelectionModal = ({
   closeModal,
 }: DateSelectionModalProps) => {
   return (
-    <div className="md:absolute md:bottom-0 md:left-0 md:z-20 fixed right-0 top-0 z-50 flex md:w-[480px] md:h-[559px] h-full w-full items-center justify-center">
+    <div className="md:absolute md:top-0 md:right-0 md:z-20 fixed right-0 top-0 z-50 flex md:w-[480px] md:h-[559px] h-full w-full items-center justify-center">
       <div className="relative bg-white p-5 md:rounded-[24px] md:w-[480px] md:h-auto w-full h-full">
         <p className="mb-[20px] text-[28px] font-bold">날짜 선택</p>
         <button
