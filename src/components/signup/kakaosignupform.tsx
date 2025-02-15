@@ -6,7 +6,7 @@ interface FormData {
 }
 
 interface KakaoSignUpFormProps {
-  setNickname: (nickname: string) => void; // 부모에서 setNickname 함수를 받음
+  setNickname: (nickname: string) => void;
 }
 
 function KakaoSignUpForm({ setNickname }: KakaoSignUpFormProps) {
@@ -35,7 +35,7 @@ function KakaoSignUpForm({ setNickname }: KakaoSignUpFormProps) {
             value={field.value || ''}
             onChange={(e) => {
               field.onChange(e);
-              setNickname(e.target.value); // 닉네임 입력 시 부모 상태 업데이트
+              setNickname(e.target.value);
             }}
             error={!!errors.nickname}
             errorMessage={errors.nickname?.message}

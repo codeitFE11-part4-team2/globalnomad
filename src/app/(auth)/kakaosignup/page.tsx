@@ -10,7 +10,7 @@ import { AxiosError } from 'axios';
 
 const KakaoSignup = () => {
   const [kakaoCode, setKakaoCode] = useState<string | null>(null);
-  const [nickname, setNickname] = useState(''); // 닉네임 상태 추가
+  const [nickname, setNickname] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
