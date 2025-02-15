@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useEffect, useState } from 'react';
 import KakaoSignUpForm from '@/components/signup/kakaosignupform';
 import Container from '@/components/login/container';
@@ -11,7 +10,7 @@ import { AxiosError } from 'axios';
 
 const KakaoSignup = () => {
   const [kakaoCode, setKakaoCode] = useState<string | null>(null);
-  const [nickname, setNickname] = useState('');
+  const [nickname, setNickname] = useState(''); // 닉네임 상태 추가
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -25,6 +24,12 @@ const KakaoSignup = () => {
 
   const handleSignup = async () => {
     if (!nickname || !kakaoCode) {
+      if (!nickname) {
+        console.log('닉네임이 없습니다.');
+      }
+      if (!kakaoCode) {
+        console.log('인가코드가 없습니다.');
+      }
       alert('모든 정보를 입력해주세요.');
       return;
     }
@@ -45,10 +50,6 @@ const KakaoSignup = () => {
 
       console.log('회원가입 성공:', response);
 
-      // 예시로 상태 관리나 로그인 상태 저장을 할 수 있습니다.
-      // 예: setToken(response.accessToken);
-
-      // 회원가입 성공 후 리디렉션
       window.location.href = '/';
     } catch (error: unknown) {
       console.error('회원가입 실패', error);
@@ -96,7 +97,7 @@ const KakaoSignup = () => {
               md:w-[340px] md:h-[192px]"
             />
           </Link>
-          <KakaoSignUpForm />
+          <KakaoSignUpForm setNickname={setNickname} />
           <Button
             type="button"
             variant="nomad-black"
