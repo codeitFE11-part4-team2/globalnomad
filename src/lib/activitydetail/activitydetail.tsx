@@ -8,8 +8,6 @@ import {
   BookReservationResponse,
   CreateImageUrlResponse,
   DeleteActivityResponse,
-  UpdateActivityRequest,
-  UpdateActivityResponse,
 } from '@/lib/activitydetail/activitydetailTypes';
 
 const TEAMID = '11-2';
@@ -86,40 +84,25 @@ export const deleteActivity = async (
   ownerId: number // 삭제 요청 시 ownerId 필요
 ): Promise<DeleteActivityResponse> => {
   const currentUserId = getCurrentUserId();
+  const token = useAuthStore.getState().token; // 토큰 가져오기
 
   // 클라이언트에서 먼저 `userId` 검증
   if (!currentUserId || currentUserId !== ownerId) {
     throw new Error('삭제 권한이 없습니다.');
   }
 
+  if (!token) {
+    throw new Error('로그인이 필요합니다.');
+  }
+
   const response: AxiosResponse<DeleteActivityResponse> = await api.delete(
     `${PATHS.MY_ACTIVITIES}${activityId}`,
     {
-      headers: getAuthHeaders(),
-    }
-  );
-
-  return response.data;
-};
-
-// 내 체험 수정 (로그인 필요, `userId` 검증 추가)
-export const updateActivity = async (
-  activityId: number,
-  ownerId: number, // 수정 요청 시 ownerId 필요
-  updateData: UpdateActivityRequest
-): Promise<UpdateActivityResponse> => {
-  const currentUserId = getCurrentUserId();
-
-  // 클라이언트에서 먼저 `userId` 검증
-  if (!currentUserId || currentUserId !== ownerId) {
-    throw new Error('수정 권한이 없습니다.');
-  }
-
-  const response: AxiosResponse<UpdateActivityResponse> = await api.put(
-    `${PATHS.MY_ACTIVITIES}${activityId}`,
-    updateData,
-    {
-      headers: getAuthHeaders(),
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      data: { userId: ownerId },
     }
   );
 
