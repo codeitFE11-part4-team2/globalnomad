@@ -14,7 +14,7 @@ function ActivityCard({ activity, isPriority = false }: ActivityCardProps) {
 
   return (
     <Link href={`/activity/${activity.id}`} className="cursor-pointer">
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 transition-transform duration-300 hover:-translate-y-2">
         <div className="relative w-full lg:w-[283px] aspect-square rounded-[20px] overflow-hidden">
           <Image
             src={bannerImageUrl}
@@ -27,7 +27,12 @@ function ActivityCard({ activity, isPriority = false }: ActivityCardProps) {
         </div>
         <div className="flex flex-col gap-[10px]">
           <div className="flex items-center gap-1">
-            <Image src="/icons/icon-star.svg" alt="별점" width={20} height={20} />
+            <Image
+              src="/icons/icon-star.svg"
+              alt="별점"
+              width={20}
+              height={20}
+            />
             <span className="text-black font-pretendard text-lg font-medium leading-[26px]">
               {rating}
             </span>
@@ -36,7 +41,7 @@ function ActivityCard({ activity, isPriority = false }: ActivityCardProps) {
             </span>
           </div>
           <div className="flex flex-col gap-[15px]">
-            <h3 className="text-black font-pretendard md:text-2xl text-2lg font-semibold leading-[28px]">
+            <h3 className="text-black font-pretendard md:text-2xl text-2lg font-semibold leading-[28px] overflow-hidden text-ellipsis line-clamp-1">
               {title}
             </h3>
             <div className="flex items-center gap-1">
