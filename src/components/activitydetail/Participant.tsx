@@ -13,8 +13,19 @@ const Participant = ({ headCount, onParticipantsChange }: ParticipantProps) => {
     onParticipantsChange(step);
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.trim(); // 공백 제거
+    const parsedValue = parseInt(value, 10);
+
+    if (value === '' || isNaN(parsedValue)) {
+      onParticipantsChange(1 - headCount); // 현재 값에서 1로 리셋
+    } else {
+      onParticipantsChange(parsedValue - headCount);
+    }
+  };
+
   return (
-    <div className="w-[120px] h-[40px] flex items-center mt-2 mb-6 rounded-[6px] border border-[#CDD0DC] border-solid ">
+    <div className="w-[120px] h-[40px] flex items-center mt-2 mb-6 rounded-[6px] border border-[#CDD0DC] border-solid">
       <button
         onClick={() => handleOnParticipantsChange(-1)}
         className="p-[10px]"
@@ -23,10 +34,8 @@ const Participant = ({ headCount, onParticipantsChange }: ParticipantProps) => {
       </button>
       <input
         type="text"
-        value={headCount} // 현재 참가자 수를 입력 필드에 표시.
-        onChange={(e) =>
-          onParticipantsChange(Math.max(1, parseInt(e.target.value)))
-        } // 참가자 수가 최소 1이 되도록 설정.
+        value={headCount} // 현재 참가자 수를 입력 필드에 표시
+        onChange={handleInputChange}
         min="1" // input 속성을 통해 최소값을 1로 제한
         className="w-full h-full p-2 outline-none text-center text-md font-regular"
       />
