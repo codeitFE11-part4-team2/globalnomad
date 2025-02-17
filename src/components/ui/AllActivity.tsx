@@ -37,7 +37,11 @@ export default function AllActivity({
     setCurrentPage(1);
   }, [selectedCategory, searchKeyword]);
 
-  const { data, isLoading, error } = useActivities(currentPage, itemsPerPage * 2, searchKeyword);
+  const { data, isLoading, error } = useActivities(
+    1, // 항상 첫 번째 페이지 요청
+    100, // 데이터 갯수 요청
+    searchKeyword
+  );
   const activities = data?.activities || [];
 
   // 선택된 카테고리에 해당하는 활동만 필터링
@@ -91,7 +95,10 @@ export default function AllActivity({
   }
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-6">
+      {searchKeyword && (
+        <p className="text-black">총 {sortedActivities.length}개의 결과</p>
+      )}{' '}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-2 md:gap-x-4 lg:gap-x-6 gap-y-[5px] md:gap-y-8 lg:gap-y-12">
         {currentPageActivities.map((activity) => (
           <ActivityCard
@@ -101,13 +108,13 @@ export default function AllActivity({
           />
         ))}
       </div>
-      {totalPages > 1 && (
+      <div className="mt-[6px] md:mt-[48px]">
         <Pagination
           activePageNum={currentPage}
           totalPageNum={totalPages}
           onPageChange={setCurrentPage}
         />
-      )}
+      </div>
     </div>
   );
 }

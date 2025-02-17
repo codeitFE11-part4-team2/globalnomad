@@ -13,7 +13,9 @@ import AllActivity from '@/components/ui/AllActivity';
 
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<string>('전체');
-  const [priceFilter, setPriceFilter] = useState<'낮은순' | '높은순' | '가격'>('가격');
+  const [priceFilter, setPriceFilter] = useState<'낮은순' | '높은순' | '가격'>(
+    '가격'
+  );
   const [searchKeyword, setSearchKeyword] = useState<string>('');
 
   const handleCategorySelect = (category: string) => {
@@ -21,7 +23,8 @@ export default function Home() {
   };
 
   const [popularActivityPage, setPopularActivityPage] = useState(1);
-  const { data: popularData, isFetching } = usePopularActivities(popularActivityPage);
+  const { data: popularData, isFetching } =
+    usePopularActivities(popularActivityPage);
 
   const handlePrevPage = useCallback(() => {
     if (isFetching) return; // 데이터 로딩 중에는 페이지 변경 방지
@@ -42,7 +45,10 @@ export default function Home() {
     setSearchKeyword(keyword);
   };
 
-  const { data, isLoading } = useSearchActivities(searchKeyword, selectedCategory);
+  const { data, isLoading } = useSearchActivities(
+    searchKeyword,
+    selectedCategory
+  );
 
   return (
     <div className="relative bg-gray-100">
@@ -135,9 +141,6 @@ export default function Home() {
                   으로 검색한 결과입니다.
                 </span>
               </h2>
-              <p className="text-black font-pretendard text-[16px] font-normal leading-[26px]">
-                총 {data?.totalCount || 0}개의 결과
-              </p>
             </div>
           ) : (
             <h2 className="md:text-[36px] text-[18px] font-bold leading-[43px] text-black font-pretendard">
