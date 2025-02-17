@@ -12,6 +12,8 @@ import Location from '../../../../public/icons/icon-location.svg';
 import Footer from '@/components/common/Footer';
 import Reservation from '@/components/activitydetail/Reservation';
 import KakaoMap from '@/components/activitydetail/KakaoMap';
+import ActivityKebab from '@/components/activitydetail/ActivityKebab';
+import { useAuthStore } from '@/store';
 
 const ActivityDetail = () => {
   const { id } = useParams();
@@ -20,6 +22,8 @@ const ActivityDetail = () => {
   const [activity, setActivity] = useState<ActivityDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const { user, token } = useAuthStore();
 
   useEffect(() => {
     if (!activityId) return;
@@ -41,6 +45,13 @@ const ActivityDetail = () => {
     loadActivity();
   }, [id]);
 
+  // 체험 삭제 핸들러
+  const handleDelete = (deletedActivityId: number) => {
+    setActivity((prevActivity) =>
+      prevActivity?.id === deletedActivityId ? null : prevActivity
+    );
+  };
+
   if (loading) return <p>로딩 중...</p>;
   if (error) return <p>{error}</p>;
   if (!activity) return <p>데이터가 없습니다.</p>;
@@ -53,9 +64,12 @@ const ActivityDetail = () => {
             <p className="text-md font-regular lg:mt-[78px] md:mt-[24px] mt-[16px]">
               {activity.category}
             </p>
-            <p className="md:text-3xl text-2xl font-bold mt-[10px]">
-              {activity.title}
-            </p>
+            <div className="w-full max-w-[1200px] flex justify-between items-center">
+              <p className="md:text-3xl text-2xl font-bold">{activity.title}</p>
+              {user && user.id === activity.userId && (
+                <ActivityKebab activity={activity} onDelete={handleDelete} />
+              )}
+            </div>
             <div className="flex items-center justify-start mt-[16px] space-x-[12px]">
               <div className="flex items-center space-x-[2px]">
                 <Image src={StarIcon} alt="별점" width={16} height={16} />
