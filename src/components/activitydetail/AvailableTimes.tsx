@@ -14,7 +14,7 @@ const AvailableTimes = ({
   return (
     <div>
       {availableTimes.length > 0 ? ( //  예약 가능한 시간이 있는 경우만 버튼 렌더링
-        <div>
+        <div className="flex flex-wrap gap-[12px]">
           {availableTimes.map((time, index) => (
             <button
               key={index}

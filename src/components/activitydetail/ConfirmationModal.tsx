@@ -8,9 +8,11 @@ interface ConfirmationModalProps {
 const ConfirmationModal = ({ onClose }: ConfirmationModalProps) => {
   return (
     <div>
-      <div>
-        <p>예약이 완료되었습니다.</p>
-        <Button onClick={onClose}>확인</Button>
+      <p className="text-2lg font-medium pt-[108px]">예약이 완료되었습니다.</p>
+      <div className="flex justify-end pt-[40px] pr-[28px]">
+        <Button onClick={onClose} className="w-[120px] h-[48px]">
+          확인
+        </Button>
       </div>
     </div>
   );

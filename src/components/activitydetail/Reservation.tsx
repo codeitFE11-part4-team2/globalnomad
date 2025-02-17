@@ -6,7 +6,7 @@ import Participant from '@/components/activitydetail/Participant';
 import AvailableTimes from './AvailableTimes';
 import { addDays, eachDayOfInterval, format } from 'date-fns';
 import ConfirmationModal from '@/components/activitydetail/ConfirmationModal';
-import router from 'next/router';
+import { useRouter } from 'next/navigation';
 import ParticipantSelectionModal from './ParticipantSelectionModal';
 import DateSelectionModal from './DateSelectionModal';
 import { bookActivity } from '@/lib/activitydetail/activitydetail';
@@ -21,6 +21,7 @@ const Reservation = ({ activity }: ReservationProps) => {
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [headCount, setHeadCount] = useState(1);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   // 모달 상태
   const [showDateModal, setShowDateModal] = useState(false); // 날짜 선택 모달
@@ -229,12 +230,12 @@ const Reservation = ({ activity }: ReservationProps) => {
 
       {/* 예약 완료 모달 */}
       {showConfirmationModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+        <div className="fixed inset-0 z-30 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-[540px] h-[250px] bg-white rounded-lg shadow-lg text-center">
             <ConfirmationModal
               onClose={() => {
                 setShowConfirmationModal(false);
-                router.push(`/activity-details/${activity.id}`);
+                router.refresh();
               }}
             />
           </div>
