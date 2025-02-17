@@ -4,12 +4,14 @@ interface CancelModalProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
+  isLoading?: boolean;
 }
 
 export default function CancelModal({
   isOpen,
   onClose,
   onConfirm,
+  isLoading = false,
 }: CancelModalProps) {
   if (!isOpen) return null;
 
@@ -34,15 +36,17 @@ export default function CancelModal({
           <div className="flex gap-2 w-full mt-6">
             <button
               onClick={onClose}
+              disabled={isLoading}
               className="flex-1 px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
             >
               아니오
             </button>
             <button
               onClick={onConfirm}
+              disabled={isLoading}
               className="flex-1 px-6 py-3 text-sm font-medium text-white bg-red-3 rounded-lg hover:bg-red-4"
             >
-              취소하기
+              {isLoading ? '취소 중...' : '취소하기'}
             </button>
           </div>
         </div>
