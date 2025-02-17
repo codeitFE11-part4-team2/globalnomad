@@ -1,9 +1,14 @@
 'use client';
 import Link from 'next/link';
 import Image from 'next/image';
-import { mockReservationResponse } from '@/lib/reservations/mockData';
 import CancelModal from './CancelModal';
 import { useState } from 'react';
+import {
+  useReservationCancel,
+  useReservationList,
+} from '@/services/ReservationHistory';
+import { ReservationStatus, Reservation } from '@/types/ReservationHistory';
+import NoReservations from './NoReservations';
 
 interface ReservationListProps {
   selectedStatus: string;
@@ -17,11 +22,17 @@ export default function ReservationList({
     number | null
   >(null);
 
-  const { reservations } = mockReservationResponse;
+  // 리액트 쿼리로 예약 목록 조회
+  const { data, isLoading, error } = useReservationList({
+    status:
+      selectedStatus === 'all'
+        ? undefined
+        : (selectedStatus as ReservationStatus),
+  });
 
-  const filteredReservations = reservations.filter((reservation) =>
-    selectedStatus === 'all' ? true : reservation.status === selectedStatus
-  );
+  // 예약 취소
+  const { mutate: cancelReservation, isPending: isCanceling } =
+    useReservationCancel();
 
   const handleCancelClick = (reservationId: number) => {
     setSelectedReservationId(reservationId);
@@ -30,16 +41,32 @@ export default function ReservationList({
 
   const handleConfirmCancel = async () => {
     if (selectedReservationId) {
-      try {
-        // TODO: API 호출로 예약 취소 처리
-        console.log('예약 취소:', selectedReservationId);
-        setIsModalOpen(false);
-        setSelectedReservationId(null);
-      } catch (error) {
-        console.error('예약 취소 실패:', error);
-      }
+      cancelReservation(selectedReservationId, {
+        onSuccess: () => {
+          setIsModalOpen(false);
+          setSelectedReservationId(null);
+        },
+        onError: (error) => {
+          alert(error.message);
+        },
+      });
     }
   };
+
+  if (isLoading) return <div>로딩 중...</div>;
+  if (error) return <div>에러가 발생했습니다: {error.message}</div>;
+
+  const filteredReservations =
+    selectedStatus === 'all'
+      ? data?.reservations
+      : data?.reservations.filter(
+          (reservation) => reservation.status === selectedStatus
+        );
+
+  // 데이터가 없거나 필터링된 결과가 없는 경우
+  if (!filteredReservations || filteredReservations.length === 0) {
+    return <NoReservations />;
+  }
 
   const getStatusStyle = (status: string) => {
     const styles = {
@@ -63,7 +90,7 @@ export default function ReservationList({
     return texts[status as keyof typeof texts] || status;
   };
 
-  const getActionButton = (reservation: (typeof reservations)[0]) => {
+  const getActionButton = (reservation: Reservation) => {
     const commonButtonClasses = 'px-4 py-2 rounded-lg text-sm font-medium';
 
     if (reservation.status === 'pending') {
@@ -111,7 +138,7 @@ export default function ReservationList({
   return (
     <>
       <div className="space-y-4">
-        {filteredReservations.map((reservation) => (
+        {filteredReservations?.map((reservation) => (
           <div key={reservation.id} className="border shadow-md rounded-3xl">
             <div className="flex">
               {/* 왼쪽 이미지 */}
@@ -165,6 +192,7 @@ export default function ReservationList({
           setSelectedReservationId(null);
         }}
         onConfirm={handleConfirmCancel}
+        isLoading={isCanceling}
       />
     </>
   );

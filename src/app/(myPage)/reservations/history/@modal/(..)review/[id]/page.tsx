@@ -6,7 +6,7 @@ import Modal from '../../../_components/Modal';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
-import { mockReservationResponse } from '@/lib/reservations/mockData';
+import { useReservationReview } from '@/services/ReservationHistory';
 
 interface ReviewModalProps {
   params: Promise<{
@@ -18,7 +18,9 @@ export default function ReviewModal({ params }: ReviewModalProps) {
   const router = useRouter();
   const [rating, setRating] = useState(5);
   const [content, setContent] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const searchParams = useSearchParams();
+  const { id } = use(params);
+
   const [reservationInfo, setReservationInfo] = useState<{
     id: string;
     title: string;
@@ -29,44 +31,23 @@ export default function ReviewModal({ params }: ReviewModalProps) {
     price: number;
   } | null>(null);
 
-  const searchParams = useSearchParams();
-
-  const { id } = use(params);
+  // 리뷰 작성 mutation
+  const { mutate: submitReview, isPending: isSubmitting } =
+    useReservationReview();
 
   useEffect(() => {
-    // 비동기 처리를 try-catch로 감싸서 에러 처리
-    try {
-      if (searchParams.get('title')) {
-        setReservationInfo({
-          id,
-          title: searchParams.get('title') || '',
-          date: searchParams.get('date') || '',
-          time: searchParams.get('time') || '',
-          headCount: Number(searchParams.get('headCount')) || 0,
-          imageUrl: searchParams.get('imageUrl') || '',
-          price: Number(searchParams.get('price')) || 0,
-        });
-      } else {
-        const { reservations } = mockReservationResponse;
-        const reservation = reservations.find((r) => r.id === parseInt(id));
-        if (reservation) {
-          setReservationInfo({
-            id,
-            title: reservation.activity.title,
-            date: reservation.date,
-            time: `${reservation.startTime}-${reservation.endTime}`,
-            headCount: reservation.headCount,
-            imageUrl: reservation.activity.bannerImageUrl,
-            price: reservation.totalPrice,
-          });
-        }
-      }
-    } catch (error) {
-      console.error('Error loading reservation info:', error);
-      // 에러 발생 시 처리
-      router.push('/reservations/history');
+    if (searchParams.get('title')) {
+      setReservationInfo({
+        id,
+        title: searchParams.get('title') || '',
+        date: searchParams.get('date') || '',
+        time: searchParams.get('time') || '',
+        headCount: Number(searchParams.get('headCount')) || 0,
+        imageUrl: searchParams.get('imageUrl') || '',
+        price: Number(searchParams.get('price')) || 0,
+      });
     }
-  }, [id, searchParams, router]);
+  }, [id, searchParams]);
 
   if (!reservationInfo) {
     return <Modal title="후기 작성">Loading...</Modal>;
@@ -74,19 +55,24 @@ export default function ReviewModal({ params }: ReviewModalProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
 
-    // API 통신 시뮬레이션
-    setTimeout(() => {
-      console.log('제출된 데이터:', {
-        reservationId: id,
-        rating,
-        content,
-      });
-
-      setIsSubmitting(false);
-      router.back();
-    }, 1000);
+    submitReview(
+      {
+        reservationId: parseInt(id),
+        reviewData: {
+          rating,
+          content: content.trim(),
+        },
+      },
+      {
+        onSuccess: () => {
+          router.back();
+        },
+        onError: (error: any) => {
+          alert(error.message);
+        },
+      }
+    );
   };
 
   return (
