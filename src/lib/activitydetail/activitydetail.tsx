@@ -74,7 +74,7 @@ export const bookActivity = async (
 ): Promise<BookReservationResponse> => {
   const response: AxiosResponse<BookReservationResponse> = await api.post(
     `${PATHS.ACTIVITIES}${activityId}/reservations`,
-    { scheduleId, headCount },
+    { scheduleId: Number(scheduleId), headCount: Number(headCount) },
     { headers: getAuthHeaders() }
   );
   return response.data;
