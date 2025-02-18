@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
-import { DailySchedule, TimeReservation } from '@/lib/reservations/types';
+import { useState } from 'react';
 import {
-  mockDailySchedule,
-  mockTimeSchedule,
-} from '@/lib/reservations/mockData';
+  useDailySchedule,
+  useReservations,
+  useUpdateReservationStatus,
+} from '@/services/ReservationStatus';
 
 interface ActivityReservationModalProps {
   isOpen: boolean;
@@ -18,73 +18,70 @@ export default function ActivityReservationModal({
   activityId,
   date,
 }: ActivityReservationModalProps) {
-  const [schedules, setSchedules] = useState<DailySchedule[]>([]);
   const [selectedSchedule, setSelectedSchedule] = useState<number | null>(null);
-  const [reservations, setReservations] = useState<TimeReservation[]>([]);
 
-  useEffect(() => {
-    const fetchScheduleData = async () => {
-      try {
-        // 해당 날짜의 예약만 필터링
-        const filteredReservations = mockTimeSchedule.reservations.filter(
-          (reservation) => reservation.date === date
-        );
+  // 날짜별 예약 스케줄 조회
+  const { data: schedules = [] } = useDailySchedule(activityId, date, {
+    enabled: isOpen,
+  });
 
-        if (filteredReservations.length > 0) {
-          // 예약이 있는 스케줄 ID들 추출
-          const schedulesWithReservations = new Set(
-            filteredReservations.map((reservation) => reservation.scheduleId)
-          );
+  // 예약 상태 업데이트 뮤테이션
+  const { mutate: updateStatus } = useUpdateReservationStatus();
 
-          // 예약이 있는 스케줄만 필터링
-          const filteredSchedules = mockDailySchedule.filter((schedule) =>
-            schedulesWithReservations.has(schedule.scheduleId)
-          );
+  // 선택된 스케줄의 예약 목록 조회
+  const { data: pendingReservations } = useReservations(
+    {
+      activityId,
+      scheduleId: selectedSchedule ?? 0,
+      status: 'pending',
+      size: 100,
+    },
+    { enabled: !!selectedSchedule }
+  );
 
-          setSchedules(filteredSchedules);
-          setReservations(filteredReservations);
-        } else {
-          setSchedules([]);
-          setReservations([]);
-        }
-      } catch (error) {
-        console.error('Failed to fetch schedule data:', error);
-        setSchedules([]);
-        setReservations([]);
-      }
-    };
+  const { data: confirmedReservations } = useReservations(
+    {
+      activityId,
+      scheduleId: selectedSchedule ?? 0,
+      status: 'confirmed',
+      size: 100,
+    },
+    { enabled: !!selectedSchedule }
+  );
 
-    if (isOpen) {
-      fetchScheduleData();
-    }
-  }, [isOpen, activityId, date]);
+  const { data: declinedReservations } = useReservations(
+    {
+      activityId,
+      scheduleId: selectedSchedule ?? 0,
+      status: 'declined',
+      size: 100,
+    },
+    { enabled: !!selectedSchedule }
+  );
 
-  const handleConfirm = async (reservationId: number, scheduleId: number) => {
-    const updatedReservations = reservations.map((reservation) => {
-      if (reservation.id === reservationId) {
-        return {
-          ...reservation,
-          status: 'confirmed',
-          updatedAt: new Date().toISOString(),
-        };
-      }
-      return reservation;
+  // 모든 예약을 합치고 정렬
+  const allReservations = [
+    ...(pendingReservations?.reservations ?? []),
+    ...(confirmedReservations?.reservations ?? []),
+    ...(declinedReservations?.reservations ?? []),
+  ].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+
+  const handleConfirm = async (reservationId: number) => {
+    updateStatus({
+      activityId,
+      reservationId,
+      status: 'confirmed',
     });
-    setReservations(updatedReservations);
   };
 
   const handleDecline = async (reservationId: number) => {
-    const updatedReservations = reservations.map((reservation) => {
-      if (reservation.id === reservationId) {
-        return {
-          ...reservation,
-          status: 'declined',
-          updatedAt: new Date().toISOString(),
-        };
-      }
-      return reservation;
+    updateStatus({
+      activityId,
+      reservationId,
+      status: 'declined',
     });
-    setReservations(updatedReservations);
   };
 
   if (!isOpen) return null;
@@ -98,7 +95,7 @@ export default function ActivityReservationModal({
               year: 'numeric',
               month: 'long',
               day: 'numeric',
-            })}
+            })}{' '}
             예약 현황
           </h3>
           <button
@@ -131,58 +128,73 @@ export default function ActivityReservationModal({
                     {schedule.count.pending} | 거절: {schedule.count.declined}
                   </div>
                 </div>
-                <span className="text-blue-500">▼</span>
+                <span className="text-blue-500">
+                  {selectedSchedule === schedule.scheduleId ? '▲' : '▼'}
+                </span>
               </div>
 
               {selectedSchedule === schedule.scheduleId && (
                 <div className="mt-4 space-y-4">
-                  {reservations
-                    .filter((r) => r.scheduleId === schedule.scheduleId)
-                    .map((reservation) => (
-                      <div
-                        key={reservation.id}
-                        className="flex justify-between items-center p-3 bg-gray-50 rounded"
-                      >
-                        <div>
-                          <div className="font-medium">
-                            {reservation.nickname}
-                          </div>
-                          <div className="text-sm text-gray-600">
-                            인원: {reservation.headCount}명 | 금액:{' '}
-                            {reservation.totalPrice.toLocaleString()}원
-                          </div>
+                  {allReservations.map((reservation) => (
+                    <div
+                      key={reservation.id}
+                      className={`flex justify-between items-center p-3 rounded ${
+                        reservation.status === 'pending'
+                          ? 'bg-yellow-50'
+                          : reservation.status === 'confirmed'
+                            ? 'bg-green-50'
+                            : 'bg-red-50'
+                      }`}
+                    >
+                      <div>
+                        <div className="font-medium">
+                          {reservation.nickname}
                         </div>
-                        <div className="space-x-2">
-                          {reservation.status === 'pending' && (
-                            <>
-                              <button
-                                onClick={() =>
-                                  handleConfirm(
-                                    reservation.id,
-                                    schedule.scheduleId
-                                  )
-                                }
-                                className="px-4 py-2 bg-nomad-black text-white rounded hover:bg-gray-900"
-                              >
-                                확정하기
-                              </button>
-                              <button
-                                onClick={() => handleDecline(reservation.id)}
-                                className="px-4 py-2 bg-white text-nomad-black rounded hover:bg-gray-800"
-                              >
-                                거절하기
-                              </button>
-                            </>
-                          )}
-                          {reservation.status === 'confirmed' && (
-                            <span className="text-green-600">승인됨</span>
-                          )}
-                          {reservation.status === 'declined' && (
-                            <span className="text-red-600">거절됨</span>
+                        <div className="text-sm text-gray-600">
+                          인원: {reservation.headCount}명 | 금액:{' '}
+                          {reservation.totalPrice.toLocaleString()}원 |{' '}
+                          {new Date(reservation.createdAt).toLocaleDateString(
+                            'ko-KR',
+                            {
+                              year: '2-digit',
+                              month: '2-digit',
+                              day: '2-digit',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            }
                           )}
                         </div>
                       </div>
-                    ))}
+                      <div className="space-x-2">
+                        {reservation.status === 'pending' && (
+                          <>
+                            <button
+                              onClick={() => handleConfirm(reservation.id)}
+                              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                            >
+                              확정하기
+                            </button>
+                            <button
+                              onClick={() => handleDecline(reservation.id)}
+                              className="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-100"
+                            >
+                              거절하기
+                            </button>
+                          </>
+                        )}
+                        {reservation.status === 'confirmed' && (
+                          <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full">
+                            승인됨
+                          </span>
+                        )}
+                        {reservation.status === 'declined' && (
+                          <span className="px-3 py-1 bg-red-100 text-red-800 rounded-full">
+                            거절됨
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>

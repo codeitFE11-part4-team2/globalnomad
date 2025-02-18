@@ -1,12 +1,8 @@
 'use client';
 
-import { MonthlyReservationStatus } from '@/lib/reservations/types';
 import { useEffect, useState } from 'react';
 import ReservationStatus from './ReservationStatus';
-import {
-  mockMonthlyReservationStatus,
-  mockTimeSchedule,
-} from '@/lib/reservations/mockData';
+import { useMonthlyDashboard } from '@/services/ReservationStatus';
 
 interface ActivityCalendarProps {
   activityId: number;
@@ -22,16 +18,18 @@ const ActivityStatusCalendar = ({
   activityId,
   onSelectDate,
 }: ActivityCalendarProps) => {
-  // 예약 데이터
-  const [monthlyData, setMonthlyData] = useState<MonthlyReservationStatus[]>(
-    []
-  );
-
   // 요일
   const weekDays = ['일', '월', '화', '수', '목', '금', '토'];
 
   // 현재 날짜
   const [currentDate, setCurrentDate] = useState(new Date());
+
+  // API 호출
+  const { data: monthlyData } = useMonthlyDashboard(
+    activityId,
+    currentDate.getFullYear().toString(),
+    (currentDate.getMonth() + 1).toString().padStart(2, '0')
+  );
 
   // 현재 월의 시작일, 종료일 계산
   const startDate = new Date(
@@ -45,7 +43,7 @@ const ActivityStatusCalendar = ({
     0
   );
 
-  // 이전월의 마지막 날짜들 계산(첫 주 채우기 용)
+  // 이전월의 마지막 날짜들 계산
   const startDay = startDate.getDay();
   const prevMonthDays = Array.from({ length: startDay }, (_, i) => ({
     day: new Date(
@@ -65,7 +63,7 @@ const ActivityStatusCalendar = ({
     })
   );
 
-  // 다음달시작 날짜들(마지막주 채우기용)
+  // 다음달 시작 날짜들
   const remainingDays = 42 - (prevMonthDays.length + currentMonthDays.length);
   const nextMonthDays = Array.from({ length: remainingDays }, (_, i) => ({
     day: i + 1,
@@ -75,7 +73,7 @@ const ActivityStatusCalendar = ({
   // 전체 날짜 배열
   const days = [...prevMonthDays, ...currentMonthDays, ...nextMonthDays];
 
-  // 월 변경 행들러
+  // 월 변경 핸들러
   const handlePrevMonth = () => {
     setCurrentDate(
       new Date(currentDate.getFullYear(), currentDate.getMonth() - 1)
@@ -87,32 +85,11 @@ const ActivityStatusCalendar = ({
     );
   };
 
-  // 예약 데이터 가져오기 (실제로는 API 호출 예정)
-  useEffect(() => {
-    const fetchMonthlyData = async () => {
-      // activityId가 일치하는 예약 데이터만 필터링
-      const filteredReservations = mockTimeSchedule.reservations
-        .filter((reservation) => reservation.activityId === activityId)
-        .map((reservation) => ({
-          date: reservation.date, // 날짜
-          reservations: {
-            completed: reservation.status === 'completed' ? 1 : 0,
-            confirmed: reservation.status === 'confirmed' ? 1 : 0,
-            pending: reservation.status === 'pending' ? 1 : 0,
-          },
-        }));
-
-      setMonthlyData(filteredReservations);
-    };
-
-    fetchMonthlyData();
-  }, [activityId, currentDate]);
-
   // 날짜에 해당하는 예약 상태 찾기
   const getReservationStatus = (date: Date) => {
     const dateStr = date.toISOString().split('T')[0];
     return (
-      monthlyData.find((data) => data.date === dateStr)?.reservations || {
+      monthlyData?.find((data) => data.date === dateStr)?.reservations || {
         completed: 0,
         confirmed: 0,
         pending: 0,
@@ -120,11 +97,9 @@ const ActivityStatusCalendar = ({
     );
   };
 
-  // 날짜 포맷팅 함수
+  // 날짜 포맷팅
   const formatDate = (date: Date) => {
-    return `${date.getFullYear()}-${(date.getMonth() + 1)
-      .toString()
-      .padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+    return date.toISOString().split('T')[0];
   };
 
   // 날짜 계산
@@ -138,7 +113,7 @@ const ActivityStatusCalendar = ({
     return date;
   };
 
-  // 날짜 렌더 메서드
+  // 날짜 셀 렌더링
   const renderDateCell = (day: DayInfo, idx: number) => {
     const date = calculateDate(day);
     const status = getReservationStatus(date);
@@ -158,34 +133,43 @@ const ActivityStatusCalendar = ({
   };
 
   return (
-    <>
-      <div className="p-4">
-        {/* 월 내비게이션 */}
-        <div className="flex justify-between items-center">
-          <button onClick={handlePrevMonth}>이전</button>
-          <span>
-            {currentDate.getFullYear()}년 {currentDate.getMonth() + 1}월
-          </span>
-          <button onClick={handleNextMonth}>다음</button>
-        </div>
-        {/* 달력 */}
-        <div>
-          {/* 요일 헤더 */}
-          <div className="grid grid-cols-7 gap-1">
-            {weekDays.map((day) => (
-              <div key={day} className="text-center">
-                {day}
-              </div>
-            ))}
-          </div>
+    <div className="p-4">
+      {/* 월 내비게이션 */}
+      <div className="flex justify-between items-center mb-4">
+        <button
+          onClick={handlePrevMonth}
+          className="px-4 py-2 text-gray-600 hover:text-gray-900"
+        >
+          이전
+        </button>
+        <span className="text-lg font-medium">
+          {currentDate.getFullYear()}년 {currentDate.getMonth() + 1}월
+        </span>
+        <button
+          onClick={handleNextMonth}
+          className="px-4 py-2 text-gray-600 hover:text-gray-900"
+        >
+          다음
+        </button>
+      </div>
 
-          {/* 날짜 그리드 */}
-          <div className="grid grid-cols-7 gap-1">
-            {days.map((day, idx) => renderDateCell(day, idx))}
-          </div>
+      {/* 달력 */}
+      <div>
+        {/* 요일 헤더 */}
+        <div className="grid grid-cols-7 gap-1 mb-2">
+          {weekDays.map((day) => (
+            <div key={day} className="text-center font-medium">
+              {day}
+            </div>
+          ))}
+        </div>
+
+        {/* 날짜 그리드 */}
+        <div className="grid grid-cols-7 gap-1">
+          {days.map((day, idx) => renderDateCell(day, idx))}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
