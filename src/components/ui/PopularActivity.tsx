@@ -1,110 +1,43 @@
 'use client';
 
 import Image from 'next/image';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
+import { useWindowSize } from '@/hooks/useWindowSize';
 import { usePopularActivities } from '@/hooks/usePopularActivities';
 import { Activity } from '@/lib/popularactivity/popularactivityTypes';
 import { Spinner } from '../common/Spinner';
+import PopularActivityCard from './PopularActivityCard';
 
+// 상수 정의
 const ITEMS_PER_PAGE = 3; // lg 화면에서 한 페이지에 표시할 체험 수
-const PRICE_FORMATTER = new Intl.NumberFormat('ko-KR');
+const SCROLL_THRESHOLD = 100; // 스크롤 임계값 (px)
+const MAX_ITEMS_PER_REQUEST = 20; // 서버에서 받아오는 최대 아이템 수
+const LAST_PAGE_INDEX = MAX_ITEMS_PER_REQUEST - ITEMS_PER_PAGE; // 마지막 페이지 인덱스
 
-// ActivityCard 컴포넌트의 props 타입 정의
-interface ActivityCardProps {
-  activity: Activity;
-}
-
-// 개별 체험 카드
-function ActivityCard({ activity }: ActivityCardProps) {
-  const { bannerImageUrl, title, rating, reviewCount, price } = activity;
-
-  return (
-    <div className="flex-none w-[186px] md:w-[384px] rounded-[20px] overflow-hidden cursor-pointer">
-      <div className="relative h-[186px] md:h-[384px]">
-        <Image
-          src={bannerImageUrl}
-          alt={title}
-          fill
-          unoptimized
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent from-33.33% to-black/80 to-91.67%">
-          <div className="absolute inset-0 flex flex-col justify-end items-start gap-[6px] md:gap-[20px] p-[24px_20px] md:p-[30px_20px]">
-            <div className="flex items-center gap-[5px]">
-              <Image
-                src="/icons/icon-star.svg"
-                alt="별점"
-                width={18}
-                height={18}
-              />
-              <span className="text-[14px] font-semibold leading-[24px] text-white">
-                {rating}
-              </span>
-              <span className="text-[14px] font-semibold leading-[24px] text-white">
-                ({reviewCount})
-              </span>
-            </div>
-            <h3 className="md:text-[32px] text-[18px] font-bold leading-[26px] md:leading-[42px] text-white font-pretendard max-w-[251px] min-h-[52px] md:min-h-[84px] break-keep line-clamp-2">
-              {title}
-            </h3>
-            <p className="font-pretendard">
-              <span className="text-[20px] font-bold md:leading-[32px] leading-[26px] text-white">
-                ₩ {PRICE_FORMATTER.format(price)}
-              </span>
-              <span className="text-[14px] font-normal leading-[24px] text-gray-700">
-                {' '}
-                / 인
-              </span>
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// 인기 체험 리스트 컴포넌트
+// PopularActivity 컴포넌트의 props 타입 정의
 interface PopularActivityProps {
+  page: number;
   onPrevPage: () => void;
   onNextPage: () => void;
-  page: number;
 }
 
-export default function PopularActivity({
-  onPrevPage,
-  onNextPage,
-  page,
-}: PopularActivityProps) {
+// 인기 체험 섹션
+function PopularActivity({ page, onPrevPage, onNextPage }: PopularActivityProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [lastValidData, setLastValidData] = useState<Activity[]>([]);
   const { data, isLoading, isFetching, error } = usePopularActivities(page);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    if (data?.activities && data.activities.length > 0) {
-      setLastValidData(data.activities);
-    }
-  }, [data]);
-
-  useEffect(() => {
-    const checkScreenSize = () => {
-      setIsMobile(window.innerWidth < 1440); // lg 브레이크포인트
-    };
-
-    checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
-
-    return () => window.removeEventListener('resize', checkScreenSize);
-  }, []);
+  const { isMobile } = useWindowSize();
 
   const handleScroll = useCallback(() => {
-    if (!containerRef.current || !isMobile) return;
+    if (!isMobile) return;
 
     const container = containerRef.current;
+    if (!container) return;
+
     const isNearEnd =
       container.scrollLeft + container.clientWidth >=
-      container.scrollWidth - 100;
+      container.scrollWidth - SCROLL_THRESHOLD;
 
     if (
       isNearEnd &&
@@ -113,7 +46,15 @@ export default function PopularActivity({
     ) {
       onNextPage();
     }
-  }, [isFetching, isMobile, onNextPage, data?.activities.length]);
+  }, [isFetching, onNextPage, data?.activities.length]);
+
+
+
+  useEffect(() => {
+    if (data?.activities && data.activities.length > 0) {
+      setLastValidData(data.activities);
+    }
+  }, [data]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -145,7 +86,7 @@ export default function PopularActivity({
     if (currentIndex + ITEMS_PER_PAGE < (data?.activities.length || 0)) {
       // 현재 페이지의 다음 항목들이 있는 경우
       setCurrentIndex((prev) => prev + ITEMS_PER_PAGE);
-    } else if (needsNextPage && data?.activities.length === 20) {
+    } else if (needsNextPage && data?.activities.length === MAX_ITEMS_PER_REQUEST) {
       // 다음 페이지 데이터가 필요한 경우
       onNextPage();
       setCurrentIndex(0);
@@ -171,7 +112,7 @@ export default function PopularActivity({
     } else if (page > 1) {
       // 이전 페이지로 이동
       onPrevPage();
-      setCurrentIndex(17); // 이전 페이지의 마지막 항목들로 이동 (20 - 3)
+      setCurrentIndex(LAST_PAGE_INDEX); // 이전 페이지의 마지막 항목들로 이동
     }
   }, [currentIndex, page, isMobile, onPrevPage]);
 
@@ -179,7 +120,7 @@ export default function PopularActivity({
   const isPrevDisabled = isMobile ? page <= 1 : page <= 1 && currentIndex === 0;
   const isNextDisabled = isMobile
     ? !data?.activities || data.activities.length === 0
-    : (!data?.activities || data.activities.length < 20) &&
+    : (!data?.activities || data.activities.length < MAX_ITEMS_PER_REQUEST) &&
       currentIndex + ITEMS_PER_PAGE >= (data?.activities.length || 0);
 
   // 로딩 상태 처리
@@ -244,7 +185,7 @@ export default function PopularActivity({
           className="flex gap-[16px] overflow-x-auto scrollbar-hide scroll-smooth"
         >
           {displayedActivities.map((activity) => (
-            <ActivityCard key={activity.id} activity={activity} />
+            <PopularActivityCard key={activity.id} activity={activity} />
           ))}
         </div>
 
@@ -257,3 +198,5 @@ export default function PopularActivity({
     </div>
   );
 }
+
+export default PopularActivity;

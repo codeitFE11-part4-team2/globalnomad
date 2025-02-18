@@ -69,11 +69,15 @@ export const authApi = {
     }
   },
 
-  //   // 카카오 간편회원가입 API
+  // 카카오 간편회원가입 API
+
   signUpWithKakao: async (data: SignUpRequest): Promise<SignUpResponse> => {
     try {
-      const response = await api.post('/oauth/sign-up/kakao', data); // 요청을 전송
-      return response.data as SignUpResponse; // 반환되는 데이터를 SignUpResponse 타입으로 명시적으로 캐스팅
+      const response = await api.post<SignUpResponse>(
+        '/oauth/sign-up/kakao',
+        data
+      );
+      return response.data;
     } catch (error) {
       console.error('카카오 간편회원가입 오류', error);
       throw error;

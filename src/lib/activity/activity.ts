@@ -1,8 +1,8 @@
 import { AxiosResponse } from 'axios';
-import { axiosInstance } from '@/lib/axios';
+import { publicApi } from '@/lib/axios';
 
 const PATHS = {
-  ACTIVITIES: `https://sp-globalnomad-api.vercel.app/11-2/activities`,
+  ACTIVITIES: 'https://sp-globalnomad-api.vercel.app/11-2/activities',
 };
 
 export interface Activity {
@@ -13,6 +13,7 @@ export interface Activity {
   price: number;
   bannerImageUrl: string;
   createdAt: string;
+  category: string;
 }
 
 export interface ActivityResponse {
@@ -22,17 +23,19 @@ export interface ActivityResponse {
 
 export async function fetchActivities(
   page: number = 1,
-  size: number = 10
+  size: number = 10,
+  keyword?: string
 ): Promise<ActivityResponse> {
   try {
-    const response: AxiosResponse<ActivityResponse> = await axiosInstance.get(
+    const response: AxiosResponse<ActivityResponse> = await publicApi.get(
       PATHS.ACTIVITIES,
       {
         params: {
           method: 'offset',
           page,
           size,
-          sort: 'latest',
+          ...(keyword && { keyword }),
+          sort: keyword ? 'latest' : undefined
         },
       }
     );

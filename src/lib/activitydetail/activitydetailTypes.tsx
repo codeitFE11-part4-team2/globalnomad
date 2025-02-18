@@ -93,35 +93,3 @@ export interface DeleteActivityResponse {
   success: boolean;
   message: string;
 }
-
-// 내 체험 수정 요청 타입
-export interface UpdateActivityRequest {
-  title?: string;
-  description?: string;
-  price?: number;
-  category?: string;
-  address?: string;
-  bannerImageUrl?: string;
-  subImageUrlsToAdd?: string[];
-  subImageIdsToRemove?: number[];
-  schedulesToAdd?: Schedule[];
-  scheduleIdsToRemove?: number[];
-}
-
-// 내 체험 수정 응답 타입
-export interface UpdateActivityResponse {
-  id: number;
-  userId: number;
-  title: string;
-  description: string;
-  category: string;
-  price: number;
-  address: string;
-  bannerImageUrl: string;
-  rating: number;
-  reviewCount: number;
-  createdAt: string;
-  updatedAt: string;
-  subImages: SubImage[];
-  schedules: Schedule[];
-}

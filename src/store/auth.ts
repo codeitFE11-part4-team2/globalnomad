@@ -17,7 +17,7 @@ interface AuthState {
   // Actions
   setUser: (user: User | null) => void;
   setToken: (token: string | null) => void;
-  login: (user: User, token: string) => void;
+  login: (user: User, accessToken: string) => void;
   logout: () => void;
 }
 
