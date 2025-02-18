@@ -18,7 +18,7 @@ interface AuthState {
   // Actions
   setUser: (user: User | null) => void;
   setToken: (token: string | null) => void;
-  setRefrshToken: (refreshToken: string | null) => void;
+  setRefreshToken: (refreshToken: string | null) => void;
   login: (user: User, accessToken: string, refreshToken: string) => void;
   logout: () => void;
 }
@@ -33,7 +33,7 @@ export const useAuthStore = create<AuthState>()(
 
       setUser: (user) => set({ user, isAuthenticated: !!user }),
 
-      setRefrshToken: (refreshToken) => set({ refreshToken }),
+      setRefreshToken: (refreshToken) => set({ refreshToken }),
 
       setToken: (token) => set({ token }),
 
@@ -60,6 +60,7 @@ export const useAuthStore = create<AuthState>()(
       partialize: (state) => ({
         user: state.user,
         token: state.token,
+        refreshToken: state.refreshToken,
         isAuthenticated: state.isAuthenticated,
       }),
     }
