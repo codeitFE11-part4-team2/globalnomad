@@ -3,6 +3,11 @@ import Image from 'next/image';
 import closeIcon from '../../../public/icons/icon-close.svg';
 import closeGrayIcon from '../../../public/icons/icon-close-gray.svg';
 import dotIcon from '../../../public/icons/icon-dot.svg';
+import {
+  getFlattedNotifications,
+  useDeleteNotification,
+  useNotifications,
+} from '@/services/Notification';
 
 export interface NotificationItemProps {
   message: string;
@@ -16,19 +21,33 @@ interface NotificationPopupProps {
 }
 
 const NotificationPopup: React.FC<NotificationPopupProps> = ({ onClose }) => {
-  const [notifications, setNotifications] = useState<NotificationItemProps[]>([
-    {
-      message:
-        '함께하면 즐거운 스트릿 댄스(2023-01-14 15:00~18:00) 예약이 승인되었어요.',
-      time: '2023-01-14 15:00~18:00',
-      status: 'completed',
-      minutesAgo: '1분 전',
-    },
-  ]);
+  // const [notifications, setNotifications] = useState<NotificationItemProps[]>([
+  //   {
+  //     message:
+  //       '함께하면 즐거운 스트릿 댄스(2023-01-14 15:00~18:00) 예약이 승인되었어요.',
+  //     time: '2023-01-14 15:00~18:00',
+  //     status: 'completed',
+  //     minutesAgo: '1분 전',
+  //   },
+  // ]);
+
+  // // 개별 알림 삭제 함수
+  // const handleDeleteNotification = (index: number) => {
+  //   setNotifications((prev) => prev.filter((_, i) => i !== index));
+  // };
+
+  // 알림 조회 훅 사용
+  const { data } = useNotifications();
+
+  // 알림 삭제 훅 사용
+  const { mutate: deleteNotification } = useDeleteNotification();
+
+  // 전체 알림 목록 가져오기
+  const notifications = getFlattedNotifications(data?.pages);
 
   // 개별 알림 삭제 함수
-  const handleDeleteNotification = (index: number) => {
-    setNotifications((prev) => prev.filter((_, i) => i !== index));
+  const handleDeleteNotification = (notificationId: number) => {
+    deleteNotification(notificationId);
   };
 
   // 전체 알림창 닫기 함수
@@ -64,8 +83,8 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({ onClose }) => {
         </div>
       ) : (
         <div className="w-[328px] flex flex-col items-start gap-1 p-[16px_12px] rounded-[5px] border border-gray-400 bg-white box-border">
-          {notifications.map((notification, index) => (
-            <div key={index} className="flex flex-col w-full gap-2">
+          {notifications.map((notification) => (
+            <div key={notification.id} className="flex flex-col w-full gap-2">
               <div className="flex justify-between items-center w-full">
                 <Image
                   src={dotIcon}
@@ -75,7 +94,7 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({ onClose }) => {
                   className="flex-shrink-0"
                 />
                 <button
-                  onClick={() => handleDeleteNotification(index)}
+                  onClick={() => handleDeleteNotification(notification.id)}
                   className="w-6 h-6 flex-shrink-0 flex items-center justify-center bg-transparent border-0 cursor-pointer p-0"
                 >
                   <Image
@@ -88,10 +107,11 @@ const NotificationPopup: React.FC<NotificationPopupProps> = ({ onClose }) => {
               </div>
               <div className="flex flex-col gap-1">
                 <p className="text-[14px] leading-[24px] text-black font-pretendard font-regular">
-                  {notification.message}
+                  {notification.content}
                 </p>
                 <span className="text-[12px] leading-[18px] text-gray-600 font-pretendard font-regular">
-                  {notification.minutesAgo}
+                  {/* 임시로 시간 표시 - 실제 데이터에 맞게 수정 필요(createdAt, updatedAt 활용) */}
+                  1분 전
                 </span>
               </div>
             </div>
