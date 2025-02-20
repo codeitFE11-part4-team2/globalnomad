@@ -16,8 +16,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={pretendard.variable}>
       <body className="antialiased">
-        <Header />
-        <QueryProvider>{children}</QueryProvider>
+        <QueryProvider>
+          <Header />
+          {children}
+        </QueryProvider>
       </body>
     </html>
   );
