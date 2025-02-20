@@ -106,11 +106,15 @@ function Myinform() {
       return;
     }
 
-    const body: Record<string, any> = {
-      nickname,
-      profileImageUrl: imageurl,
-    };
+    const body: Record<string, any> = {};
 
+    // 변경된 값만 추가
+    if (nickname !== user.nickname) {
+      body.nickname = nickname;
+    }
+    if (imageurl !== user.profileImageUrl) {
+      body.profileImageUrl = imageurl;
+    }
     if (password) {
       body.newPassword = password;
     }
@@ -160,9 +164,6 @@ function Myinform() {
         <Controller
           name="nickname"
           control={control}
-          rules={{
-            required: '닉네임은 필수 입력 사항입니다.',
-          }}
           render={({ field }) => (
             <InputItem
               label="닉네임"
@@ -183,9 +184,6 @@ function Myinform() {
         <Controller
           name="email"
           control={control}
-          rules={{
-            required: '이메일은 필수 입력 사항입니다.',
-          }}
           render={({ field }) => (
             <InputItem
               label="이메일"
@@ -206,9 +204,6 @@ function Myinform() {
         <Controller
           name="password"
           control={control}
-          rules={{
-            required: '비밀번호는 필수 입력 사항입니다.',
-          }}
           render={({ field }) => (
             <InputItem
               label="비밀번호"
@@ -229,9 +224,6 @@ function Myinform() {
         <Controller
           name="confirmPassword"
           control={control}
-          rules={{
-            required: '비밀번호 확인은 필수 입력 사항입니다.',
-          }}
           render={({ field }) => (
             <InputItem
               label="비밀번호 확인"
