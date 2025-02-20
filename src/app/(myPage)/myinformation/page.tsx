@@ -1,5 +1,4 @@
 'use client';
-
 import { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import InputItem from '@/components/login/logininputitem';
@@ -7,12 +6,17 @@ import { useAuthStore } from '@/store/auth'; // Zustand store
 import { Button } from '@/components/common/Button';
 import { useRouter } from 'next/navigation';
 import { useFixProfile } from '@/store/fixprofile';
-
 interface FormData {
   email: string;
   nickname: string;
   password: string;
   confirmPassword: string;
+}
+
+interface ProfileUpdateBody {
+  nickname?: string;
+  profileImageUrl?: string;
+  newPassword?: string;
 }
 
 function Myinform() {
@@ -44,7 +48,6 @@ function Myinform() {
     mode: 'onChange',
     reValidateMode: 'onChange',
   });
-
   const validateEmail = (email: string) => {
     const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
     if (!emailRegex.test(email)) {
@@ -56,9 +59,7 @@ function Myinform() {
       clearErrors('email');
     }
   };
-
   const imageurl = useFixProfile((state) => state.imageurl);
-
   const validateNickname = (nickname: string) => {
     if (nickname.length > 10) {
       setError('nickname', {
@@ -69,7 +70,6 @@ function Myinform() {
       clearErrors('nickname');
     }
   };
-
   const validatePassword = (password: string) => {
     if (password.length < 8) {
       setError('password', {
@@ -80,7 +80,6 @@ function Myinform() {
       clearErrors('password');
     }
   };
-
   const validateConfirmPassword = (confirmPassword: string) => {
     const password = getValues('password');
     if (confirmPassword !== password) {
@@ -106,7 +105,7 @@ function Myinform() {
       return;
     }
 
-    const body: Record<string, any> = {};
+    const body: ProfileUpdateBody = {};
 
     // 변경된 값만 추가
     if (nickname !== user.nickname) {
@@ -130,11 +129,9 @@ function Myinform() {
           body: JSON.stringify(body),
         }
       );
-
       if (!response.ok) {
         throw new Error('프로필 업데이트 실패');
       }
-
       const result = await response.json();
       console.log('프로필 업데이트 성공:', result);
 
@@ -150,7 +147,6 @@ function Myinform() {
       console.error('프로필 업데이트 중 오류 발생:', error);
     }
   };
-
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
@@ -242,5 +238,4 @@ function Myinform() {
     </div>
   );
 }
-
 export default Myinform;
