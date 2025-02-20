@@ -112,7 +112,7 @@ interface UpdateReservationRequest {
 
 export const cancelReservation = async (reservationId: number) => {
   try {
-    const { data } = await api.put<ReservationDetail>(
+    const { data } = await api.patch<ReservationDetail>(
       `/my-reservations/${reservationId}`,
       { status: 'canceled' } as UpdateReservationRequest
     );
