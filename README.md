@@ -5,11 +5,17 @@
 ## 기술 스택
 
 - Frontend
+
   - Next.js 15 (App Router)
   - TypeScript
   - TailwindCSS
   - TanStack Query
   - Zustand
+
+- 도구 및 배포
+  - GitHub (버전 관리 및 협업)
+  - ESLint & Prettier (코드 품질 유지)
+  - Vercel (배포 및 CI/CD 자동화)
 
 ## 시작하기
 
@@ -46,15 +52,51 @@ npm run dev
 
 ```
 src/
-├── app/               # Next.js 페이지 및 레이아웃
-├── components/        # 재사용 가능한 컴포넌트
+├── app/              # Next.js 페이지 및 레이아웃
+├── components/       # 재사용 가능한 컴포넌트
 ├── styles/           # 글로벌 스타일
 ├── lib/              # 유틸리티 함수
-├── api/              # API 관련 함수
+├── services/         # API 관련 함수
 ├── hooks/            # 커스텀 훅
 ├── providers/        # 리액트 컨텍스트 프로바이더
+├── types/            # 관련 타입
 └── store/            # Zustand 스토어
 ```
+
+## 배포 가이드
+
+본 프로젝트는 **Vercel**을 통해 배포됩니다.
+
+```bash
+npm install -g vercel
+vercel
+```
+
+## 코드 컨벤션
+
+- **네이밍 규칙**
+
+  - `camelCase`: 일반 변수 (`userName`)
+  - `UPPER_SNAKE_CASE`: 상수 (`API_URL`)
+  - `PascalCase`: 컴포넌트 (`UserProfile`)
+
+- **파일 및 폴더 구조**
+  - `kebab-case`: 일반 폴더 및 파일 (`user-profile.js`)
+  - `PascalCase`: 컴포넌트 폴더 및 파일 (`UserProfile.jsx`)
+
+## 기여 가이드
+
+### 브랜치 전략
+
+- `main`: 배포 브랜치
+- `develop`: 개발 브랜치
+- `feature/{기능명}`: 기능 추가 브랜치
+
+### PR 규칙
+
+1. 모든 PR은 `develop` 브랜치로 요청
+2. 변경사항 상세 설명 필수
+3. 코드 리뷰 후 승인 시 병합
 
 ## 테스트
 
@@ -68,12 +110,22 @@ npm test
 npm run test:coverage
 ```
 
+## 문제 해결 (FAQ)
+
+### `npm install` 오류 해결
+
+```bash
+rm -rf node_modules package-lock.json
+npm install
+```
+
+### 개발 서버 실행 오류
+
+- `.env.local` 파일 확인
+- `npm run lint` 실행 후 오류 확인
+
 ## 컨벤션
 
 - 코드 포맷팅: Prettier
 - 린팅: ESLint
 - 커밋 메시지: [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
-
-```
-
-```
