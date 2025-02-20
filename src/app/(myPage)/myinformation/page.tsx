@@ -94,7 +94,7 @@ function Myinform() {
   };
 
   const handleProfileUpdate = async (data: FormData) => {
-    if (isKakaoUser) {
+    if (isKakaoUser && data.password) {
       alert('카카오 계정은 비밀번호를 변경할 수 없습니다.');
       return;
     }
