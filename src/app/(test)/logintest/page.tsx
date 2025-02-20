@@ -21,8 +21,8 @@ export default function LoginTest() {
 
       console.log('Login response:', response.data);
 
-      const { user, accessToken } = response.data;
-      login(user, accessToken);
+      const { user, accessToken, refreshToken } = response.data;
+      login(user, accessToken, refreshToken);
 
       router.push('/');
     } catch (error) {

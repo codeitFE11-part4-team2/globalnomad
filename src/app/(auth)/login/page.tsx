@@ -16,7 +16,7 @@ export default function Signin() {
   const login = useAuthStore((state) => state.login);
   const [isClient, setIsClient] = useState(false);
 
-  const { modalType, isOpen, openModal, closeModal } = modalStore();
+  const { modalType, isOpen } = modalStore();
 
   useEffect(() => {
     setIsClient(true);
@@ -35,8 +35,9 @@ export default function Signin() {
             token: kakaoCode,
           })
           .then((response) => {
-            const { accessToken, user } = response.data as {
+            const { accessToken, user, refreshToken } = response.data as {
               accessToken: string;
+              refreshToken: string;
               user: {
                 id: number;
                 email: string;
@@ -47,7 +48,7 @@ export default function Signin() {
               };
             };
 
-            login(user, accessToken);
+            login(user, accessToken, refreshToken);
 
             window.location.href = '/';
           })
