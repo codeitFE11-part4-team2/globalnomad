@@ -17,7 +17,7 @@ interface FormData {
 
 function Myinform() {
   const [isClient, setIsClient] = useState(false);
-  const { user, setUser, token } = useAuthStore((state) => state); // user, setUser, token 가져오기
+  const { user, setUser, token } = useAuthStore((state) => state);
   const router = useRouter();
 
   useEffect(() => {
@@ -138,8 +138,6 @@ function Myinform() {
       const result = await response.json();
       console.log('프로필 업데이트 성공:', result);
 
-      // 서버에서 프로필 업데이트가 완료된 후, 상태를 갱신합니다.
-      // 만약 서버 응답에 수정된 사용자 정보가 포함되어 있다면, 그 값을 상태에 반영할 수 있습니다.
       setUser({
         ...user,
         nickname: result.nickname || user.nickname,
@@ -147,7 +145,6 @@ function Myinform() {
       });
       console.log('업데이트된 사용자 정보:', user);
 
-      // 성공적으로 업데이트되었으면 페이지를 리디렉션할 수 있습니다.
       router.push('/');
     } catch (error) {
       console.error('프로필 업데이트 중 오류 발생:', error);
