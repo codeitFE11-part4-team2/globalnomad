@@ -1,14 +1,24 @@
-import { Activity } from '@/lib/reservations/types';
+interface Activity {
+  id: number;
+  title: string;
+  description: string;
+  category: string;
+  price: number;
+  address: string;
+  bannerImageUrl: string;
+  rating: number;
+  reviewCount: number;
+}
 
 interface SelectActivityProps {
   activities: Activity[];
-  selectedActivity: Activity;
-  onSelectActivity: (activity: Activity) => void;
+  selectedActivityId: number | null;
+  onSelectActivity: (activityId: number) => void;
 }
 
 export default function SelectActivity({
   activities,
-  selectedActivity,
+  selectedActivityId,
   onSelectActivity,
 }: SelectActivityProps) {
   return (
@@ -21,13 +31,8 @@ export default function SelectActivity({
       </label>
       <select
         id="activity-select"
-        value={selectedActivity.id}
-        onChange={(e) => {
-          const activity = activities.find(
-            (a) => a.id === Number(e.target.value)
-          );
-          if (activity) onSelectActivity(activity);
-        }}
+        value={selectedActivityId ?? ''}
+        onChange={(e) => onSelectActivity(Number(e.target.value))}
         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-3"
       >
         {activities.map((activity) => (
