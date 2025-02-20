@@ -11,23 +11,42 @@ const ReservationStatus = ({
 }: ReservationStatusProps) => {
   if (completed + confirmed + pending === 0) return null;
 
+  const existingStatuses = [
+    pending > 0 && (
+      <div
+        key="pending"
+        className="flex items-center justify-center text-xs px-1 bg-blue-3 text-blue-1 rounded whitespace-nowrap h-full"
+      >
+        신청 {pending}
+      </div>
+    ),
+    confirmed > 0 && (
+      <div
+        key="confirmed"
+        className="flex items-center justify-center text-xs px-1 bg-red-1 text-red-3 rounded whitespace-nowrap h-full"
+      >
+        승인 {confirmed}
+      </div>
+    ),
+    completed > 0 && (
+      <div
+        key="completed"
+        className="flex items-center justify-center text-xs px-1 bg-gray-700 text-gray-100 rounded whitespace-nowrap h-full"
+      >
+        완료 {completed}
+      </div>
+    ),
+  ].filter(Boolean);
+
+  const statusCount = existingStatuses.length;
+
   return (
-    <div className="flex flex-col gap-0.5 h-6">
-      {completed > 0 && (
-        <div className="text-xs px-1 py-0.5 bg-gray-700 text-gray-100 rounded whitespace-nowrap">
-          완료 {completed}
+    <div className="flex flex-col gap-0.5 h-10">
+      {existingStatuses.map((status, index) => (
+        <div key={index} style={{ height: `33%` }}>
+          {status}
         </div>
-      )}
-      {confirmed > 0 && (
-        <div className="text-xs px-1 py-0.5 bg-red-1 text-red-3 rounded whitespace-nowrap">
-          승인 {confirmed}
-        </div>
-      )}
-      {pending > 0 && (
-        <div className="text-xs px-1 py-0.5 bg-blue-3 text-blue-1 rounded whitespace-nowrap">
-          신청 {pending}
-        </div>
-      )}
+      ))}
     </div>
   );
 };

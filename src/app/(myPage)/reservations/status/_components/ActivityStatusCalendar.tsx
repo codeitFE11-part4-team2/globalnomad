@@ -121,13 +121,17 @@ const ActivityStatusCalendar = ({
     return (
       <div
         key={idx}
-        onClick={() => day.isCurrentMonth && onSelectDate(formatDate(date))}
-        className={`p-2 text-center hover:bg-gray-100 cursor-pointer ${
+        className={`px-2 text-left h-full  ${
           !day.isCurrentMonth ? 'text-gray-400' : ''
         }`}
       >
         {day.day}
-        <ReservationStatus {...status} />
+        <div
+          className="cursor-pointer"
+          onClick={() => day.isCurrentMonth && onSelectDate(formatDate(date))}
+        >
+          <ReservationStatus {...status} />
+        </div>
       </div>
     );
   };
@@ -140,7 +144,7 @@ const ActivityStatusCalendar = ({
           onClick={handlePrevMonth}
           className="px-4 py-2 text-gray-600 hover:text-gray-900"
         >
-          이전
+          &lt;&lt;
         </button>
         <span className="text-lg font-medium">
           {currentDate.getFullYear()}년 {currentDate.getMonth() + 1}월
@@ -149,24 +153,31 @@ const ActivityStatusCalendar = ({
           onClick={handleNextMonth}
           className="px-4 py-2 text-gray-600 hover:text-gray-900"
         >
-          다음
+          &gt;&gt;
         </button>
       </div>
 
       {/* 달력 */}
-      <div>
+      <div className="border border-gray-200 ">
         {/* 요일 헤더 */}
-        <div className="grid grid-cols-7 gap-1 mb-2">
+        <div className="grid grid-cols-7 gap-0">
           {weekDays.map((day) => (
-            <div key={day} className="text-center font-medium">
+            <div
+              key={day}
+              className="text-left font-medium p-2 bg-gray-50 border border-gray-200"
+            >
               {day}
             </div>
           ))}
         </div>
 
         {/* 날짜 그리드 */}
-        <div className="grid grid-cols-7 gap-1">
-          {days.map((day, idx) => renderDateCell(day, idx))}
+        <div className="grid grid-cols-7 gap-0">
+          {days.map((day, idx) => (
+            <div key={idx} className="border border-gray-200 h-20">
+              {renderDateCell(day, idx)}
+            </div>
+          ))}
         </div>
       </div>
     </div>
