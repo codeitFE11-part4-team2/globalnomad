@@ -52,13 +52,14 @@ npm run dev
 
 ```
 src/
-├── app/               # Next.js 페이지 및 레이아웃
-├── components/        # 재사용 가능한 컴포넌트
-├── styles/            # 글로벌 스타일
+├── app/              # Next.js 페이지 및 레이아웃
+├── components/       # 재사용 가능한 컴포넌트
+├── styles/           # 글로벌 스타일
 ├── lib/              # 유틸리티 함수
-├── api/              # API 관련 함수
+├── services/         # API 관련 함수
 ├── hooks/            # 커스텀 훅
 ├── providers/        # 리액트 컨텍스트 프로바이더
+├── types/            # 관련 타입
 └── store/            # Zustand 스토어
 ```
 
