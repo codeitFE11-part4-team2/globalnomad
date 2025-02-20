@@ -146,7 +146,7 @@ export const createReservationReview = async (
 ) => {
   try {
     const { data } = await api.post<Review>(
-      `/my-reservations/${reservationId}/review`,
+      `/my-reservations/${reservationId}/reviews`,
       reviewData
     );
     return data;
