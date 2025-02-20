@@ -24,6 +24,8 @@ function Myinform() {
     setIsClient(true);
   }, []);
 
+  const isKakaoUser = user?.email?.endsWith('@kakao.com');
+
   const {
     control,
     handleSubmit,
@@ -92,6 +94,11 @@ function Myinform() {
   };
 
   const handleProfileUpdate = async (data: FormData) => {
+    if (isKakaoUser) {
+      alert('카카오 계정은 비밀번호를 변경할 수 없습니다.');
+      return;
+    }
+
     const { nickname, password } = data;
 
     if (!user) {
@@ -99,12 +106,14 @@ function Myinform() {
       return;
     }
 
-    const body = {
+    const body: Record<string, any> = {
       nickname,
       profileImageUrl: imageurl,
-      newPassword: password,
     };
 
+    if (password) {
+      body.newPassword = password;
+    }
     try {
       const response = await fetch(
         'https://sp-globalnomad-api.vercel.app/11-2/users/me',
