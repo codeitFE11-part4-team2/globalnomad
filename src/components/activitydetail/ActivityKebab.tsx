@@ -23,28 +23,37 @@ export default function ActivityKebab({
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
 
   const [isDeleting, setIsDeleting] = useState(false);
 
   const toggleMenu = (event: React.MouseEvent) => {
     event.stopPropagation();
-    event.preventDefault();
     setIsOpen((prev) => !prev);
   };
 
   const closeMenu = () => setIsOpen(false);
 
+  // 메뉴 외부 클릭 시 메뉴 닫기
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        closeMenu();
+      // 메뉴가 열려 있고, 클릭이 menuRef 또는 buttonRef 외부에서 발생한 경우에만 닫음
+      if (
+        isOpen &&
+        menuRef.current &&
+        buttonRef.current &&
+        !menuRef.current.contains(event.target as Node) &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
       }
     };
+
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
+  }, [isOpen]);
 
   const handleEdit = () => {
     router.push(`/myPage/myactivity/${activity.id}`); // 경로 수정 필요
@@ -88,13 +97,13 @@ export default function ActivityKebab({
 
   return (
     <div className="relative" onClick={(event) => event.stopPropagation()}>
-      <button onClick={toggleMenu} className="p-2">
+      <button ref={buttonRef} onClick={toggleMenu} className="p-2">
         <Image src={kebab} alt="Kebab Menu" width={40} height={40} />
       </button>
       {isOpen && (
         <div
+          ref={menuRef}
           className="absolute z-40 right-[8px] top-[48px] bg-white rounded-[6px] w-[160px] h-auto border-[1px] border-gray-300"
-          onClick={closeMenu}
         >
           <ul className="text-center">
             <li
