@@ -35,6 +35,7 @@ export const ReservationFilter = ({
 
   const statuses = [
     { label: '전체', value: 'all' },
+    { label: '예약 완료', value: 'pending' },
     { label: '예약 승인', value: 'confirmed' },
     { label: '예약 취소', value: 'canceled' },
     { label: '예약 거절', value: 'declined' },
