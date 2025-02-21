@@ -18,14 +18,15 @@ export default function ImageSelector({
 }: Props) {
   const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      try {
-        const uploadedUrl = await ImageUrl(file, token);
-        setBannerImage(uploadedUrl);
-        console.log('배너 이미지 URL:', uploadedUrl);
-      } catch (error) {
-        console.error('배너 이미지 업로드 실패:', error);
-      }
+    if (!file) return;
+
+    try {
+      const uploadedUrl = await ImageUrl(file, token);
+      setBannerImage(uploadedUrl);
+      console.log('배너 이미지 URL:', uploadedUrl);
+    } catch (error) {
+      console.error('배너 이미지 업로드 실패:', error);
+      alert('이미지 업로드에 실패했습니다. 다시 시도해주세요.');
     }
   };
 
@@ -44,6 +45,7 @@ export default function ImageSelector({
       console.log('상세 이미지 URL들:', uploadedUrls);
     } catch (error) {
       console.error('상세 이미지 업로드 실패:', error);
+      alert('이미지 업로드에 실패했습니다. 다시 시도해주세요.');
     }
   };
 
@@ -76,12 +78,20 @@ export default function ImageSelector({
                 alt="배너 이미지"
                 className="rounded-md object-cover"
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                quality={75}
+                priority
               />
               <button
-                className="absolute top-1 right-1 bg-black/50 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center"
+                className="absolute top-1 right-1 bg-black/50 rounded-full w-6 h-6 flex items-center justify-center"
                 onClick={removeBannerImage}
               >
-                ✕
+                <Image
+                  src="/icons/icon-delete.svg"
+                  alt="삭제"
+                  width={40}
+                  height={40}
+                />
               </button>
             </div>
           )}
@@ -110,12 +120,20 @@ export default function ImageSelector({
                 alt={`소개 이미지 ${index + 1}`}
                 className="rounded-md object-cover"
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                quality={75}
+                loading="lazy"
               />
               <button
-                className="absolute top-1 right-1 bg-black/50 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center"
+                className="absolute top-1 right-1 bg-black/50 rounded-full w-6 h-6 flex items-center justify-center"
                 onClick={() => removeIntroImage(index)}
               >
-                ✕
+                <Image
+                  src="/icons/icon-delete.svg"
+                  alt="삭제"
+                  width={40}
+                  height={40}
+                />
               </button>
             </div>
           ))}
