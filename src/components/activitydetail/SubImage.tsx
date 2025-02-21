@@ -30,7 +30,7 @@ const SubImageBanner = ({
           alt="서브 이미지"
           width={595}
           height={534}
-          className="w-full h-full object-cover rounded-[8px]"
+          className="w-full h-full object-cover rounded-r-[12px]"
         />
       </div>
     );
@@ -51,13 +51,13 @@ const SubImageBanner = ({
             alt={`서브 이미지 ${index + 1}`}
             width={595}
             height={263}
-            className="w-full h-full object-cover rounded-[8px]"
+            className="w-full h-full object-cover"
           />
         </div>
       );
     }
     return (
-      <div className="grid grid-cols-1 lg:h-[534px] h-[310px] gap-2">
+      <div className="grid grid-rows-2 h-full gap-2 rounded-r-[12px] overflow-hidden">
         {newSubImages}
       </div>
     );
@@ -65,25 +65,22 @@ const SubImageBanner = ({
 
   // 서브 이미지가 3개일 때 (위 1개 + 아래 2개 배치)
   if (subImages.length === 3) {
-    for (let index = 0; index < 3; index += 1) {
-      if (index === 2) {
-        newSubImages.push(
-          <div
-            key={subImages[index].id}
-            className="w-full h-full cursor-pointer col-span-2"
-            onClick={() => setSelectedImage(subImages[index].imageUrl)}
-          >
-            <Image
-              src={subImages[index].imageUrl}
-              alt={`서브 이미지 ${index + 1}`}
-              width={293.5}
-              height={263}
-              className="w-full h-full object-cover rounded-[8px]"
-            />
-          </div>
-        );
-        break;
-      }
+    newSubImages.push(
+      <div
+        key={subImages[0].id}
+        className="w-full h-full cursor-pointer col-span-2"
+        onClick={() => setSelectedImage(subImages[0].imageUrl)}
+      >
+        <Image
+          src={subImages[0].imageUrl}
+          alt="서브 이미지 1"
+          width={595}
+          height={263}
+          className="w-full h-full object-cover"
+        />
+      </div>
+    );
+    for (let index = 1; index < 3; index += 1) {
       newSubImages.push(
         <div
           key={subImages[index].id}
@@ -95,13 +92,13 @@ const SubImageBanner = ({
             alt={`서브 이미지 ${index + 1}`}
             width={293.5}
             height={263}
-            className="w-full h-full object-cover rounded-[8px]"
+            className="w-full h-full object-cover"
           />
         </div>
       );
     }
     return (
-      <div className="grid grid-cols-2 lg:h-[534px] h-[310px] gap-2">
+      <div className="grid grid-rows-2 grid-cols-2 h-full gap-2 rounded-r-[12px] overflow-hidden">
         {newSubImages}
       </div>
     );
@@ -121,13 +118,13 @@ const SubImageBanner = ({
             alt={`서브 이미지 ${index + 1}`}
             width={293.5}
             height={263}
-            className="w-full h-full object-cover rounded-[8px]"
+            className="w-full h-full object-cover"
           />
         </div>
       );
     }
     return (
-      <div className="grid grid-cols-2 lg:h-[534px] h-[310px] gap-2">
+      <div className="grid grid-cols-2 h-full gap-2 rounded-r-[12px] overflow-hidden">
         {newSubImages}
       </div>
     );

@@ -1,4 +1,8 @@
-import { ActivityDetailResponse } from '@/lib/activitydetail/activitydetailTypes';
+import {
+  ActivityDetailResponse,
+  AvailableReservations,
+  AvailableScheduleResponse,
+} from '@/lib/activitydetail/activitydetailTypes';
 import React, { useState } from 'react';
 import CalendarModal from '@/components/activitydetail/CalendarModal';
 import { Button } from '../common/Button';
@@ -9,8 +13,13 @@ import ConfirmationModal from '@/components/activitydetail/ConfirmationModal';
 import { useRouter } from 'next/navigation';
 import ParticipantSelectionModal from './ParticipantSelectionModal';
 import DateSelectionModal from './DateSelectionModal';
-import { bookActivity } from '@/lib/activitydetail/activitydetail';
+import {
+  bookActivity,
+  fetchAvailableSchedules,
+  fetchMyReservations,
+} from '@/lib/activitydetail/activitydetail';
 import { useAuthStore } from '@/store';
+import { useQuery } from '@tanstack/react-query';
 
 interface ReservationProps {
   activity: ActivityDetailResponse;
@@ -31,6 +40,36 @@ const Reservation = ({ activity }: ReservationProps) => {
   const pricePerPerson = activity.price;
   const schedules = activity.schedules;
 
+  // 예약 가능한 일정 가져오기
+  const { data: availableSchedules } = useQuery<
+    AvailableScheduleResponse[] | null
+  >({
+    queryKey: ['availableSchedules', activity.id],
+    queryFn: async () => {
+      const data = await fetchAvailableSchedules(Number(activity.id));
+
+      if ('message' in data) {
+        console.log('데이터 오류');
+      }
+      return data;
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+
+  // 내 예약 내역 가져오기
+  const { data: myReservations } = useQuery<AvailableReservations | null>({
+    queryKey: ['myReservations', activity.id],
+    queryFn: async () => {
+      const data = await fetchMyReservations(Number(activity.id)); // 여기 수정
+
+      if ('message' in data) {
+        console.log('데이터 오류');
+      }
+      return data;
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+
   // 예약 가능한 날짜 반환 함수
   const getAvailableDates = () => {
     const today = new Date();
@@ -40,19 +79,61 @@ const Reservation = ({ activity }: ReservationProps) => {
     return allDates.filter((date) => getAvailableTimes(date).length > 0);
   };
 
-  // 예약 가능한 시간 반환 함수
+  // 실제 예약 가능한 시간 반환 함수
+  // const getAvailableTimes = (date: Date | null) => {
+  //   if (!date) return [];
+  //   return schedules
+  //     .filter(
+  //       (schedule) =>
+  //         format(new Date(schedule.date), 'yyyy-MM-dd') ===
+  //         format(date, 'yyyy-MM-dd')
+  //     )
+  //     .map(
+  //       (schedule) =>
+  //         `${schedule.startTime} ~ ${schedule.endTime === '00:00' ? '24:00' : schedule.endTime}`
+  //     );
+  // };
   const getAvailableTimes = (date: Date | null) => {
-    if (!date) return [];
-    return schedules
+    if (!date || !availableSchedules || !myReservations) return [];
+
+    // 선택한 날짜의 예약 가능한 시간대 필터링
+    const availableTimeSlots = availableSchedules
       .filter(
         (schedule) =>
           format(new Date(schedule.date), 'yyyy-MM-dd') ===
           format(date, 'yyyy-MM-dd')
       )
-      .map(
-        (schedule) =>
-          `${schedule.startTime} ~ ${schedule.endTime === '00:00' ? '24:00' : schedule.endTime}`
-      );
+      .flatMap((schedule) => schedule.times);
+
+    // 내 예약 내역에서 해당 날짜에 예약한 시간 목록 가져오기
+    const myReservedTimes = myReservations.reservations
+      .filter(
+        (reservation) =>
+          format(new Date(reservation.date), 'yyyy-MM-dd') ===
+          format(date, 'yyyy-MM-dd')
+      )
+      .map((reservation) => ({
+        startTime: reservation.startTime,
+        endTime: reservation.endTime,
+      }));
+
+    // 예약 가능한 시간대에서 내 예약 내역의 시간을 제외
+    const filteredTimeSlots = availableTimeSlots.filter(
+      (timeSlot) =>
+        !myReservedTimes.some(
+          (reserved) =>
+            reserved.startTime === timeSlot.startTime &&
+            reserved.endTime === timeSlot.endTime
+        )
+    );
+
+    // 시간대 포맷: "HH:mm ~ HH:mm"
+    const availableTimes = filteredTimeSlots.map(
+      (timeSlot) =>
+        `${timeSlot.startTime} ~ ${timeSlot.endTime === '00:00' ? '24:00' : timeSlot.endTime}`
+    );
+
+    return availableTimes;
   };
 
   // 날짜 변경 핸들러

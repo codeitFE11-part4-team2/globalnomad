@@ -1,6 +1,6 @@
 import React from 'react';
 import Calendar, { CalendarProps } from 'react-calendar';
-import { format } from 'date-fns';
+import { addDays, format } from 'date-fns';
 import 'react-calendar/dist/Calendar.css'; // 기본 스타일
 import '@/styles/calendar.css';
 
@@ -39,7 +39,7 @@ const CalendarModal = ({
       <Calendar
         onChange={handleDateChange} // 날짜 변경
         value={selectedDate} // 현재 선택된 날짜
-        minDate={new Date()} // 최소 선택 날짜 (오늘 이후의 날짜만 선택 가능)
+        minDate={addDays(new Date(), 1)} // 최소 선택 날짜
         calendarType="gregory"
         locale="en"
         formatDay={(locale, date) => date.getDate().toString()}
