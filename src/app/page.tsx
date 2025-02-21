@@ -154,7 +154,7 @@ export default function Home() {
           searchKeyword={searchKeyword}
         />
       </div>
-      <Footer />
+
     </div>
   );
 }
