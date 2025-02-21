@@ -17,7 +17,7 @@ export default function HistoryPage() {
           />
         </div>
       </div>
-      <div className="flex-1 overflow-auto px-4 pb-4">
+      <div className="flex-1 overflow-auto pb-4">
         <ReservationList selectedStatus={selectedStatus} />
       </div>
     </div>
