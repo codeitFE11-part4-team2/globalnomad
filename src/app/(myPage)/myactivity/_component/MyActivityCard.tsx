@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import CardDropdown from './CardDropdown';
 import { modalStore } from '@/store/modalStore';
 
@@ -22,8 +23,19 @@ export default function MyActivityCard({
   title,
   price,
 }: Props) {
+  const router = useRouter();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { openModal } = modalStore();
+
+  const handleEdit = (activityId: number) => {
+    setIsDropdownOpen(false);
+    router.push(`/editactivity/${activityId}`);
+  };
+
+  const handleDelete = (activityId: number) => {
+    setIsDropdownOpen(false);
+    openModal('card', activityId);
+  };
 
   return (
     <div className="w-full h-[128px] md:h-[156px] lg:h-[204px] flex rounded-3xl shadow-card relative">
@@ -82,13 +94,11 @@ export default function MyActivityCard({
               />
             </div>
             <CardDropdown
+              activityId={id}
               isOpen={isDropdownOpen}
               onClose={() => setIsDropdownOpen(false)}
-              onEdit={() => setIsDropdownOpen(false)}
-              onDelete={() => {
-                setIsDropdownOpen(false);
-                openModal('card');
-              }}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
             />
           </div>
         </div>

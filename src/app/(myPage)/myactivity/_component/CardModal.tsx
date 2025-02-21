@@ -1,11 +1,23 @@
 'use client';
 
 import { modalStore } from '@/store/modalStore';
+import { useDeleteActivity } from '@/services/MyActivity';
 
 export default function CardModal() {
-  const { isOpen, closeModal } = modalStore();
+  const { isOpen, closeModal, modalData } = modalStore();
+  const deleteActivity = useDeleteActivity();
 
   if (!isOpen) return null;
+
+  const handleDelete = async () => {
+    try {
+      await deleteActivity.mutateAsync(modalData);
+      closeModal('card');
+    } catch (error) {
+      console.error('체험 삭제 실패:', error);
+      // 에러 처리 (에러 메시지 표시 등)
+    }
+  };
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -20,11 +32,10 @@ export default function CardModal() {
           </button>
           <button
             className="px-4 py-1 bg-nomad-black text-xl text-white rounded-lg"
-            onClick={() => {
-              closeModal('card');
-            }}
+            onClick={handleDelete}
+            disabled={deleteActivity.isPending}
           >
-            삭제
+            {deleteActivity.isPending ? '삭제 중...' : '삭제'}
           </button>
         </div>
       </div>
