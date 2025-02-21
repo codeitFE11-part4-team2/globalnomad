@@ -6,8 +6,8 @@ import {
   AvailableScheduleResponse,
   ReviewsResponse,
   BookReservationResponse,
-  CreateImageUrlResponse,
   DeleteActivityResponse,
+  AvailableReservations,
 } from '@/lib/activitydetail/activitydetailTypes';
 
 const TEAMID = '11-2';
@@ -16,6 +16,7 @@ const BASEURL = 'https://sp-globalnomad-api.vercel.app';
 const PATHS = {
   ACTIVITIES: `${BASEURL}/${TEAMID}/activities/`,
   MY_ACTIVITIES: `${BASEURL}/${TEAMID}/my-activities/`,
+  MY_RESERVATIONS: `${BASEURL}/${TEAMID}/my-reservations`,
   AUTH: `${BASEURL}/${TEAMID}/auth/tokens`,
 };
 
@@ -46,6 +47,26 @@ export const fetchAvailableSchedules = async (
 ): Promise<AvailableScheduleResponse[]> => {
   const response: AxiosResponse<AvailableScheduleResponse[]> =
     await publicApi.get(`${PATHS.ACTIVITIES}${activityId}/available-schedule`);
+  return response.data;
+};
+
+// 내 예약 내역 조회 (로그인 필요)
+export const fetchMyReservations = async (
+  cursorId?: number
+): Promise<AvailableReservations> => {
+  const token = useAuthStore.getState().token; // 토큰 가져오기
+
+  if (!token) {
+    throw new Error('로그인이 필요합니다.');
+  }
+
+  const response: AxiosResponse<AvailableReservations> = await api.get(
+    PATHS.MY_RESERVATIONS,
+    {
+      headers: getAuthHeaders(),
+      params: cursorId ? { cursorId } : {},
+    }
+  );
   return response.data;
 };
 

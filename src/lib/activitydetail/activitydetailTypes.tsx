@@ -30,6 +30,7 @@ export interface Schedule {
 
 // 체험 예약 가능일 조회 응답 타입
 export interface AvailableScheduleResponse {
+  activityId: number;
   date: string;
   times: TimeSlot[];
 }
@@ -38,6 +39,34 @@ export interface TimeSlot {
   endTime: string;
   startTime: string;
   id: number;
+}
+
+// 내 예약 내역 조회
+export interface Reservation {
+  id: number;
+  teamId: string;
+  userId: number;
+  activity: {
+    bannerImageUrl: string;
+    title: string;
+    id: number;
+  };
+  scheduleId: number;
+  status: string;
+  reviewSubmitted: boolean;
+  totalPrice: number;
+  headCount: number;
+  date: string;
+  startTime: string;
+  endTime: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AvailableReservations {
+  cursorId: number;
+  reservations: Reservation[];
+  totalCount: number;
 }
 
 // 체험 리뷰 조회 응답 타입
