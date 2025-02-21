@@ -61,7 +61,7 @@ const BannerImage = ({ bannerImages, subImages }: BannerImageProps) => {
 
       {/* 데스크탑 및 태블릿 */}
       <div className="hidden md:flex flex-row lg:w-[1198px] lg:h-[534px] md:w-[696px] w-[375px] h-[310px] lg:gap-[8px] md:gap-[4.65px] gap-0 overflow-hidden rounded-[12px]">
-        <div className="lg:w-[595px] lg:h-[534px] md:w-[348px] md:h-[300px] w-[187.5px] h-[310px]">
+        <div className="lg:w-[595px] lg:h-[534px] md:w-[348px] md:h-[300px] w-[187.5px] h-[310px] overflow-hidden rounded-l-[12px]">
           <Image
             src={bannerImages}
             alt="배너 이미지"
@@ -71,7 +71,7 @@ const BannerImage = ({ bannerImages, subImages }: BannerImageProps) => {
             onClick={() => setSelectedImage(bannerImages)}
           />
         </div>
-        <div className="lg:w-[595px] lg:h-[534px] md:w-[348px] md:h-[300px] w-[187.5px] h-[310px]">
+        <div className="lg:w-[595px] lg:h-[534px] md:w-[348px] md:h-[300px] w-[187.5px] h-[310px] overflow-hidden">
           <SubImageBanner
             subImages={subImages}
             setSelectedImage={setSelectedImage}
