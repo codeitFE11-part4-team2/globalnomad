@@ -1,13 +1,14 @@
-import type { Metadata } from 'next';
 import '@/styles/globals.css';
 import { pretendard } from './fonts';
 import QueryProvider from '@/providers/query-provider';
-import Header from '@/components/common/Header';
+import LayoutWrapper from '@/components/layout/LayoutWrapper';
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'GlobalNomad',
   description: 'This is for Global Nomads',
 };
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -15,10 +16,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={pretendard.variable}>
-      <body className="antialiased">
+      <body className="antialiased bg-[#FAFBFC]">
         <QueryProvider>
-          <Header />
-          {children}
+          <LayoutWrapper>{children}</LayoutWrapper>
         </QueryProvider>
       </body>
     </html>

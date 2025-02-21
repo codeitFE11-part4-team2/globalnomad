@@ -9,7 +9,6 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import StarIcon from '../../../../public/icons/icon-star.svg';
 import Location from '../../../../public/icons/icon-location.svg';
-import Footer from '@/components/common/Footer';
 import Reservation from '@/components/activitydetail/Reservation';
 import KakaoMap from '@/components/activitydetail/KakaoMap';
 import ActivityKebab from '@/components/activitydetail/ActivityKebab';
@@ -122,9 +121,6 @@ const ActivityDetail = () => {
             </div>
           </div>
         </div>
-      </div>
-      <div className="lg:mt-[293px] md:mt-[144px] mt-[135px]">
-        <Footer />
       </div>
     </div>
   );
