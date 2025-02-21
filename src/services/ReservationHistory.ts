@@ -1,15 +1,3 @@
-// import { ReservationResponse } from '@/lib/reservations/types';
-// import { mockReservationResponse } from '@/lib/reservations/mockData';
-
-// export async function fetchReservations(): Promise<ReservationResponse> {
-//   // mock 데이터를 사용하여 API 호출 시뮬레이션
-//   return new Promise((resolve) => {
-//     setTimeout(() => {
-//       resolve(mockReservationResponse);
-//     }, 1000); // 1초 딜레이
-//   });
-// }
-
 import { api } from '@/lib/axios';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
@@ -124,7 +112,7 @@ interface UpdateReservationRequest {
 
 export const cancelReservation = async (reservationId: number) => {
   try {
-    const { data } = await api.put<ReservationDetail>(
+    const { data } = await api.patch<ReservationDetail>(
       `/my-reservations/${reservationId}`,
       { status: 'canceled' } as UpdateReservationRequest
     );
@@ -158,7 +146,7 @@ export const createReservationReview = async (
 ) => {
   try {
     const { data } = await api.post<Review>(
-      `/my-reservations/${reservationId}/review`,
+      `/my-reservations/${reservationId}/reviews`,
       reviewData
     );
     return data;

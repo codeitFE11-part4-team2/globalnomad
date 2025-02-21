@@ -135,6 +135,8 @@ export const api = {
     axiosInstance.put<T>(url, data, config),
 
   delete: <T>(url: string, config = {}) => axiosInstance.delete<T>(url, config),
+  patch: <T>(url: string, data = {}, config = {}) =>
+    axiosInstance.patch<T>(url, data, config),
 };
 
 // 인증이 필요없는 public api
@@ -154,6 +156,8 @@ export const publicApi = {
   put: <T>(url: string, data = {}, config = {}) =>
     publicAxios.put<T>(url, data, config),
   delete: <T>(url: string, config = {}) => publicAxios.delete<T>(url, config),
+  patch: <T>(url: string, data = {}, config = {}) =>
+    axiosInstance.patch<T>(url, data, config),
 };
 
 // 에러처리 인터셉터

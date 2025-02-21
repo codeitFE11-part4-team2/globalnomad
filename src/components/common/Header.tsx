@@ -3,8 +3,9 @@
 import Image from 'next/image';
 import { useAuthStore } from '@/store';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { usePathname } from 'next/navigation';
+import useOutsideClick from '@/hooks/useOutsideClick'; // 커스텀 훅 import
 import logo from '../../../public/icons/icon-logomd.svg';
 import NotificationPopup from './NotificationPopup';
 
@@ -18,6 +19,13 @@ export default function Header() {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const pathname = usePathname();
 
+  const notificationRef = useRef(null);
+  const dropdownRef = useRef(null);
+
+  useOutsideClick(notificationRef, () => setNotificationOpen(false));
+
+  useOutsideClick(dropdownRef, () => setDropdownOpen(false));
+
   if (
     pathname === '/login' ||
     pathname === '/signup' ||
@@ -25,14 +33,6 @@ export default function Header() {
   ) {
     return null;
   }
-
-  const toggleNotification = () => {
-    setNotificationOpen((prev) => !prev);
-  };
-
-  const toggleDropdown = () => {
-    setDropdownOpen((prev) => !prev);
-  };
 
   return (
     <header className="w-full h-[70px] p-[10px] flex justify-center items-center border-b border-gray-300 gap-0">
@@ -45,7 +45,8 @@ export default function Header() {
           <div className="flex items-center gap-6">
             {/* 알림 아이콘 */}
             <div
-              onClick={toggleNotification}
+              ref={notificationRef} // ref 적용
+              onClick={() => setNotificationOpen((prev) => !prev)}
               className="relative cursor-pointer"
             >
               <Image
@@ -62,7 +63,7 @@ export default function Header() {
             <div className="h-[22px] border-r border-gray-300" />
 
             {/* 사용자 프로필 사진과 닉네임 */}
-            <div className="relative flex items-center gap-5">
+            <div ref={dropdownRef} className="relative flex items-center gap-5">
               {user?.profileImageUrl ? (
                 <Image
                   src={user.profileImageUrl}
@@ -79,7 +80,7 @@ export default function Header() {
 
               <span
                 className="cursor-pointer text-black text-md font-medium font-pretendard"
-                onClick={toggleDropdown}
+                onClick={() => setDropdownOpen((prev) => !prev)}
               >
                 {user?.nickname}
               </span>
@@ -87,7 +88,7 @@ export default function Header() {
               {isDropdownOpen && (
                 <div
                   className="absolute top-full right-0 w-[160px] bg-white border border-gray-300 rounded-[6px] 
-                py-2 mt-2 text-center font-mediume text-2lg font-pretendard z-20"
+                py-2 mt-2 text-center font-medium text-2lg font-pretendard z-20"
                 >
                   <Link
                     href="/myinformation"
