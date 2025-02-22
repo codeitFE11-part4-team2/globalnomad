@@ -8,7 +8,7 @@ const scheduleSchema = z.object({
 
 export const activitySchema = z.object({
   title: z.string().min(2, '제목은 최소 2글자 이상 입력해야 합니다.'),
-  category: z.enum(['문화예술', '식음료', '스포츠', '투어', '관광', '웰빙']),
+  category: z.enum(['문화 · 예술', '식음료', '스포츠', '투어', '관광', '웰빙']),
   description: z.string().min(1, '설명을 입력해주세요.'),
   address: z.string().min(5, '주소를 입력해주세요.'),
   price: z.number().positive('가격은 양수여야 합니다.'),

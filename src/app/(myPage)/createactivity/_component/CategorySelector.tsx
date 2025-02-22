@@ -15,7 +15,7 @@ export default function CategorySelector({ category, setCategory }: Props) {
         <option value="" disabled hidden>
           카테고리
         </option>
-        <option value="문화예술">문화예술</option>
+        <option value="문화 · 예술">문화 · 예술</option>
         <option value="식음료">식음료</option>
         <option value="스포츠">스포츠</option>
         <option value="투어">투어</option>
