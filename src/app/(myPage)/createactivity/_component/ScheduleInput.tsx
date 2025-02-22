@@ -56,15 +56,16 @@ export default function ScheduleInput({ schedules, setSchedules }: Props) {
       alert('이미 예약된 시간과 겹칩니다. 다른 시간을 선택해주세요');
       return;
     }
-    setSchedules([
-      ...schedules,
-      {
-        id: Date.now(),
-        date: formattedDate,
-        startTime,
-        endTime,
-      },
-    ]);
+    console.log('Current schedules:', schedules);
+    const newSchedule = {
+      id: Date.now(),
+      date: formattedDate,
+      startTime,
+      endTime,
+    };
+    console.log('Adding new schedule:', newSchedule);
+    setSchedules([...schedules, newSchedule]);
+    console.log('Updated schedules:', [...schedules, newSchedule]);
     if (dateInputRef.current) dateInputRef.current.value = '';
     setStartTime('');
     setEndTime('');
@@ -160,12 +161,7 @@ export default function ScheduleInput({ schedules, setSchedules }: Props) {
           </div>
         </div>
 
-        <div className="w-full border my-5 border-gray-300"></div>
-        <input
-          type="hidden"
-          name="schedules"
-          value={JSON.stringify(schedules)}
-        />
+        <div className="w-full border-[1px] my-5 border-[#DDD]"></div>
 
         {schedules.map((schedule) => (
           <div key={schedule.id} className="w-full flex items-center mb-5">

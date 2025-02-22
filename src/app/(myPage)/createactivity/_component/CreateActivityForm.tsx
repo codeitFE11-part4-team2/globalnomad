@@ -33,13 +33,14 @@ export default function CreateActivityForm() {
 
   const isFormValid = () => {
     return (
-      title.trim().length >= 2 &&
+      title.trim().length >= 2 &&  
       category !== '' &&
-      description.trim().length >= 3 &&
+      description.trim().length >= 1 &&
       address.trim() !== '' &&
       Number(price) > 0 &&
       schedules.length > 0 &&
-      bannerImage !== null
+      bannerImage !== null &&
+      introImages.length > 0 
     );
   };
 
@@ -47,6 +48,8 @@ export default function CreateActivityForm() {
     <div>
       <Form
         action={async (formData) => {
+          console.log('Submitting schedules:', schedules);
+          formData.append('schedules', JSON.stringify(schedules));
           await createActions(formData);
           openModal('activitycomplete');
         }}
@@ -108,11 +111,6 @@ export default function CreateActivityForm() {
 
         <input type="hidden" name="token" value={token ?? ''} />
         <input type="hidden" name="address" value={address} />
-        <input
-          type="hidden"
-          name="schedules"
-          value={JSON.stringify(schedules)}
-        />
         <input type="hidden" name="category" value={category} />
       </Form>
       <ActivityCompleteModal />
