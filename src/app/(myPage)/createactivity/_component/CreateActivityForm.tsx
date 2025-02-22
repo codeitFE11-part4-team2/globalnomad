@@ -100,6 +100,10 @@ export default function CreateActivityForm({
     );
   };
 
+  const setSchedulesAction = (newSchedules: Schedule[]) => {
+    setSchedules(newSchedules);
+  };
+
   return (
     <div>
       <Form
@@ -186,7 +190,10 @@ export default function CreateActivityForm({
           className="mt-4 h-14 w-full rounded-md border border-[#A1A1A1] px-4 focus:outline-none"
         />
         <AddressInput address={address} setAddress={setAddress} />
-        <ScheduleInput schedules={schedules} setSchedules={setSchedules} />
+        <ScheduleInput
+          schedules={schedules}
+          setSchedulesAction={setSchedulesAction}
+        />
         <ImageSelector
           bannerImage={bannerImage}
           setBannerImage={setBannerImage}

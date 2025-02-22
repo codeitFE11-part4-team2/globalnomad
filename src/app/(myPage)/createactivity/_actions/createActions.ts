@@ -57,23 +57,23 @@ export async function createActions(formData: FormData): Promise<void> {
       JSON.parse(formData.get('currentSubImages') as string) || [];
 
     const scheduleIdsToRemove = currentSchedules
-      .filter((schedule) => !schedules.find((s) => s.id === schedule.id))
-      .map((schedule) => schedule.id);
+      .filter((schedule: { id: string }) => !schedules.find((s: { id: string }) => s.id === schedule.id))
+      .map((schedule: { id: string }) => schedule.id);
 
-    const schedulesToAdd = schedules.filter((schedule) => !schedule.id);
+    const schedulesToAdd = schedules.filter((schedule: { id?: string }) => !schedule.id);
 
     const subImageIdsToRemove = currentSubImages
       .filter(
-        (img) =>
+        (img: { imageUrl: string; id: string }) =>
           !JSON.parse(formData.get('introImages') as string).includes(
             img.imageUrl
           )
       )
-      .map((img) => img.id);
+      .map((img: { imageUrl: string; id: string }) => img.id);
 
     const subImageUrlsToAdd = JSON.parse(
       formData.get('introImages') as string
-    ).filter((url) => !currentSubImages.find((img) => img.imageUrl === url));
+    ).filter((url: string) => !currentSubImages.find((img: { imageUrl: string; id: string }) => img.imageUrl === url));
 
     validatedData = activitySchema.parse({
       title: formData.get('title'),

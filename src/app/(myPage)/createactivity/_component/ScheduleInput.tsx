@@ -11,10 +11,10 @@ interface Schedule {
 
 interface Props {
   schedules: Schedule[];
-  setSchedules: React.Dispatch<React.SetStateAction<Schedule[]>>;
+  setSchedulesAction: (schedules: Schedule[]) => void;
 }
 
-export default function ScheduleInput({ schedules, setSchedules }: Props) {
+export default function ScheduleInput({ schedules, setSchedulesAction }: Props) {
   const dateInputRef = useRef<HTMLInputElement>(null);
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
@@ -64,14 +64,14 @@ export default function ScheduleInput({ schedules, setSchedules }: Props) {
       endTime,
     };
     console.log('Adding new schedule:', newSchedule);
-    setSchedules([...schedules, newSchedule]);
+    setSchedulesAction([...schedules, newSchedule]);
     console.log('Updated schedules:', [...schedules, newSchedule]);
     if (dateInputRef.current) dateInputRef.current.value = '';
     setStartTime('');
     setEndTime('');
   };
   const removeSchedule = (id: number) => {
-    setSchedules(schedules.filter((schedule) => schedule.id !== id));
+    setSchedulesAction(schedules.filter((schedule) => schedule.id !== id));
   };
   return (
     <>
