@@ -11,14 +11,15 @@ import {
   SideMenuIcon3,
   SideMenuIcon4,
 } from '@/lib/constants/icons';
-import { useFixProfile } from '@/store/fixprofile';
+import { useFixProfile } from '@/store/fixprofile'; // useFixProfile import
 
 interface ProfileImage {
   file: File | null;
   preview: string;
 }
 
-export async function ProfileImageUrl(file: File, token: string | null) {
+// 이미지 업로드를 처리하는 함수
+async function ProfileImageUrl(file: File, token: string | null) {
   const formData = new FormData();
   formData.append('image', file);
 
@@ -51,10 +52,11 @@ export async function ProfileImageUrl(file: File, token: string | null) {
 export default function SideNavMenu({
   onMenuItemClick,
 }: {
-  onMenuItemClick: () => void;
+  onMenuItemClick: (href: string) => void; // 경로를 받는 클릭 핸들러
 }) {
   const pathname = usePathname(); // 현재 경로 가져오기
 
+  const { setImageurl } = useFixProfile(); // useFixProfile 사용
   const [profileImage, setProfileImage] = useState<ProfileImage>({
     file: null,
     preview: '/icons/defaultuser_icon.svg',
@@ -93,7 +95,7 @@ export default function SideNavMenu({
             preview: uploadedUrl,
           }));
 
-          // setImageurl(uploadedUrl); // 이미지 URL 상태 업데이트 함수
+          setImageurl(uploadedUrl); // useFixProfile의 setImageurl 사용
         } catch (error) {
           console.error('프로필 이미지 업로드 실패:', error);
         }
@@ -178,9 +180,9 @@ export default function SideNavMenu({
               <li key={href}>
                 <Link
                   href={href}
+                  onClick={() => onMenuItemClick(href)} // Link 클릭 시 경로 전달
                   className={`flex gap-3.5 px-4 py-2.5 items-center h-11 w-full rounded-xl 
                     ${isActive ? 'bg-green-2 text-nomad-black' : 'text-gray-700'}`}
-                  onClick={onMenuItemClick} // 메뉴 클릭 시 onMenuItemClick 호출
                 >
                   {icon(isActive)}
                   <span className="text-lg font-bold">{label}</span>
