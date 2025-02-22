@@ -1,11 +1,8 @@
 'use client';
 
-import { ReactNode } from 'react';
 import SideNavMenu from '@/app/(myPage)/_component/SideNavMenu';
 
-type Props = { children: ReactNode; modal: ReactNode };
-
-export default function mobilemyinform({ children }: Props) {
+export default function mobilemyinform() {
   const handleMenuItemClick = (href: string) => {};
 
   return (
