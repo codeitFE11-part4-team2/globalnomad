@@ -48,8 +48,11 @@ export async function ProfileImageUrl(file: File, token: string | null) {
   }
 }
 
-export default function SideNavMenu() {
-  const { setImageurl } = useFixProfile();
+export default function SideNavMenu({
+  onMenuItemClick,
+}: {
+  onMenuItemClick: () => void;
+}) {
   const pathname = usePathname(); // 현재 경로 가져오기
 
   const [profileImage, setProfileImage] = useState<ProfileImage>({
@@ -90,7 +93,7 @@ export default function SideNavMenu() {
             preview: uploadedUrl,
           }));
 
-          setImageurl(uploadedUrl);
+          // setImageurl(uploadedUrl); // 이미지 URL 상태 업데이트 함수
         } catch (error) {
           console.error('프로필 이미지 업로드 실패:', error);
         }
@@ -143,7 +146,7 @@ export default function SideNavMenu() {
   ];
 
   return (
-    <div className="md:w-[251px] lg:w-[384px] h-[432px] rounded-xl p-6 flex flex-col items-center gap-6 border border-gray-300 shadow-[0px_4px_16px_0px_rgba(17,34,17,0.05)]">
+    <div className="md:w-[251px] sm:w-[344px] lg:w-[384px] h-[432px] rounded-xl p-6 flex flex-col items-center gap-6 border border-gray-300 shadow-[0px_4px_16px_0px_rgba(17,34,17,0.05)]">
       <div className="w-40 h-40 relative">
         <div className="w-full h-full rounded-full overflow-hidden">
           <img
@@ -177,6 +180,7 @@ export default function SideNavMenu() {
                   href={href}
                   className={`flex gap-3.5 px-4 py-2.5 items-center h-11 w-full rounded-xl 
                     ${isActive ? 'bg-green-2 text-nomad-black' : 'text-gray-700'}`}
+                  onClick={onMenuItemClick} // 메뉴 클릭 시 onMenuItemClick 호출
                 >
                   {icon(isActive)}
                   <span className="text-lg font-bold">{label}</span>
