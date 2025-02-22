@@ -12,27 +12,60 @@ import ScheduleInput from './ScheduleInput';
 import ImageSelector from './ImageSelector';
 import CategorySelector from './CategorySelector';
 
-interface Schedule {
-  id: number;
-  date: string;
-  startTime: string;
-  endTime: string;
+import { Schedule } from '@/types/activity';
+
+interface DefaultValues {
+  title: string;
+  category: string;
+  description: string;
+  address: string;
+  price: number;
+  schedules: Schedule[];
+  bannerImageUrl: string;
+  subImages: { id: number; imageUrl: string; }[];
 }
 
-export default function CreateActivityForm() {
+interface Props {
+  defaultValues?: DefaultValues;
+  isEdit?: boolean;
+  activityId?: number;
+}
+
+export default function CreateActivityForm({ defaultValues, isEdit, activityId }: Props) {
   const { token } = useAuthStore();
   const { openModal } = modalStore();
-  const [schedules, setSchedules] = useState<Schedule[]>([]);
-  const [bannerImage, setBannerImage] = useState<string | null>(null);
-  const [introImages, setIntroImages] = useState<string[]>([]);
-  const [address, setAddress] = useState('');
-  const [category, setCategory] = useState('');
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [price, setPrice] = useState('');
+  const [schedules, setSchedules] = useState<Schedule[]>(defaultValues?.schedules || []);
+  const [bannerImage, setBannerImage] = useState<string | null>(defaultValues?.bannerImageUrl || null);
+  const [introImages, setIntroImages] = useState<string[]>(
+    defaultValues?.subImages ? defaultValues.subImages.map(img => img.imageUrl) : []
+  );
+  const [address, setAddress] = useState(defaultValues?.address || '');
+  const [category, setCategory] = useState(defaultValues?.category || '');
+  const [title, setTitle] = useState(defaultValues?.title || '');
+  const [description, setDescription] = useState(defaultValues?.description || '');
+  const [price, setPrice] = useState(defaultValues?.price?.toString() || '');
+
+  const hasChanges = () => {
+    if (!defaultValues) return true;
+    
+    const hasScheduleChanges = JSON.stringify(schedules) !== JSON.stringify(defaultValues.schedules);
+    const hasImageChanges = 
+      bannerImage !== defaultValues.bannerImageUrl ||
+      JSON.stringify(introImages) !== JSON.stringify(defaultValues.subImages.map(img => img.imageUrl));
+    
+    return (
+      title !== defaultValues.title ||
+      category !== defaultValues.category ||
+      description !== defaultValues.description ||
+      address !== defaultValues.address ||
+      Number(price) !== defaultValues.price ||
+      hasScheduleChanges ||
+      hasImageChanges
+    );
+  };
 
   const isFormValid = () => {
-    return (
+    const basicValidation = (
       title.trim().length >= 2 &&  
       category !== '' &&
       description.trim().length >= 1 &&
@@ -42,23 +75,43 @@ export default function CreateActivityForm() {
       bannerImage !== null &&
       introImages.length > 0 
     );
+
+    if (isEdit) {
+      return basicValidation && hasChanges();
+    }
+
+    return basicValidation;
   };
 
   return (
     <div>
       <Form
         action={async (formData) => {
-          console.log('Submitting schedules:', schedules);
-          formData.append('schedules', JSON.stringify(schedules));
-          await createActions(formData);
-          openModal('activitycomplete');
+          try {
+            if (isEdit && activityId) {
+              formData.append('id', activityId.toString());
+            }
+            console.log('Submitting schedules:', schedules);
+            formData.append('schedules', JSON.stringify(schedules));
+            formData.append('introImages', JSON.stringify(introImages));
+            formData.append('bannerImageUrl', bannerImage || '');
+            await createActions(formData);
+            if (isEdit) {
+              window.location.href = '/myactivity';
+            } else {
+              openModal('activitycomplete');
+            }
+          } catch (error) {
+            console.error('Form submission error:', error);
+            alert(error instanceof Error ? error.message : '오류가 발생했습니다.');
+          }
         }}
         className="mx-auto flex w-full max-w-[343px] flex-col md:max-w-[429px] lg:max-w-[936px]"
       >
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">내 체험 등록</h1>
+          <h1 className="text-3xl font-bold">{isEdit ? '내 체험 수정' : '내 체험 등록'}</h1>
           <Button type="submit" disabled={!isFormValid()}>
-            등록하기
+            {isEdit ? '수정하기' : '등록하기'}
           </Button>
         </div>
 
