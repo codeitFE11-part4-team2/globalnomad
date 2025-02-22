@@ -50,7 +50,7 @@ export default function CreateActivityForm() {
           await createActions(formData);
           openModal('activitycomplete');
         }}
-        className="flex flex-col"
+        className="mx-auto flex w-full max-w-[343px] flex-col md:max-w-[429px] lg:max-w-[936px]"
       >
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold">내 체험 등록</h1>
@@ -63,7 +63,7 @@ export default function CreateActivityForm() {
           type="text"
           name="title"
           placeholder="제목"
-          className="w-full h-14 border border-gray-800 rounded-md px-4 focus:outline-none text-lg placeholder-gray-700 mt-6"
+          className="mt-6 h-14 w-full rounded-md border border-[#A1A1A1] px-4 text-lg placeholder-gray-700 focus:outline-none"
           value={title}
           onChange={(e) => {
             const newValue = e.target.value.slice(0, 20);
@@ -78,10 +78,12 @@ export default function CreateActivityForm() {
           name="description"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="w-full h-[346px] p-4 text-lg border border-gray-800 rounded-md focus:outline-none resize-none mt-6"
+          className="mt-6 h-[346px] w-full resize-none rounded-md border border-[#A1A1A1] p-4 text-lg focus:outline-none"
         />
 
-        <label className="block text-black text-2xl font-bold mt-6">가격</label>
+        <label className="mt-6 block text-[20px] font-bold text-black md:text-2xl">
+          가격
+        </label>
         <input
           type="number"
           name="price"
@@ -91,7 +93,7 @@ export default function CreateActivityForm() {
             const newValue = e.target.value.slice(0, 8);
             setPrice(newValue);
           }}
-          className="w-full h-14 border border-gray-800 rounded-md px-4 mt-4 focus:outline-none"
+          className="mt-4 h-14 w-full rounded-md border border-[#A1A1A1] px-4 focus:outline-none"
         />
 
         <AddressInput address={address} setAddress={setAddress} />

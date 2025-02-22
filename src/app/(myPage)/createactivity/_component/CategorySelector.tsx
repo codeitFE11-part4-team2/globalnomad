@@ -10,7 +10,7 @@ export default function CategorySelector({ category, setCategory }: Props) {
         name="category"
         value={category}
         onChange={(e) => setCategory(e.target.value)}
-        className="w-full text-lg h-14 mt-6 border border-gray-800 rounded-md px-2 focus:outline-none text-gray-800 appearance-none bg-[url('/icons/selectArrow_icon.svg')] bg-no-repeat bg-right"
+        className={`mt-6 h-14 w-full appearance-none rounded-md border border-[#A1A1A1] bg-[url('/icons/selectArrow_icon.svg')] bg-no-repeat bg-right px-2 text-lg focus:outline-none ${category ? 'text-black' : 'text-gray-800'}`}
       >
         <option value="" disabled hidden>
           카테고리

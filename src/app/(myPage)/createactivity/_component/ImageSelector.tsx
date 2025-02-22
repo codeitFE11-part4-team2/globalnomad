@@ -59,9 +59,9 @@ export default function ImageSelector({
   return (
     <div className="w-full">
       <div>
-        <p className="text-black text-2xl font-bold mt-6">배너 이미지</p>
-        <div className="flex items-center space-x-4 mt-6">
-          <label className="w-[180px] aspect-square flex flex-col items-center justify-center border-2 border-dashed border-gray-400 rounded-md cursor-pointer">
+        <p className="mt-6 text-[20px] font-bold text-black md:text-2xl">배너 이미지</p>
+        <div className="flex items-center gap-2 md:gap-4 mt-6">
+          <label className="w-[167px] md:w-[180px] aspect-square flex flex-col items-center justify-center border-2 border-dashed border-gray-400 rounded-md cursor-pointer">
             <input
               type="file"
               className="hidden"
@@ -72,7 +72,7 @@ export default function ImageSelector({
             </span>
           </label>
           {bannerImage && (
-            <div className="relative w-[180px] aspect-square">
+            <div className="relative w-[167px] md:w-[180px] aspect-square">
               <Image
                 src={bannerImage}
                 alt="배너 이미지"
@@ -99,9 +99,9 @@ export default function ImageSelector({
       </div>
 
       <div>
-        <p className="text-black text-2xl font-bold mt-6">소개 이미지</p>
-        <div className="flex flex-wrap items-center gap-4 mt-6">
-          <label className="w-[180px] aspect-square flex flex-col items-center justify-center border-2 border-dashed border-gray-400 rounded-md cursor-pointer">
+        <p className="mt-6 text-[20px] font-bold text-black md:text-2xl">소개 이미지</p>
+        <div className="flex flex-wrap items-center gap-2 md:gap-4 mt-6">
+          <label className="w-[167px] md:w-[180px] aspect-square flex flex-col items-center justify-center border-2 border-dashed border-gray-400 rounded-md cursor-pointer">
             <input
               type="file"
               className="hidden"
@@ -114,7 +114,7 @@ export default function ImageSelector({
           </label>
 
           {introImages.map((url, index) => (
-            <div key={index} className="relative w-[180px] aspect-square">
+            <div key={index} className="relative w-[167px] md:w-[180px] aspect-square">
               <Image
                 src={url}
                 alt={`소개 이미지 ${index + 1}`}
