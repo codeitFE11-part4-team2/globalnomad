@@ -60,24 +60,21 @@ export async function createActions(formData: FormData): Promise<void> {
   const activityId = formData.get('id');
   const isEdit = !!activityId;
 
-  const url = isEdit
-    ? `${process.env.NEXT_PUBLIC_API_URL}/my-activities/${activityId}`
-    : `${process.env.NEXT_PUBLIC_API_URL}/activities`;
+  try {
+    const { axiosInstance } = await import('@/lib/axios');
+    
+    const endpoint = isEdit
+      ? `/my-activities/${activityId}`
+      : '/activities';
 
-  const response = await fetch(url, {
-    method: isEdit ? 'PATCH' : 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(validatedData),
-    }
-  );
+    const response = isEdit
+      ? await axiosInstance.patch(endpoint, validatedData)
+      : await axiosInstance.post(endpoint, validatedData);
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    console.error('폼 제출 실패:', response.status, errorData);
-  } else {
-    console.log('폼 제출 성공');
+    console.log('폼 제출 성공:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('API 호출 중 오류 발생:', error);
+    throw error;
   }
 }
