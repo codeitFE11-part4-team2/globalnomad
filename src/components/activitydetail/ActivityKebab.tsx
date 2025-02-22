@@ -56,7 +56,7 @@ export default function ActivityKebab({
   }, [isOpen]);
 
   const handleEdit = () => {
-    router.push(`/myPage/myactivity/${activity.id}`); // 경로 수정 필요
+    router.push(`/myactivity/${activity.id}`);
   };
 
   const handleDelete = async () => {
