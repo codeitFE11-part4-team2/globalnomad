@@ -270,8 +270,17 @@ const Reservation = ({ activity }: ReservationProps) => {
       )}
 
       {showConfirmationModal && (
-        <div className="hidden md:flex fixed inset-0 z-30 items-center justify-center bg-black bg-opacity-70">
-          <div className="w-[540px] h-[250px] bg-white rounded-lg shadow-lg text-center">
+        <div
+          className="hidden md:flex fixed inset-0 z-30 items-center justify-center bg-black bg-opacity-70"
+          onClick={() => {
+            setShowConfirmationModal(false);
+            router.refresh();
+          }}
+        >
+          <div
+            className="w-[540px] h-[250px] bg-white rounded-lg shadow-lg text-center"
+            onClick={(e) => e.stopPropagation()}
+          >
             <ConfirmationModal
               onClose={() => {
                 setShowConfirmationModal(false);
