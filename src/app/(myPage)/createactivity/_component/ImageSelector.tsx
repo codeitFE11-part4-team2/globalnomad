@@ -18,14 +18,15 @@ export default function ImageSelector({
 }: Props) {
   const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      try {
-        const uploadedUrl = await ImageUrl(file, token);
-        setBannerImage(uploadedUrl);
-        console.log('배너 이미지 URL:', uploadedUrl);
-      } catch (error) {
-        console.error('배너 이미지 업로드 실패:', error);
-      }
+    if (!file) return;
+
+    try {
+      const uploadedUrl = await ImageUrl(file, token);
+      setBannerImage(uploadedUrl);
+      console.log('배너 이미지 URL:', uploadedUrl);
+    } catch (error) {
+      console.error('배너 이미지 업로드 실패:', error);
+      alert('이미지 업로드에 실패했습니다. 다시 시도해주세요.');
     }
   };
 
@@ -44,6 +45,7 @@ export default function ImageSelector({
       console.log('상세 이미지 URL들:', uploadedUrls);
     } catch (error) {
       console.error('상세 이미지 업로드 실패:', error);
+      alert('이미지 업로드에 실패했습니다. 다시 시도해주세요.');
     }
   };
 
@@ -57,9 +59,9 @@ export default function ImageSelector({
   return (
     <div className="w-full">
       <div>
-        <p className="text-black text-2xl font-bold mt-6">배너 이미지</p>
-        <div className="flex items-center space-x-4 mt-6">
-          <label className="w-[180px] aspect-square flex flex-col items-center justify-center border-2 border-dashed border-gray-400 rounded-md cursor-pointer">
+        <p className="mt-6 text-[20px] font-bold text-black md:text-2xl">배너 이미지</p>
+        <div className="flex items-center gap-2 md:gap-4 mt-6">
+          <label className="w-[167px] md:w-[180px] aspect-square flex flex-col items-center justify-center border-2 border-dashed border-gray-400 rounded-md cursor-pointer">
             <input
               type="file"
               className="hidden"
@@ -70,18 +72,26 @@ export default function ImageSelector({
             </span>
           </label>
           {bannerImage && (
-            <div className="relative w-[180px] aspect-square">
+            <div className="relative w-[167px] md:w-[180px] aspect-square">
               <Image
                 src={bannerImage}
                 alt="배너 이미지"
                 className="rounded-md object-cover"
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                quality={75}
+                priority
               />
               <button
-                className="absolute top-1 right-1 bg-black/50 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center"
+                className="absolute top-1 right-1 bg-black/50 rounded-full w-6 h-6 flex items-center justify-center"
                 onClick={removeBannerImage}
               >
-                ✕
+                <Image
+                  src="/icons/icon-delete.svg"
+                  alt="삭제"
+                  width={40}
+                  height={40}
+                />
               </button>
             </div>
           )}
@@ -89,9 +99,9 @@ export default function ImageSelector({
       </div>
 
       <div>
-        <p className="text-black text-2xl font-bold mt-6">소개 이미지</p>
-        <div className="flex flex-wrap items-center gap-4 mt-6">
-          <label className="w-[180px] aspect-square flex flex-col items-center justify-center border-2 border-dashed border-gray-400 rounded-md cursor-pointer">
+        <p className="mt-6 text-[20px] font-bold text-black md:text-2xl">소개 이미지</p>
+        <div className="flex flex-wrap items-center gap-2 md:gap-4 mt-6">
+          <label className="w-[167px] md:w-[180px] aspect-square flex flex-col items-center justify-center border-2 border-dashed border-gray-400 rounded-md cursor-pointer">
             <input
               type="file"
               className="hidden"
@@ -104,18 +114,26 @@ export default function ImageSelector({
           </label>
 
           {introImages.map((url, index) => (
-            <div key={index} className="relative w-[180px] aspect-square">
+            <div key={index} className="relative w-[167px] md:w-[180px] aspect-square">
               <Image
                 src={url}
                 alt={`소개 이미지 ${index + 1}`}
                 className="rounded-md object-cover"
                 fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                quality={75}
+                loading="lazy"
               />
               <button
-                className="absolute top-1 right-1 bg-black/50 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center"
+                className="absolute top-1 right-1 bg-black/50 rounded-full w-6 h-6 flex items-center justify-center"
                 onClick={() => removeIntroImage(index)}
               >
-                ✕
+                <Image
+                  src="/icons/icon-delete.svg"
+                  alt="삭제"
+                  width={40}
+                  height={40}
+                />
               </button>
             </div>
           ))}

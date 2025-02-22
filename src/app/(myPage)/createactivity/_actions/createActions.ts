@@ -10,14 +10,28 @@ export async function createActions(formData: FormData): Promise<void> {
   }
   formData.delete('token');
 
-  let schedules = JSON.parse(formData.get('schedules') as string);
-  schedules = schedules.map((schedule: any) => {
-    const [year, month, day] = schedule.date.split('/');
-    return {
-      ...schedule,
-      date: `20${year}-${month}-${day}`,
-    };
-  });
+  let schedules = [];
+  try {
+    const schedulesData = formData.get('schedules');
+    console.log('Raw schedules data:', schedulesData);
+    if (schedulesData) {
+      schedules = JSON.parse(schedulesData as string);
+      console.log('Parsed schedules:', schedules);
+      if (Array.isArray(schedules)) {
+        schedules = schedules.map((schedule) => {
+          const [year, month, day] = schedule.date.split('/');
+          return {
+            ...schedule,
+            date: `20${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`,
+          };
+        });
+        console.log('Formatted schedules:', schedules);
+      }
+    }
+  } catch (error) {
+    console.error('스케줄 데이터 처리 중 오류:', error);
+    schedules = [];
+  }
 
   const validatedData: ActivityFormData = activitySchema.parse({
     title: formData.get('title'),
@@ -27,8 +41,10 @@ export async function createActions(formData: FormData): Promise<void> {
     price: Number(formData.get('price')),
     schedules,
     bannerImageUrl: formData.get('bannerImageUrl'),
-    subImageUrls: JSON.parse(formData.get('subImageUrls') as string),
+    subImageUrls: JSON.parse(formData.get('subImageUrls') as string) || [],
   });
+
+  console.log('Validated data being sent to server:', validatedData);
 
   const response = await fetch(
     'https://sp-globalnomad-api.vercel.app/11-2/activities',

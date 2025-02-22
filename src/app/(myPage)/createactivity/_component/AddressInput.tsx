@@ -13,14 +13,14 @@ export default function AddressInput({
 
   return (
     <>
-      <label className="block text-black text-2xl font-bold mt-6">주소</label>
+      <label className="mt-6 block text-[20px] font-bold text-black md:text-2xl">주소</label>
       <input
         type="text"
         placeholder="주소를 입력해주세요"
         value={address}
         readOnly
         onClick={() => openModal('address')}
-        className="w-full h-14 border border-gray-800 rounded-md px-4 mt-4 focus:outline-none"
+        className="mt-4 h-14 w-full rounded-md border border-[#A1A1A1] px-4 focus:outline-none"
       />
       {isOpen && modalType === 'address' && (
         <AddressModal
