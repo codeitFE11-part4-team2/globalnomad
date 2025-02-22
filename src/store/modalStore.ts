@@ -6,6 +6,7 @@ type ModalType =
   | 'emailerror'
   | 'checkemail'
   | 'address'
+  | 'activitycomplete'
   | null;
 
 interface ModalState {

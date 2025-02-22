@@ -8,6 +8,7 @@ import {
 } from '@/lib/activitydetail/activitydetailTypes';
 import { format } from 'date-fns';
 import rating from '@/lib/activitydetail/rating';
+import StarIcon from '../../../public/icons/icon-star.svg';
 
 interface ReviewListProps {
   activityId: number;
@@ -51,18 +52,40 @@ const ReviewList = ({ activityId, pageSize = 3 }: ReviewListProps) => {
     setCurrentPage(page);
   };
 
+  // 닉네임 첫 글자 가져오기
+  const getInitial = (nickname: string) => {
+    const firstChar = nickname.charAt(0);
+    const isKorean = /^[가-힣]+$/.test(nickname);
+    const isAlphabet = /^[a-zA-Z]$/.test(firstChar);
+
+    if (isKorean) {
+      return nickname; // 한글은 전체 표시
+    } else if (isAlphabet) {
+      return firstChar; // 알파벳은 대소문자 그대로 표시
+    } else {
+      return firstChar.toUpperCase(); // 그 외는 대문자로 표시
+    }
+  };
+
   return (
     <div>
       <div>
         <p className="lg:text-2lg text-xl font-bold">후기</p>
         {totalCount ? (
-          <div>
-            <span>{averageRating}</span>
-            <span>{rating(averageRating)}</span>
-            <span>({totalCount}개 후기)</span>
+          <div className="flex items-center lg:mt-[24px] mt-[18px] gap-[16px]">
+            <p className="text-[50px] font-semibold">
+              {averageRating.toFixed(1)}
+            </p>
+            <div>
+              <p className="text-2lg font-regular">{rating(averageRating)}</p>
+              <div className="flex items-center gap-[6px]">
+                <Image src={StarIcon} alt="별" width={16} height={16} />
+                <p className="text-md font-regular">{totalCount}개 후기</p>
+              </div>
+            </div>
           </div>
         ) : (
-          <p className="text-lg">후기가 없습니다.</p>
+          <p className="text-md font-regular">후기가 없습니다.</p>
         )}
       </div>
 
@@ -75,23 +98,41 @@ const ReviewList = ({ activityId, pageSize = 3 }: ReviewListProps) => {
         <div>
           {/* 리뷰 리스트 */}
           {reviews.length > 0 && (
-            <div>
-              {reviews.map((review) => (
+            <div className="space-y-8 mt-[24px]">
+              {reviews.map((review, index) => (
                 <div key={review.id}>
-                  <div>
-                    <Image
-                      src={review.user.profileImageUrl}
-                      alt={`프로필 이미지`}
-                      width={45}
-                      height={45}
-                    />
-                    <div>
-                      <p>{review.user.nickname}</p>
-                      <p>{format(new Date(review.createdAt), 'yyyy.MM.dd')}</p>
+                  <div className="flex items-start gap-[16px]">
+                    {review.user.profileImageUrl ? (
+                      <Image
+                        src={review.user.profileImageUrl}
+                        alt={`프로필 이미지`}
+                        width={45}
+                        height={45}
+                        className="rounded-full"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center bg-[#E3E5E8] text-nomad-black rounded-full w-[45px] h-[45px] text-lg font-bold overflow-hidden">
+                        {getInitial(review.user.nickname)}
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-[8px]">
+                        <p className="text-lg font-bold">
+                          {review.user.nickname}
+                        </p>
+                        <p className="text-md font-regular">|</p>
+                        <p className="text-md font-bold text-gray-600">
+                          {format(new Date(review.createdAt), 'yyyy.MM.dd')}
+                        </p>
+                      </div>
+                      <p className="text-lg font-regular mt-[8px]">
+                        {review.content}
+                      </p>
                     </div>
                   </div>
-                  <p>{review.content}</p>
-                  <hr className="w-full border-t-[1px] border-nomad-black" />
+                  {index < reviews.length - 1 && (
+                    <hr className="w-full lg:h-[0.5px] h-[1px] opacity-25 border-t-[1px] border-nomad-black mt-[24px] mb-[24px]" />
+                  )}
                 </div>
               ))}
             </div>

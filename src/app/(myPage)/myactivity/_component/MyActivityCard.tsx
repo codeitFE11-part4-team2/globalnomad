@@ -29,7 +29,7 @@ export default function MyActivityCard({
 
   const handleEdit = (activityId: number) => {
     setIsDropdownOpen(false);
-    router.push(`/editactivity/${activityId}`);
+    router.push(`/myactivity/${activityId}`);
   };
 
   const handleDelete = (activityId: number) => {
