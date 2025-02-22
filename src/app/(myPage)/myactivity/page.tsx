@@ -1,40 +1,22 @@
-'use client'; // 클라이언트 컴포넌트에서만 동작
+'use client';
 
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/common/Button';
 import MyActivityCard from './_component/MyActivityCard';
 import CardModal from './_component/CardModal';
+import { useMyActivities } from '@/services/MyActivity';
+import { useRouter } from 'next/navigation';
 
 export default function Page() {
-  const router = useRouter(); // useRouter 훅 사용
+  const router = useRouter();
+  const { data, isLoading, error } = useMyActivities({ size: 20 });
 
-  /** 임시로 사용할 데이터 */
-  const mockActivities = [
-    {
-      id: 1,
-      bannerImageUrl: '/icons/testimg.png',
-      rating: 1.3,
-      reviewCount: 293,
-      title: '테스트용 제목1',
-      price: 1000,
-    },
-    {
-      id: 2,
-      bannerImageUrl: '/icons/testimg2.png',
-      rating: 2.8,
-      reviewCount: 150,
-      title: '테스트용 제목2',
-      price: 15000,
-    },
-    {
-      id: 3,
-      bannerImageUrl: '/icons/testimg3.png',
-      rating: 5.0,
-      reviewCount: 87,
-      title: '테스트용 제목3',
-      price: 20000,
-    },
-  ];
+  if (isLoading) {
+    return <div>로딩 중...</div>;
+  }
+
+  if (error) {
+    return <div>에러가 발생했습니다.</div>;
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -45,8 +27,16 @@ export default function Page() {
         </Button>
       </div>
       <div className="flex flex-col gap-4">
-        {mockActivities.map((item) => (
-          <MyActivityCard key={item.id} {...item} />
+        {data?.activities.map((activity) => (
+          <MyActivityCard
+            key={activity.id}
+            id={activity.id}
+            bannerImageUrl={activity.bannerImageUrl}
+            rating={activity.rating}
+            reviewCount={activity.reviewCount}
+            title={activity.title}
+            price={activity.price}
+          />
         ))}
       </div>
       <CardModal />

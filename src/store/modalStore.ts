@@ -11,18 +11,21 @@ type ModalType =
 interface ModalState {
   isOpen: boolean;
   modalType: ModalType;
-  openModal: (type: ModalType) => void;
+  modalData: any; //나중에 수정
+  openModal: (type: ModalType, data?: any) => void;
   closeModal: (type?: ModalType) => void; // 타입이 선택적 (type?: ModalType)
 }
 
 export const modalStore = create<ModalState>((set, get) => ({
   isOpen: false,
   modalType: null,
-  openModal: (type) => set({ isOpen: true, modalType: type }),
+  modalData: null,
+  openModal: (type, data) =>
+    set({ isOpen: true, modalType: type, modalData: data }),
   closeModal: (type) => {
     const { modalType } = get();
     if (!type || modalType === type) {
-      set({ isOpen: false, modalType: null });
+      set({ isOpen: false, modalType: null, modalData: null });
     }
   },
 }));

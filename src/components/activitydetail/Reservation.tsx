@@ -1,4 +1,7 @@
-import { ActivityDetailResponse } from '@/lib/activitydetail/activitydetailTypes';
+import {
+  ActivityDetailResponse,
+  AvailableReservations,
+} from '@/lib/activitydetail/activitydetailTypes';
 import React, { useState } from 'react';
 import CalendarModal from '@/components/activitydetail/CalendarModal';
 import { Button } from '../common/Button';
@@ -9,8 +12,13 @@ import ConfirmationModal from '@/components/activitydetail/ConfirmationModal';
 import { useRouter } from 'next/navigation';
 import ParticipantSelectionModal from './ParticipantSelectionModal';
 import DateSelectionModal from './DateSelectionModal';
-import { bookActivity } from '@/lib/activitydetail/activitydetail';
 import { useAuthStore } from '@/store';
+import {
+  useAvailableSchedule,
+  useCreateReservation,
+} from '@/services/ActivityReservation';
+import { useQuery } from '@tanstack/react-query';
+import { fetchMyReservations } from '@/lib/activitydetail/activitydetail';
 
 interface ReservationProps {
   activity: ActivityDetailResponse;
@@ -20,19 +28,43 @@ const Reservation = ({ activity }: ReservationProps) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [headCount, setHeadCount] = useState(1);
-  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   // 모달 상태
-  const [showDateModal, setShowDateModal] = useState(false); // 날짜 선택 모달
-  const [showParticipantModal, setShowParticipantModal] = useState(false); // 인원 선택 모달
-  const [showConfirmationModal, setShowConfirmationModal] = useState(false); // 예약 완료 모달
+  const [showDateModal, setShowDateModal] = useState(false);
+  const [showParticipantModal, setShowParticipantModal] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
   const pricePerPerson = activity.price;
   const schedules = activity.schedules;
 
+  // 커스텀 훅을 사용하여 예약 가능한 일정 조회
+  const currentDate = new Date();
+  const { data: availableSchedules } = useAvailableSchedule(
+    activity.id,
+    format(currentDate, 'yyyy'),
+    format(currentDate, 'MM')
+  );
+
+  // 예약 생성 뮤테이션 훅
+  const createReservation = useCreateReservation();
+
+  // 내 예약 내역 가져오기
+  const { data: myReservations } = useQuery<AvailableReservations | null>({
+    queryKey: ['myReservations', activity.id],
+    queryFn: async () => {
+      const data = await fetchMyReservations(Number(activity.id));
+      if ('message' in data) {
+        console.log('데이터 오류');
+      }
+      return data;
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+
   // 예약 가능한 날짜 반환 함수
   const getAvailableDates = () => {
+    if (!availableSchedules) return [];
     const today = new Date();
     const endDate = addDays(today, 30);
     const allDates = eachDayOfInterval({ start: today, end: endDate });
@@ -42,17 +74,49 @@ const Reservation = ({ activity }: ReservationProps) => {
 
   // 예약 가능한 시간 반환 함수
   const getAvailableTimes = (date: Date | null) => {
-    if (!date) return [];
-    return schedules
-      .filter(
-        (schedule) =>
-          format(new Date(schedule.date), 'yyyy-MM-dd') ===
-          format(date, 'yyyy-MM-dd')
-      )
-      .map(
-        (schedule) =>
-          `${schedule.startTime} ~ ${schedule.endTime === '00:00' ? '24:00' : schedule.endTime}`
-      );
+    if (!date || !availableSchedules) return [];
+
+    const dateString = format(date, 'yyyy-MM-dd');
+    const availableDate = availableSchedules.find(
+      (schedule) => format(new Date(schedule.date), 'yyyy-MM-dd') === dateString
+    );
+
+    if (!availableDate) return [];
+
+    const availableTimeSlots = availableDate.times;
+
+    // 로그인한 경우에만 내 예약 시간 제외
+    if (myReservations) {
+      const myReservedTimes = myReservations.reservations
+        .filter(
+          (reservation) =>
+            format(new Date(reservation.date), 'yyyy-MM-dd') === dateString
+        )
+        .map((reservation) => ({
+          startTime: reservation.startTime,
+          endTime: reservation.endTime,
+        }));
+
+      return availableTimeSlots
+        .filter(
+          (timeSlot) =>
+            !myReservedTimes.some(
+              (reserved) =>
+                reserved.startTime === timeSlot.startTime &&
+                reserved.endTime === timeSlot.endTime
+            )
+        )
+        .map(
+          (timeSlot) =>
+            `${timeSlot.startTime} ~ ${timeSlot.endTime === '00:00' ? '24:00' : timeSlot.endTime}`
+        );
+    }
+
+    // 로그인하지 않은 경우 모든 가능한 시간 반환
+    return availableTimeSlots.map(
+      (timeSlot) =>
+        `${timeSlot.startTime} ~ ${timeSlot.endTime === '00:00' ? '24:00' : timeSlot.endTime}`
+    );
   };
 
   // 날짜 변경 핸들러
@@ -66,15 +130,15 @@ const Reservation = ({ activity }: ReservationProps) => {
     setSelectedTime(time);
   };
 
-  const totalPrice = pricePerPerson * headCount; // 총 가격
+  const totalPrice = pricePerPerson * headCount;
 
-  // 예약하기
+  // 예약하기 핸들러
   const handleReservation = async () => {
-    const token = useAuthStore.getState().token; // 현재 로그인 상태 확인
+    const token = useAuthStore.getState().token;
 
     if (!token) {
       alert('로그인이 필요합니다.');
-      window.location.href = '/login'; // 로그인 페이지로 이동
+      window.location.href = '/login';
       return;
     }
 
@@ -83,12 +147,18 @@ const Reservation = ({ activity }: ReservationProps) => {
       return;
     }
 
-    const selectedSchedule = schedules.find(
-      (schedule) =>
-        format(new Date(schedule.date), 'yyyy-MM-dd') ===
-          format(selectedDate, 'yyyy-MM-dd') &&
-        schedule.startTime === selectedTime.split(' ~ ')[0]
-    );
+    // 선택된 시간에 해당하는 scheduleId 찾기
+    const selectedSchedule = availableSchedules
+      ?.find(
+        (schedule) =>
+          format(new Date(schedule.date), 'yyyy-MM-dd') ===
+          format(selectedDate, 'yyyy-MM-dd')
+      )
+      ?.times.find(
+        (time) =>
+          `${time.startTime} ~ ${time.endTime === '00:00' ? '24:00' : time.endTime}` ===
+          selectedTime
+      );
 
     if (!selectedSchedule) {
       alert('선택한 시간에 대한 예약이 불가능합니다.');
@@ -96,20 +166,24 @@ const Reservation = ({ activity }: ReservationProps) => {
     }
 
     try {
-      setLoading(true);
-      await bookActivity(activity.id, selectedSchedule.id, headCount);
+      await createReservation.mutateAsync({
+        activityId: activity.id,
+        reservationData: {
+          scheduleId: selectedSchedule.id,
+          headCount: headCount,
+        },
+      });
       setShowConfirmationModal(true);
     } catch (error) {
       console.error('예약 실패', error);
-      alert('예약에 실패했습니다. 다시 시도해주세요.');
-    } finally {
-      setLoading(false);
+      alert(error);
     }
   };
 
   return (
     <div className="md:relative flex">
       <div className="hidden md:block justify-center lg:w-[384px] w-[251px] h-auto lg:p-[16px] p-[24px] border border-solid border-gray-300 rounded-xl shadow-sm bg-white">
+        {/* 기존 JSX 유지 */}
         <div className="flex items-center gap-2">
           <p className="lg:text-3xl md:text-2xl text-xl font-bold">
             ₩ {pricePerPerson.toLocaleString()}
@@ -158,10 +232,12 @@ const Reservation = ({ activity }: ReservationProps) => {
         />
         <Button
           onClick={handleReservation}
-          disabled={!selectedDate || !selectedTime}
+          disabled={
+            !selectedDate || !selectedTime || createReservation.isPending
+          }
           className="lg:w-[336px] md:w-[203px] md:h-[56px] w-[106px] h-[48px] lg:mt-[24px] md:mt-[32px]"
         >
-          예약하기
+          {createReservation.isPending ? '예약 중...' : '예약하기'}
         </Button>
         <hr className="lg:w-[336px] border-[1px] border-solid border-gray-300 mt-[24px]" />
         <div className="hidden mt-[16px] md:flex items-center justify-between">
@@ -169,6 +245,42 @@ const Reservation = ({ activity }: ReservationProps) => {
           <p className="font-bold text-xl">₩ {totalPrice.toLocaleString()}</p>
         </div>
       </div>
+
+      {/* 모달 컴포넌트들 */}
+      {showDateModal && (
+        <DateSelectionModal
+          selectedDate={selectedDate}
+          selectedTime={selectedTime}
+          getAvailableDates={getAvailableDates}
+          getAvailableTimes={getAvailableTimes}
+          handleDateChange={handleDateChange}
+          handleTimeChange={handleTimeChange}
+          closeModal={() => setShowDateModal(false)}
+        />
+      )}
+
+      {showParticipantModal && (
+        <ParticipantSelectionModal
+          headCount={headCount}
+          onParticipantsChange={(step) =>
+            setHeadCount((prev) => Math.max(1, prev + step))
+          }
+          closeModal={() => setShowParticipantModal(false)}
+        />
+      )}
+
+      {showConfirmationModal && (
+        <div className="fixed inset-0 z-30 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-[540px] h-[250px] bg-white rounded-lg shadow-lg text-center">
+            <ConfirmationModal
+              onClose={() => {
+                setShowConfirmationModal(false);
+                router.refresh();
+              }}
+            />
+          </div>
+        </div>
+      )}
 
       {/* 모바일 전용 하단 바 */}
       <div className="fixed z-10 bottom-0 left-0 w-full h-[83px] bg-white border-t border-gray-300 p-4 flex justify-between items-center md:hidden">
@@ -194,53 +306,13 @@ const Reservation = ({ activity }: ReservationProps) => {
           </button>
         </div>
         <Button
-          onClick={() => {
-            if (!selectedDate || !selectedTime) return;
-          }}
-          disabled={!selectedTime}
+          onClick={handleReservation}
+          disabled={!selectedTime || createReservation.isPending}
           className="w-[120px] h-[48px]"
         >
-          예약하기
+          {createReservation.isPending ? '예약 중...' : '예약하기'}
         </Button>
       </div>
-
-      {/* 날짜 선택 모달 */}
-      {showDateModal && (
-        <DateSelectionModal
-          selectedDate={selectedDate}
-          selectedTime={selectedTime}
-          getAvailableDates={getAvailableDates}
-          getAvailableTimes={getAvailableTimes}
-          handleDateChange={handleDateChange}
-          handleTimeChange={handleTimeChange}
-          closeModal={() => setShowDateModal(false)}
-        />
-      )}
-
-      {/* 인원 선택 모달 */}
-      {showParticipantModal && (
-        <ParticipantSelectionModal
-          headCount={headCount}
-          onParticipantsChange={(step) =>
-            setHeadCount((prev) => Math.max(1, prev + step))
-          }
-          closeModal={() => setShowParticipantModal(false)}
-        />
-      )}
-
-      {/* 예약 완료 모달 */}
-      {showConfirmationModal && (
-        <div className="fixed inset-0 z-30 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="w-[540px] h-[250px] bg-white rounded-lg shadow-lg text-center">
-            <ConfirmationModal
-              onClose={() => {
-                setShowConfirmationModal(false);
-                router.refresh();
-              }}
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 };
