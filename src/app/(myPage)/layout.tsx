@@ -2,16 +2,16 @@
 
 import { ReactNode, useState, useEffect } from 'react';
 import SideNavMenu from '@/app/(myPage)/_component/SideNavMenu';
-import { useRouter, usePathname } from 'next/navigation'; // usePathname 사용
+import { useRouter, usePathname } from 'next/navigation';
 import { Button } from '@/components/common/Button';
 
 type Props = { children: ReactNode };
 
 export default function myPageLayout({ children }: Props) {
-  const [isMenuItemClicked, setIsMenuItemClicked] = useState(false); // 메뉴 클릭 여부 상태
-  const [isSideNavVisible, setIsSideNavVisible] = useState(true); // SideNavMenu 표시 여부 상태
-  const pathname = usePathname(); // 현재 경로 감지
-  const router = useRouter(); // Next.js 라우터 사용
+  const [isMenuItemClicked, setIsMenuItemClicked] = useState(false);
+  const [isSideNavVisible, setIsSideNavVisible] = useState(true);
+  const pathname = usePathname();
+  const router = useRouter();
 
   // 메뉴 클릭 시 호출되는 핸들러
   const handleMenuItemClick = (href: string) => {
@@ -48,6 +48,8 @@ export default function myPageLayout({ children }: Props) {
     setIsMenuItemClicked(false); // children 숨기기
   };
 
+  const isMobileMyInformPage = pathname === '/mobilemyinform';
+
   return (
     <div className="w-[344px] md:w-[696px] lg:w-[1208px] flex md:gap-4 lg:gap-6 justify-center mx-auto mt-6 lg:mt-[72px]">
       {/* 모바일에서만 SideNavMenu 숨기기 */}
@@ -62,8 +64,7 @@ export default function myPageLayout({ children }: Props) {
       >
         {children}
 
-        {/* 버튼을 children 아래로 위치시킴 */}
-        {!isSideNavVisible && (
+        {!isSideNavVisible && !isMobileMyInformPage && (
           <div className="md:hidden mt-4">
             <Button
               type="button"
