@@ -1,5 +1,4 @@
 'use client';
-
 import { useState } from 'react';
 import { createActions } from '../_actions/createActions';
 import Form from 'next/form';
@@ -11,34 +10,29 @@ import AddressInput from './AddressInput';
 import ScheduleInput from './ScheduleInput';
 import ImageSelector from './ImageSelector';
 import CategorySelector from './CategorySelector';
+import { Schedule, SubImage } from '@/types/activity';
 
-import { Schedule } from '@/types/activity';
-
-interface DefaultValues {
-  title: string;
-  category: string;
-  description: string;
-  address: string;
-  price: number;
-  schedules: Schedule[];
-  bannerImageUrl: string;
-  subImages: { id: number; imageUrl: string; }[];
-}
-
-interface Props {
-  defaultValues?: DefaultValues;
+interface CreateActivityFormProps {
+  defaultValues?: {
+    title: string;
+    category: string;
+    description: string;
+    address: string;
+    price: number;
+    schedules: Schedule[];
+    bannerImageUrl: string;
+    subImages: SubImage[];
+  };
   isEdit?: boolean;
   activityId?: number;
 }
 
-export default function CreateActivityForm({ defaultValues, isEdit, activityId }: Props) {
+export default function CreateActivityForm({ defaultValues, isEdit, activityId }: CreateActivityFormProps = {}) {
   const { token } = useAuthStore();
   const { openModal } = modalStore();
   const [schedules, setSchedules] = useState<Schedule[]>(defaultValues?.schedules || []);
   const [bannerImage, setBannerImage] = useState<string | null>(defaultValues?.bannerImageUrl || null);
-  const [introImages, setIntroImages] = useState<string[]>(
-    defaultValues?.subImages ? defaultValues.subImages.map(img => img.imageUrl) : []
-  );
+  const [introImages, setIntroImages] = useState<string[]>(defaultValues?.subImages?.map(img => img.imageUrl) || []);
   const [address, setAddress] = useState(defaultValues?.address || '');
   const [category, setCategory] = useState(defaultValues?.category || '');
   const [title, setTitle] = useState(defaultValues?.title || '');
@@ -47,7 +41,7 @@ export default function CreateActivityForm({ defaultValues, isEdit, activityId }
 
   const hasChanges = () => {
     if (!defaultValues) return true;
-    
+
     const hasScheduleChanges = JSON.stringify(schedules) !== JSON.stringify(defaultValues.schedules);
     const hasImageChanges = 
       bannerImage !== defaultValues.bannerImageUrl ||
@@ -58,29 +52,34 @@ export default function CreateActivityForm({ defaultValues, isEdit, activityId }
       category !== defaultValues.category ||
       description !== defaultValues.description ||
       address !== defaultValues.address ||
-      Number(price) !== defaultValues.price ||
+      price !== defaultValues.price.toString() ||
       hasScheduleChanges ||
       hasImageChanges
     );
   };
 
+  const hasScheduleChanges = () => {
+    if (!defaultValues) return true;
+    return JSON.stringify(schedules) !== JSON.stringify(defaultValues.schedules);
+  };
+
   const isFormValid = () => {
-    const basicValidation = (
-      title.trim().length >= 2 &&  
+    if (isEdit) {
+      // 수정 모드에서는 스케줄이 변경되지 않았다면 기존 스케줄 사용
+      const hasValidSchedules = hasScheduleChanges() ? schedules.length > 0 : defaultValues?.schedules.length > 0;
+      return hasChanges() && hasValidSchedules;
+    }
+
+    return (
+      title.trim().length >= 2 &&
       category !== '' &&
       description.trim().length >= 1 &&
       address.trim() !== '' &&
       Number(price) > 0 &&
       schedules.length > 0 &&
       bannerImage !== null &&
-      introImages.length > 0 
+      introImages.length > 0
     );
-
-    if (isEdit) {
-      return basicValidation && hasChanges();
-    }
-
-    return basicValidation;
   };
 
   return (
@@ -91,13 +90,20 @@ export default function CreateActivityForm({ defaultValues, isEdit, activityId }
             if (isEdit && activityId) {
               formData.append('id', activityId.toString());
             }
-            console.log('Submitting schedules:', schedules);
+            formData.append('token', token || '');
+            formData.append('title', title);
+            formData.append('category', category);
+            formData.append('description', description);
+            formData.append('address', address);
+            formData.append('price', price);
             formData.append('schedules', JSON.stringify(schedules));
             formData.append('introImages', JSON.stringify(introImages));
             formData.append('bannerImageUrl', bannerImage || '');
+            
             await createActions(formData);
+            
             if (isEdit) {
-              window.location.href = '/myactivity';
+              window.location.href = '/myPage/myactivity';
             } else {
               openModal('activitycomplete');
             }
@@ -114,7 +120,6 @@ export default function CreateActivityForm({ defaultValues, isEdit, activityId }
             {isEdit ? '수정하기' : '등록하기'}
           </Button>
         </div>
-
         <input
           type="text"
           name="title"
@@ -126,9 +131,7 @@ export default function CreateActivityForm({ defaultValues, isEdit, activityId }
             setTitle(newValue);
           }}
         />
-
         <CategorySelector category={category} setCategory={setCategory} />
-
         <textarea
           placeholder="설명"
           name="description"
@@ -136,7 +139,6 @@ export default function CreateActivityForm({ defaultValues, isEdit, activityId }
           onChange={(e) => setDescription(e.target.value)}
           className="mt-6 h-[346px] w-full resize-none rounded-md border border-[#A1A1A1] p-4 text-lg focus:outline-none"
         />
-
         <label className="mt-6 block text-[20px] font-bold text-black md:text-2xl">
           가격
         </label>
@@ -151,7 +153,6 @@ export default function CreateActivityForm({ defaultValues, isEdit, activityId }
           }}
           className="mt-4 h-14 w-full rounded-md border border-[#A1A1A1] px-4 focus:outline-none"
         />
-
         <AddressInput address={address} setAddress={setAddress} />
         <ScheduleInput schedules={schedules} setSchedules={setSchedules} />
         <ImageSelector
@@ -161,10 +162,6 @@ export default function CreateActivityForm({ defaultValues, isEdit, activityId }
           setIntroImages={setIntroImages}
           token={token}
         />
-
-        <input type="hidden" name="token" value={token ?? ''} />
-        <input type="hidden" name="address" value={address} />
-        <input type="hidden" name="category" value={category} />
       </Form>
       <ActivityCompleteModal />
     </div>

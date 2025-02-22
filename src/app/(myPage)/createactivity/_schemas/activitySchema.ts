@@ -17,14 +17,11 @@ export const activitySchema = z.object({
     .string()
     .url('올바른 이미지 URL을 입력해주세요.')
     .regex(/\.(jpeg|jpg|png|gif)$/i, '이미지 URL이어야 합니다.'),
-  subImages: z.array(
-    z.object({
-      id: z.number(),
-      imageUrl: z
-        .string()
-        .url('올바른 이미지 URL을 입력해주세요.')
-        .regex(/\.(jpeg|jpg|png|gif)$/i, '이미지 URL이어야 합니다.')
-    })
+  subImageUrls: z.array(
+    z
+      .string()
+      .url('올바른 이미지 URL을 입력해주세요.')
+      .regex(/\.(jpeg|jpg|png|gif)$/i, '이미지 URL이어야 합니다.')
   ),
 });
 
