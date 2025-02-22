@@ -270,7 +270,7 @@ const Reservation = ({ activity }: ReservationProps) => {
       )}
 
       {showConfirmationModal && (
-        <div className="fixed inset-0 z-30 flex items-center justify-center bg-black bg-opacity-50">
+        <div className="hidden md:flex fixed inset-0 z-30 items-center justify-center bg-black bg-opacity-70">
           <div className="w-[540px] h-[250px] bg-white rounded-lg shadow-lg text-center">
             <ConfirmationModal
               onClose={() => {
