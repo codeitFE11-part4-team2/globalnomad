@@ -103,6 +103,17 @@ export default function SideNavMenu() {
     imageRef.current?.click();
   };
 
+  const isPathActive = (path: string) => {
+    if (path === '/myactivity') {
+      // 내 체험 관리 메뉴는 등록/수정 페이지에서도 활성화
+      return pathname === path || 
+             pathname.startsWith('/myactivity/') || 
+             pathname === '/createactivity' || 
+             pathname.includes('/createactivity/');
+    }
+    return pathname === path || pathname.startsWith(path + '/');
+  };
+
   const menuItems = [
     {
       href: '/myinformation',
@@ -169,7 +180,7 @@ export default function SideNavMenu() {
       <div className="w-full">
         <ul className="grid gap-2">
           {menuItems.map(({ href, label, icon }) => {
-            const isActive = pathname === href;
+            const isActive = isPathActive(href);
 
             return (
               <li key={href}>
