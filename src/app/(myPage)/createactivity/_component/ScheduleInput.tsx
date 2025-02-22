@@ -95,7 +95,7 @@ export default function ScheduleInput({ schedules, setSchedules }: Props) {
                 onClick={() => dateInputRef.current?.showPicker()}
               >
                 <div className="relative w-6 h-6 md:w-8 md:h-8">
-                  <Image src="icons/calendar_icon.svg" alt="달력아이콘" fill />
+                  <Image src="/icons/calendar_icon.svg" alt="달력아이콘" fill />
                 </div>
               </div>
             </div>
