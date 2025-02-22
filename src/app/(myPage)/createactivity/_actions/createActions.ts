@@ -19,7 +19,7 @@ export async function createActions(formData: FormData): Promise<void> {
           if (schedule.date.includes('-')) {
             return schedule;
           }
-          
+
           // YY/MM/DD 형식인 경우 변환
           try {
             const [year, month, day] = schedule.date.split('/');
@@ -32,7 +32,7 @@ export async function createActions(formData: FormData): Promise<void> {
           } catch (error) {
             console.error('날짜 형식 변환 오류:', error);
           }
-          
+
           // 오류 발생 시 기존 데이터 그대로 사용
           return schedule;
         });
@@ -44,28 +44,69 @@ export async function createActions(formData: FormData): Promise<void> {
     schedules = [];
   }
 
-  const validatedData: ActivityFormData = activitySchema.parse({
-    title: formData.get('title'),
-    category: formData.get('category'),
-    description: formData.get('description'),
-    address: formData.get('address'),
-    price: Number(formData.get('price')),
-    schedules,
-    bannerImageUrl: formData.get('bannerImageUrl'),
-    subImageUrls: JSON.parse(formData.get('introImages') as string) || [],
-  });
-
-  console.log('Validated data being sent to server:', validatedData);
-
   const activityId = formData.get('id');
   const isEdit = !!activityId;
 
+  let validatedData: ActivityFormData;
+
+  if (isEdit) {
+    // 수정 모드일 때는 변경된 항목만 전송
+    const currentSchedules =
+      JSON.parse(formData.get('currentSchedules') as string) || [];
+    const currentSubImages =
+      JSON.parse(formData.get('currentSubImages') as string) || [];
+
+    const scheduleIdsToRemove = currentSchedules
+      .filter((schedule) => !schedules.find((s) => s.id === schedule.id))
+      .map((schedule) => schedule.id);
+
+    const schedulesToAdd = schedules.filter((schedule) => !schedule.id);
+
+    const subImageIdsToRemove = currentSubImages
+      .filter(
+        (img) =>
+          !JSON.parse(formData.get('introImages') as string).includes(
+            img.imageUrl
+          )
+      )
+      .map((img) => img.id);
+
+    const subImageUrlsToAdd = JSON.parse(
+      formData.get('introImages') as string
+    ).filter((url) => !currentSubImages.find((img) => img.imageUrl === url));
+
+    validatedData = activitySchema.parse({
+      title: formData.get('title'),
+      category: formData.get('category'),
+      description: formData.get('description'),
+      address: formData.get('address'),
+      price: Number(formData.get('price')),
+      bannerImageUrl: formData.get('bannerImageUrl'),
+      scheduleIdsToRemove,
+      schedulesToAdd,
+      subImageIdsToRemove,
+      subImageUrlsToAdd,
+    });
+  } else {
+    // 생성 모드
+    validatedData = activitySchema.parse({
+      title: formData.get('title'),
+      category: formData.get('category'),
+      description: formData.get('description'),
+      address: formData.get('address'),
+      price: Number(formData.get('price')),
+      schedules,
+      bannerImageUrl: formData.get('bannerImageUrl'),
+      subImageUrls: JSON.parse(formData.get('introImages') as string) || [],
+    });
+  }
+
+  console.log('Validated data being sent to server:', validatedData);
+
   try {
     const { axiosInstance } = await import('@/lib/axios');
-    
-    const endpoint = isEdit
-      ? `/my-activities/${activityId}`
-      : '/activities';
+
+    const endpoint = isEdit ? `/my-activities/${activityId}` : '/activities';
 
     const response = isEdit
       ? await axiosInstance.patch(endpoint, validatedData)

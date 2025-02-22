@@ -27,26 +27,40 @@ interface CreateActivityFormProps {
   activityId?: number;
 }
 
-export default function CreateActivityForm({ defaultValues, isEdit, activityId }: CreateActivityFormProps = {}) {
+export default function CreateActivityForm({
+  defaultValues,
+  isEdit,
+  activityId,
+}: CreateActivityFormProps = {}) {
   const { token } = useAuthStore();
   const { openModal } = modalStore();
-  const [schedules, setSchedules] = useState<Schedule[]>(defaultValues?.schedules || []);
-  const [bannerImage, setBannerImage] = useState<string | null>(defaultValues?.bannerImageUrl || null);
-  const [introImages, setIntroImages] = useState<string[]>(defaultValues?.subImages?.map(img => img.imageUrl) || []);
+  const [schedules, setSchedules] = useState<Schedule[]>(
+    defaultValues?.schedules || []
+  );
+  const [bannerImage, setBannerImage] = useState<string | null>(
+    defaultValues?.bannerImageUrl || null
+  );
+  const [introImages, setIntroImages] = useState<string[]>(
+    defaultValues?.subImages?.map((img) => img.imageUrl) || []
+  );
   const [address, setAddress] = useState(defaultValues?.address || '');
   const [category, setCategory] = useState(defaultValues?.category || '');
   const [title, setTitle] = useState(defaultValues?.title || '');
-  const [description, setDescription] = useState(defaultValues?.description || '');
+  const [description, setDescription] = useState(
+    defaultValues?.description || ''
+  );
   const [price, setPrice] = useState(defaultValues?.price?.toString() || '');
 
   const hasChanges = () => {
     if (!defaultValues) return true;
 
-    const hasScheduleChanges = JSON.stringify(schedules) !== JSON.stringify(defaultValues.schedules);
-    const hasImageChanges = 
+    const hasScheduleChanges =
+      JSON.stringify(schedules) !== JSON.stringify(defaultValues.schedules);
+    const hasImageChanges =
       bannerImage !== defaultValues.bannerImageUrl ||
-      JSON.stringify(introImages) !== JSON.stringify(defaultValues.subImages.map(img => img.imageUrl));
-    
+      JSON.stringify(introImages) !==
+        JSON.stringify(defaultValues.subImages.map((img) => img.imageUrl));
+
     return (
       title !== defaultValues.title ||
       category !== defaultValues.category ||
@@ -60,14 +74,16 @@ export default function CreateActivityForm({ defaultValues, isEdit, activityId }
 
   const hasScheduleChanges = () => {
     if (!defaultValues) return true;
-    return JSON.stringify(schedules) !== JSON.stringify(defaultValues.schedules);
+    return (
+      JSON.stringify(schedules) !== JSON.stringify(defaultValues.schedules)
+    );
   };
 
   const isFormValid = () => {
     if (isEdit) {
       // 수정 모드에서는 스케줄이 변경되지 않았다면 기존 스케줄 사용
-      const hasValidSchedules = hasScheduleChanges() 
-        ? schedules.length > 0 
+      const hasValidSchedules = hasScheduleChanges()
+        ? schedules.length > 0
         : (defaultValues?.schedules?.length ?? 0) > 0;
       return hasChanges() && hasValidSchedules;
     }
@@ -91,6 +107,15 @@ export default function CreateActivityForm({ defaultValues, isEdit, activityId }
           try {
             if (isEdit && activityId) {
               formData.append('id', activityId.toString());
+              // 현재 스케줄과 이미지 정보 추가
+              formData.append(
+                'currentSchedules',
+                JSON.stringify(defaultValues?.schedules || [])
+              );
+              formData.append(
+                'currentSubImages',
+                JSON.stringify(defaultValues?.subImages || [])
+              );
             }
             formData.append('token', token || '');
             formData.append('title', title);
@@ -101,10 +126,10 @@ export default function CreateActivityForm({ defaultValues, isEdit, activityId }
             formData.append('schedules', JSON.stringify(schedules));
             formData.append('introImages', JSON.stringify(introImages));
             formData.append('bannerImageUrl', bannerImage || '');
-            
+
             const result = await createActions(formData);
             console.log('Form submission result:', result);
-            
+
             if (isEdit) {
               window.location.href = '/myactivity';
             } else {
@@ -112,13 +137,17 @@ export default function CreateActivityForm({ defaultValues, isEdit, activityId }
             }
           } catch (error) {
             console.error('Form submission error:', error);
-            alert(error instanceof Error ? error.message : '오류가 발생했습니다.');
+            alert(
+              error instanceof Error ? error.message : '오류가 발생했습니다.'
+            );
           }
         }}
         className="mx-auto flex w-full max-w-[343px] flex-col md:max-w-[429px] lg:max-w-[936px]"
       >
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold">{isEdit ? '내 체험 수정' : '내 체험 등록'}</h1>
+          <h1 className="text-3xl font-bold">
+            {isEdit ? '내 체험 수정' : '내 체험 등록'}
+          </h1>
           <Button type="submit" disabled={!isFormValid()}>
             {isEdit ? '수정하기' : '등록하기'}
           </Button>
