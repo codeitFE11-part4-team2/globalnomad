@@ -2,7 +2,7 @@
 
 import { useAuthStore } from '@/store/auth'; // Zustand store import
 import Link from 'next/link';
-import { useSelectedLayoutSegment } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useRef, useState, ChangeEvent } from 'react';
 import {
   EditProfileIcon,
@@ -35,29 +35,28 @@ export async function ProfileImageUrl(file: File, token: string | null) {
 
   if (!response.ok) {
     const errorData = await response.json();
-    console.error('서버 응답 오류:', errorData); // 서버 응답 오류 내용
+    console.error('서버 응답 오류:', errorData);
     throw new Error('이미지 업로드 실패!');
   }
 
   const data = await response.json();
-  console.log(data); // 응답 데이터 확인
   if (data && data.profileImageUrl) {
     return data.profileImageUrl;
   } else {
-    console.error('ProfileImageUrl이 응답에 없음:', data); // 응답에서 ProfileImageUrl이 없는 경우
+    console.error('ProfileImageUrl이 응답에 없음:', data);
     throw new Error('ProfileImageUrl을 찾을 수 없습니다.');
   }
 }
 
 export default function SideNavMenu() {
-  // 메뉴 선택되는 상태변화를 segment로 추적하려고 생각중
   const { setImageurl } = useFixProfile();
-  const segment = useSelectedLayoutSegment();
+  const pathname = usePathname(); // 현재 경로 가져오기
 
   const [profileImage, setProfileImage] = useState<ProfileImage>({
     file: null,
     preview: '/icons/defaultuser_icon.svg',
   });
+
   const imageRef = useRef<HTMLInputElement>(null);
   const token = useAuthStore((state) => state.token); // Zustand에서 access-token 가져오기
 
@@ -65,20 +64,18 @@ export default function SideNavMenu() {
     const MAX_FILE_SIZE = 5 * 1024 * 1024;
     const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
     const file = e.target.files?.[0];
+
     if (file) {
-      // 파일 크기 체크
       if (file.size > MAX_FILE_SIZE) {
         console.log('파일크기 5MB 초과');
         return;
       }
 
-      // 파일 형식 체크
       if (!ALLOWED_FILE_TYPES.includes(file.type)) {
         console.log('지원하는 이미지형식이 아님');
         return;
       }
 
-      // 로컬 미리보기 이미지 업데이트
       const reader = new FileReader();
       reader.onload = async () => {
         setProfileImage({
@@ -86,17 +83,14 @@ export default function SideNavMenu() {
           preview: reader.result as string,
         });
 
-        // 서버에 이미지 업로드
         try {
           const uploadedUrl = await ProfileImageUrl(file, token);
           setProfileImage((prev) => ({
             ...prev,
-            preview: uploadedUrl, // 업로드된 이미지 URL로 미리보기 업데이트
+            preview: uploadedUrl,
           }));
 
           setImageurl(uploadedUrl);
-
-          console.log('업로드된 프로필 이미지 URL:', uploadedUrl);
         } catch (error) {
           console.error('프로필 이미지 업로드 실패:', error);
         }
@@ -109,8 +103,47 @@ export default function SideNavMenu() {
     imageRef.current?.click();
   };
 
+  const menuItems = [
+    {
+      href: '/myinformation',
+      label: '내 정보',
+      icon: (isActive: boolean) => (
+        <SideMenuIcon1
+          className={isActive ? 'fill-nomad-black' : 'fill-gray-700'}
+        />
+      ),
+    },
+    {
+      href: '/reservations/history',
+      label: '예약 내역',
+      icon: (isActive: boolean) => (
+        <SideMenuIcon2
+          className={isActive ? 'fill-nomad-black' : 'fill-gray-700'}
+        />
+      ),
+    },
+    {
+      href: '/myactivity',
+      label: '내 체험 관리',
+      icon: (isActive: boolean) => (
+        <SideMenuIcon4
+          className={isActive ? 'fill-nomad-black' : 'fill-gray-700'}
+        />
+      ),
+    },
+    {
+      href: '/reservations/status',
+      label: '예약 현황',
+      icon: (isActive: boolean) => (
+        <SideMenuIcon3
+          className={isActive ? 'fill-nomad-black' : 'fill-gray-700'}
+        />
+      ),
+    },
+  ];
+
   return (
-    <div className="md:w-[251px] lg:w-[384px] h-[432px] rounded-xl p-6 flex flex-col items-center gap-6 border border-gray-300">
+    <div className="md:w-[251px] lg:w-[384px] h-[432px] rounded-xl p-6 flex flex-col items-center gap-6 border border-gray-300 shadow-[0px_4px_16px_0px_rgba(17,34,17,0.05)]">
       <div className="w-40 h-40 relative">
         <div className="w-full h-full rounded-full overflow-hidden">
           <img
@@ -135,42 +168,22 @@ export default function SideNavMenu() {
       </div>
       <div className="w-full">
         <ul className="grid gap-2">
-          <li>
-            <Link
-              href=""
-              className="flex gap-3.5 px-4 py-2.5 items-center h-11 w-full rounded-xl text-gray-700 fill-gray-700"
-            >
-              <SideMenuIcon1 className="fill-gray-700" />
-              <span className="text-lg font-bold">내 정보</span>
-            </Link>
-          </li>
-          <li>
-            <Link
-              href=""
-              className="flex gap-3.5 px-4 py-2.5 items-center h-11 w-full rounded-xl text-nomad-black fill-nomad-black bg-green-2"
-            >
-              <SideMenuIcon2 className="fill-gray-700" />
-              <span className="text-lg font-bold">예약 내역</span>
-            </Link>
-          </li>
-          <li>
-            <Link
-              href=""
-              className="flex gap-3.5 px-4 py-2.5 items-center h-11 w-full rounded-xl text-gray-700 fill-gray-700"
-            >
-              <SideMenuIcon3 className="fill-gray-700" />
-              <span className="text-lg font-bold">내 체험 관리</span>
-            </Link>
-          </li>
-          <li>
-            <Link
-              href=""
-              className="flex gap-3.5 px-4 py-2.5 items-center h-11 w-full rounded-xl text-gray-700 fill-gray-700"
-            >
-              <SideMenuIcon4 className="fill-gray-700" />
-              <span className="text-lg font-bold">예약 현황</span>
-            </Link>
-          </li>
+          {menuItems.map(({ href, label, icon }) => {
+            const isActive = pathname === href;
+
+            return (
+              <li key={href}>
+                <Link
+                  href={href}
+                  className={`flex gap-3.5 px-4 py-2.5 items-center h-11 w-full rounded-xl 
+                    ${isActive ? 'bg-green-2 text-nomad-black' : 'text-gray-700'}`}
+                >
+                  {icon(isActive)}
+                  <span className="text-lg font-bold">{label}</span>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </div>
     </div>
