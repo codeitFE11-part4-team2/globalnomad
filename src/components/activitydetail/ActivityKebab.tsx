@@ -56,7 +56,7 @@ export default function ActivityKebab({
   }, [isOpen]);
 
   const handleEdit = () => {
-    router.push(`/editactivity`);
+    router.push(`/myactivity/[id]`);
   };
 
   const handleDelete = async () => {
