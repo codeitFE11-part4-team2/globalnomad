@@ -110,7 +110,7 @@ const ActivityDetail = () => {
                 </div>
 
                 <div className="md:mt-[41px] mt-[40px]">
-                  <hr className="hidden md:block border-t-[1px] border-nomad-black md:mb-[40px] mb-0" />
+                  <hr className="hidden md:block border-t-[1px] border-nomad-black lg:mb-[293px] md:mb-[145px] mb-[133px]" />
                   <ReviewList activityId={activityId} pageSize={3} />
                 </div>
               </div>
