@@ -71,7 +71,7 @@ export default function ActivityKebab({
       await deleteActivity(activity.id, activity.userId);
       onDelete(activity.id);
       setShowDeleteModal(false);
-      router.push('/myActivity'); // 경로 수정 필요
+      router.push('/myactivity');
     } catch (error) {
       console.error('체험 삭제에 실패했습니다.', error);
 

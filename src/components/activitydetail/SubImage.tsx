@@ -124,7 +124,7 @@ const SubImageBanner = ({
       );
     }
     return (
-      <div className="grid grid-cols-2 h-full gap-2 rounded-r-[12px] overflow-hidden">
+      <div className="grid grid-cols-2 grid-rows-2 h-full gap-2 rounded-r-[12px] overflow-hidden">
         {newSubImages}
       </div>
     );
