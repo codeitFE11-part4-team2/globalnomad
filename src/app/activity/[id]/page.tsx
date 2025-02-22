@@ -60,7 +60,7 @@ const ActivityDetail = () => {
       <div className="flex justify-center mx-auto px-[24px]">
         <div className="w-full max-w-[1200px] flex flex-col">
           <div>
-            <p className="text-md font-regular lg:mt-[78px] md:mt-[24px] mt-[16px]">
+            <p className="text-md font-regular lg:mt-[78px] md:mt-[24px] mt-[16px] opacity-75">
               {activity.category}
             </p>
             <div className="w-full max-w-[1200px] flex justify-between items-center">
@@ -79,7 +79,9 @@ const ActivityDetail = () => {
               </div>
               <div className="flex items-center space-x-[2px]">
                 <Image src={Location} alt="위치" width={18} height={18} />
-                <p className="text-md font-regular">{activity.address}</p>
+                <p className="text-md font-regular opacity-75">
+                  {activity.address}
+                </p>
               </div>
             </div>
 
@@ -95,22 +97,22 @@ const ActivityDetail = () => {
             <div className="w-full lg:max-w-[1200px] md:max-w-[696px] flex flex-row justify-between ">
               <div className="lg:w-[740px] md:w-[428px] w-[327px] ">
                 <div className="lg:mt-[85px] md:mt-[32px] mt-0">
-                  <hr className="hidden md:block border-t-[1px] border-nomad-black " />
+                  <hr className="hidden md:block border-t-[1px] border-nomad-black opacity-25" />
                   <p className="text-xl font-bold md:mt-[40px] mt-[15px]">
                     체험 설명
                   </p>
                   <p className="text-lg font-regular mt-[16px]">
                     {activity.description}
                   </p>
-                  <hr className="border-t-[1px] border-nomad-black lg:mt-[34px] md:mt-[57px] mt-[16px]" />
+                  <hr className="border-t-[1px] border-nomad-black opacity-25 lg:mt-[34px] md:mt-[57px] mt-[16px]" />
                 </div>
 
                 <div className="md:mt-[40px] mt-[16px] lg:mb-[40px] md:mb-[42px] mb-0">
                   <KakaoMap address={activity.address} />
                 </div>
 
-                <div className="md:mt-[41px] mt-[40px]">
-                  <hr className="hidden md:block border-t-[1px] border-nomad-black lg:mb-[293px] md:mb-[145px] mb-[133px]" />
+                <div className="md:mt-[41px] mt-[40px] lg:mb-[293px] md:mb-[145px] mb-[133px]">
+                  <hr className="hidden md:block border-t-[1px] border-nomad-black opacity-25 md:mb-[40px] mb-0" />
                   <ReviewList activityId={activityId} pageSize={3} />
                 </div>
               </div>
