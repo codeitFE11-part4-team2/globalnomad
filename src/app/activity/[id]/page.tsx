@@ -26,6 +26,12 @@ const ActivityDetail = () => {
   const { user, token } = useAuthStore();
 
   useEffect(() => {
+    if (!loading && activity) {
+      window.scrollTo(0, 0);
+    }
+  }, [loading, activity]);
+
+  useEffect(() => {
     if (!activityId) return;
 
     const loadActivity = async () => {
