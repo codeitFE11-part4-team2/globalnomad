@@ -60,8 +60,8 @@ const BannerImage = ({ bannerImages, subImages }: BannerImageProps) => {
       )}
 
       {/* 데스크탑 및 태블릿 */}
-      <div className="hidden md:flex flex-row lg:w-[1198px] lg:h-[534px] md:w-[696px] w-[375px] h-[310px] lg:gap-[8px] md:gap-[4.65px] gap-0 overflow-hidden rounded-[12px]">
-        <div className="lg:w-[595px] lg:h-[534px] md:w-[348px] md:h-[300px] w-[187.5px] h-[310px] overflow-hidden rounded-l-[12px]">
+      <div className="hidden md:flex flex-row w-full h-auto gap-[8px] overflow-hidden rounded-[12px]">
+        <div className="w-1/2 h-[50vw] max-h-[534px] overflow-hidden rounded-l-[12px]">
           <Image
             src={bannerImages}
             alt="배너 이미지"
@@ -71,7 +71,7 @@ const BannerImage = ({ bannerImages, subImages }: BannerImageProps) => {
             onClick={() => setSelectedImage(bannerImages)}
           />
         </div>
-        <div className="lg:w-[595px] lg:h-[534px] md:w-[348px] md:h-[300px] w-[187.5px] h-[310px] overflow-hidden">
+        <div className="w-1/2 h-[50vw] max-h-[534px] overflow-hidden rounded-r-[12px]">
           <SubImageBanner
             subImages={subImages}
             setSelectedImage={setSelectedImage}
@@ -81,11 +81,17 @@ const BannerImage = ({ bannerImages, subImages }: BannerImageProps) => {
 
       {/* 이미지 확대 모달 */}
       {selectedImage && (
-        <div className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50">
-          <div className="relative w-[80%] max-w-[600px] h-auto">
+        <div
+          className="fixed inset-0 bg-black bg-opacity-80 flex justify-center items-center z-50"
+          onClick={() => setSelectedImage(null)}
+        >
+          <div
+            className="relative w-[80%] max-w-[600px] h-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
               onClick={() => setSelectedImage(null)}
-              className="absolute top-2 right-2 bg-white text-black rounded-full px-2 py-1 z-10"
+              className="absolute top-[10px] right-[10px] bg-white text-nomad-black rounded-full w-8 h-8 flex items-center justify-center z-10"
             >
               ✕
             </button>
