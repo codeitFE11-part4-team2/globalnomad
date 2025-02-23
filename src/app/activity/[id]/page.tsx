@@ -13,6 +13,7 @@ import Reservation from '@/components/activitydetail/Reservation';
 import KakaoMap from '@/components/activitydetail/KakaoMap';
 import ActivityKebab from '@/components/activitydetail/ActivityKebab';
 import { useAuthStore } from '@/store';
+import Footer from '@/components/common/Footer';
 
 const ActivityDetail = () => {
   const { id } = useParams();
@@ -56,8 +57,8 @@ const ActivityDetail = () => {
   if (!activity) return <p>데이터가 없습니다.</p>;
 
   return (
-    <div className="bg-gray-100">
-      <div className="flex justify-center">
+    <div className="relative bg-gray-100">
+      <div className="flex justify-center mx-auto px-[24px]">
         <div className="w-full max-w-[1200px] flex flex-col">
           <div>
             <p className="text-md font-regular lg:mt-[78px] md:mt-[24px] mt-[16px] opacity-75 px-[24px] lg:px-0">
@@ -125,6 +126,9 @@ const ActivityDetail = () => {
             </div>
           </div>
         </div>
+      </div>
+      <div className="md:mb-0 mb-[83px]">
+        <Footer />
       </div>
     </div>
   );

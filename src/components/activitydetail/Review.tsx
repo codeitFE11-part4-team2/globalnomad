@@ -85,7 +85,9 @@ const ReviewList = ({ activityId, pageSize = 3 }: ReviewListProps) => {
             </div>
           </div>
         ) : (
-          <p className="text-md font-regular">후기가 없습니다.</p>
+          <p className="text-md font-regular px-[24px] lg:px-0">
+            후기가 없습니다.
+          </p>
         )}
       </div>
 
