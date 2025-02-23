@@ -1,5 +1,11 @@
 import { api } from '@/lib/axios';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  InfiniteData,
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 
 // 공통 에러 타입
 interface ApiError {
@@ -176,9 +182,21 @@ export const createReservationReview = async (
 
 // 리액트 쿼리 커스텀 훅
 export const useReservationList = (params: ReservationListParams) => {
-  return useQuery({
+  return useInfiniteQuery<
+    ReservationListResponse,
+    Error,
+    InfiniteData<ReservationListResponse>,
+    (string | ReservationListParams)[],
+    number | undefined
+  >({
     queryKey: ['reservations', params],
-    queryFn: () => getMyReservations(params),
+    queryFn: ({ pageParam = undefined }) =>
+      getMyReservations({
+        ...params,
+        cursorId: pageParam,
+      }),
+    initialPageParam: undefined,
+    getNextPageParam: (lastPage) => lastPage.cursorId || undefined,
     staleTime: 1000 * 60 * 5, // 5분
   });
 };

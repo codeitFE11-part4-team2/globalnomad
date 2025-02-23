@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useEffect, useRef, useCallback } from 'react';
 import CancelModal from './CancelModal';
 import { useState } from 'react';
 import {
@@ -14,6 +15,8 @@ interface ReservationListProps {
   selectedStatus: string;
 }
 
+const PAGE_SIZE = 10;
+
 export default function ReservationList({
   selectedStatus,
 }: ReservationListProps) {
@@ -21,16 +24,64 @@ export default function ReservationList({
   const [selectedReservationId, setSelectedReservationId] = useState<
     number | null
   >(null);
+  const [cursorId, setCursorId] = useState<number | undefined>(undefined);
 
-  const { data, isLoading, error } = useReservationList({
+  // Intersection Observer를 위한 ref
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+
+  const {
+    data,
+    isLoading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useReservationList({
     status:
       selectedStatus === 'all'
         ? undefined
         : (selectedStatus as ReservationStatus),
+    size: PAGE_SIZE,
+    cursorId: undefined,
   });
 
   const { mutate: cancelReservation, isPending: isCanceling } =
     useReservationCancel();
+
+  // 무한 스크롤 구현
+  const handleObserver = useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      const [target] = entries;
+      if (target.isIntersecting && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    },
+    [fetchNextPage, hasNextPage, isFetchingNextPage]
+  );
+
+  useEffect(() => {
+    const element = loadMoreRef.current;
+
+    if (!element) return;
+
+    observerRef.current = new IntersectionObserver(handleObserver, {
+      threshold: 0.1,
+    });
+
+    observerRef.current.observe(element);
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [handleObserver]);
+
+  // selectedStatus가 변경될 때 cursorId 초기화
+  useEffect(() => {
+    setCursorId(undefined);
+  }, [selectedStatus]);
 
   const handleCancelClick = (reservationId: number) => {
     setSelectedReservationId(reservationId);
@@ -54,10 +105,13 @@ export default function ReservationList({
   if (isLoading) return <div>로딩 중...</div>;
   if (error) return <div>에러가 발생했습니다: {error.message}</div>;
 
+  const allReservations =
+    data?.pages.flatMap((page) => page.reservations) ?? [];
+
   const filteredReservations =
     selectedStatus === 'all'
-      ? data?.reservations
-      : data?.reservations.filter(
+      ? allReservations
+      : allReservations.filter(
           (reservation) => reservation.status === selectedStatus
         );
 
@@ -185,6 +239,10 @@ export default function ReservationList({
             </div>
           </div>
         ))}
+        {/* Intersection Observer를 위한 타겟 요소 */}
+        <div ref={loadMoreRef} className="h-10">
+          {isFetchingNextPage && <div>더 불러오는 중...</div>}
+        </div>
       </div>
       <CancelModal
         isOpen={isModalOpen}
