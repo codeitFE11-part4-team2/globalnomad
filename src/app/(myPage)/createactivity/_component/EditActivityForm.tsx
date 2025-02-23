@@ -78,7 +78,9 @@ export default function EditActivityForm({ defaultValues, activityId }: Props) {
       <Form
         action={async (formData) => {
           try {
-            formData.append('token', token);
+            if (token) {
+              formData.append('token', token);
+            }
             formData.append('id', activityId.toString());
             formData.append('title', title);
             formData.append('category', category);
@@ -154,7 +156,10 @@ export default function EditActivityForm({ defaultValues, activityId }: Props) {
         />
 
         <AddressInput address={address} setAddress={setAddress} />
-        <ScheduleInput schedules={schedules} setSchedules={setSchedules} />
+        <ScheduleInput
+          schedules={schedules}
+          setSchedulesAction={(newSchedules) => setSchedules(newSchedules)}
+        />
         <ImageSelector
           bannerImage={bannerImage}
           setBannerImage={setBannerImage}

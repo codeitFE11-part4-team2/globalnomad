@@ -14,15 +14,17 @@ interface Props {
   setSchedulesAction: (schedules: Schedule[]) => void;
 }
 
-export default function ScheduleInput({ schedules, setSchedulesAction }: Props) {
+export default function ScheduleInput({
+  schedules,
+  setSchedulesAction,
+}: Props) {
   const dateInputRef = useRef<HTMLInputElement>(null);
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
 
   const formatDate = (date: string) => {
     if (!date) return '';
-    const [year, month, day] = date.split('-');
-    return `${year.slice(2)}/${month}/${day}`;
+    return date; // HTML date input이 이미 YYYY-MM-DD 형식을 사용하므로 그대로 반환
   };
   const timeToMinutes = (time: string) => {
     const [h, m] = time.split(':').map(Number);
