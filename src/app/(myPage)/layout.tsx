@@ -1,22 +1,24 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { usePathname } from 'next/navigation'; // 현재 경로를 확인하기 위한 훅
+import { usePathname } from 'next/navigation';
 import SideNavMenu from '@/app/(myPage)/_component/SideNavMenu';
 
-type Props = { children: ReactNode; modal: ReactNode };
+type Props = {
+  children: ReactNode;
+  modal?: ReactNode;
+};
 
 export default function myPageLayout({ children, modal }: Props) {
-  const pathname = usePathname(); // 현재 경로를 가져옵니다.
+  const pathname = usePathname();
 
-  // '/mobilemyinform' 경로인 경우 레이아웃을 제외
   if (pathname === '/mobilemyinform') {
     return (
       <>
         {children}
         {modal}
       </>
-    ); // 이 경우는 레이아웃을 제외하고 children과 modal만 렌더링
+    );
   }
 
   return (
