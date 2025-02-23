@@ -7,7 +7,7 @@ export default function ActivityCompleteModal() {
 
   const handleConfirm = () => {
     closeModal('activitycomplete');
-    router.push('/myinformation');
+    router.push('/myactivity');
   };
 
   if (!isOpen) return null;
