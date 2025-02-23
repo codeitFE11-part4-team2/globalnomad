@@ -137,9 +137,9 @@ export default function ReservationList({
       <div className="space-y-4">
         {filteredReservations?.map((reservation) => (
           <div key={reservation.id} className="border shadow-md rounded-3xl">
-            <div className="flex">
+            <div className="flex min-h-[8rem]">
               {/* 이미지 컨테이너 - 반응형 조정 */}
-              <div className="relative w-32 sm:w-36 md:w-48 h-32 sm:h-36 md:h-48">
+              <div className="relative w-32 min-h-[8rem]">
                 <Image
                   src={reservation.activity.bannerImageUrl}
                   alt={reservation.activity.title}
