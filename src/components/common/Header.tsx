@@ -3,8 +3,8 @@
 import Image from 'next/image';
 import { useAuthStore } from '@/store';
 import Link from 'next/link';
-import { useState, useRef } from 'react';
-import { usePathname } from 'next/navigation';
+import { useState, useRef, useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation'; // useRouter 추가
 import useOutsideClick from '@/hooks/useOutsideClick'; // 커스텀 훅 import
 import logo from '../../../public/icons/icon-logomd.svg';
 import NotificationPopup from './NotificationPopup';
@@ -17,7 +17,9 @@ export default function Header() {
   const { user, isAuthenticated, logout } = useAuthStore();
   const [isNotificationOpen, setNotificationOpen] = useState(false);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const pathname = usePathname();
+  const router = useRouter(); // useRouter 추가
 
   const notificationRef = useRef(null);
   const dropdownRef = useRef(null);
@@ -26,6 +28,18 @@ export default function Header() {
 
   useOutsideClick(dropdownRef, () => setDropdownOpen(false));
 
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth <= 425); // 모바일 화면 크기 설정 (425px 이하)
+    };
+
+    checkIfMobile();
+
+    window.addEventListener('resize', checkIfMobile);
+
+    return () => window.removeEventListener('resize', checkIfMobile);
+  }, []);
+
   if (
     pathname === '/login' ||
     pathname === '/signup' ||
@@ -33,6 +47,12 @@ export default function Header() {
   ) {
     return null;
   }
+
+  // 로그아웃 후 홈으로 리디렉션하는 함수
+  const handleLogout = () => {
+    logout(); // 로그아웃 처리
+    router.push('/'); // 홈으로 리디렉션
+  };
 
   return (
     <header className="w-full h-[70px] p-[10px] flex justify-center items-center border-b border-gray-300 gap-0 bg-white">
@@ -91,13 +111,14 @@ export default function Header() {
                 py-2 mt-2 text-center font-medium text-2lg font-pretendard z-20"
                 >
                   <Link
-                    href="/myinformation"
+                    href={isMobile ? '/mobilemyinform' : '/myinformation'}
                     className="block px-4 py-2 text-gray-900 hover:bg-gray-200"
                   >
                     마이페이지
                   </Link>
+                  {/* 로그아웃 버튼 클릭 시 홈으로 리디렉션 */}
                   <button
-                    onClick={logout}
+                    onClick={handleLogout}
                     className="block w-full px-4 py-2 text-gray-900 hover:bg-gray-200 "
                   >
                     로그아웃
