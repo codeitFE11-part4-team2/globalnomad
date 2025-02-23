@@ -271,7 +271,7 @@ function SignUpForm() {
       <p className="flex gap-[10px] font-medium text-gray-900 text-[16px] mx-auto mt-8px">
         회원이신가요?
         <Link href="/login" aria-label="로그인으로 이동">
-          <span className="text-gray-900 text-[16px] font-medium underline">
+          <span className="text-green-3 text-[16px] font-medium underline">
             로그인하기
           </span>
         </Link>
@@ -288,12 +288,14 @@ function SignUpForm() {
         <Image
           src="/icons/icon-logo-google.svg"
           alt="구글 로고"
+          className="md:w-[72px] md:h-[72px] w-[48px] h-[48px]"
           width={72}
           height={72}
         />
         <Image
           src="/icons/icon-logo-kakao.svg"
           alt="카카오 로고"
+          className="md:w-[72px] md:h-[72px] w-[48px] h-[48px]"
           width={72}
           height={72}
         />
