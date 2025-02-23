@@ -70,9 +70,9 @@ const ReviewList = ({ activityId, pageSize = 3 }: ReviewListProps) => {
   return (
     <div>
       <div>
-        <p className="lg:text-2lg text-xl font-bold">후기</p>
+        <p className="lg:text-2lg text-xl font-bold px-[24px] lg:px-0">후기</p>
         {totalCount ? (
-          <div className="flex items-center lg:mt-[24px] mt-[18px] gap-[16px]">
+          <div className="flex items-center lg:mt-[24px] mt-[18px] gap-[16px] px-[24px] lg:px-0">
             <p className="text-[50px] font-semibold">
               {averageRating.toFixed(1)}
             </p>
@@ -98,10 +98,10 @@ const ReviewList = ({ activityId, pageSize = 3 }: ReviewListProps) => {
         <div>
           {/* 리뷰 리스트 */}
           {reviews.length > 0 && (
-            <div className="space-y-8 mt-[24px]">
+            <div className="space-y-8 mt-[24px] ">
               {reviews.map((review, index) => (
                 <div key={review.id}>
-                  <div className="flex items-start gap-[16px]">
+                  <div className="flex items-start gap-[16px] px-[24px] lg:px-0">
                     {review.user.profileImageUrl ? (
                       <Image
                         src={review.user.profileImageUrl}
