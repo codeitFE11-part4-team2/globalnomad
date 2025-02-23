@@ -4,10 +4,12 @@ import { ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 import SideNavMenu from '@/app/(myPage)/_component/SideNavMenu';
 
-type Props = {
+type LayoutProps = {
   children: ReactNode;
   modal?: ReactNode;
 };
+
+type Props = LayoutProps;
 
 export default function myPageLayout({ children, modal }: Props) {
   const pathname = usePathname();
