@@ -2,7 +2,7 @@ import { ButtonHTMLAttributes, ReactNode } from 'react';
 import { Spinner } from './Spinner';
 
 type ButtonVariant = 'nomad-black' | 'white' | 'gray-600' | 'green';
-type ButtonSize = 'small' | 'medium' | 'large' | 'full';
+type ButtonSize = 'small' | 'xsmall' | 'medium' | 'large' | 'full';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode; // 버튼 내부에 들어갈 컨텐츠
@@ -38,6 +38,7 @@ export function Button({
   // 크기별 스타일(width, height, 글자 크기)
   const sizeStyles = {
     small: 'w-[108px] h-[38px] text-sm',
+    xsmall: 'w-[120px] h-[48px] text-base',
     medium: 'w-[144px] h-[48px] text-base',
     large: 'w-[350px] h-[48px] text-base',
     full: 'px-6 py-3 text-base w-full',
