@@ -12,20 +12,37 @@ export const activitySchema = z.object({
   description: z.string().min(1, '설명을 입력해주세요.'),
   address: z.string().min(5, '주소를 입력해주세요.'),
   price: z.number().positive('가격은 양수여야 합니다.'),
-  schedules: z.array(scheduleSchema).min(1, '예약 가능한 시간을 추가해주세요.'),
   bannerImageUrl: z
     .string()
     .url('올바른 이미지 URL을 입력해주세요.')
     .regex(/\.(jpeg|jpg|png|gif)$/i, '이미지 URL이어야 합니다.'),
-  subImages: z.array(
-    z.object({
-      id: z.number(),
-      imageUrl: z
+
+  // 생성 모드 필드
+  schedules: z
+    .array(scheduleSchema)
+    .min(1, '예약 가능한 시간을 추가해주세요.')
+    .optional(),
+  subImageUrls: z
+    .array(
+      z
         .string()
         .url('올바른 이미지 URL을 입력해주세요.')
         .regex(/\.(jpeg|jpg|png|gif)$/i, '이미지 URL이어야 합니다.')
-    })
-  ),
+    )
+    .optional(),
+
+  // 수정 모드 필드
+  scheduleIdsToRemove: z.array(z.number()).optional(),
+  schedulesToAdd: z.array(scheduleSchema).optional(),
+  subImageIdsToRemove: z.array(z.number()).optional(),
+  subImageUrlsToAdd: z
+    .array(
+      z
+        .string()
+        .url('올바른 이미지 URL을 입력해주세요.')
+        .regex(/\.(jpeg|jpg|png|gif)$/i, '이미지 URL이어야 합니다.')
+    )
+    .optional(),
 });
 
 export type ActivityFormData = z.infer<typeof activitySchema>;
