@@ -10,13 +10,16 @@ export default function LayoutWrapper({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const isAuthPage = ['/login', '/signup', '/kakaosignup'].includes(pathname);
+  const isActivityPage = pathname.includes('/activity/');
+  const isAuthPage =
+    ['/login', '/signup', '/kakaosignup'].includes(pathname) || isActivityPage;
+  const showFooter = !isAuthPage;
 
   return (
     <>
       <Header />
       <main className="min-h-screen">{children}</main>
-      {!isAuthPage && <Footer />}
+      {showFooter && <Footer />}
     </>
   );
 }

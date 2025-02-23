@@ -40,7 +40,7 @@ export default function Footer() {
             </div>
             <div className="flex gap-[30px]">
               <Link
-                href="/privacy-policy"
+                href="/privacy"
                 className="text-[#676767] text-lg font-regular leading-[18px] hover:underline"
               >
                 Privacy Policy
