@@ -288,16 +288,16 @@ function SignUpForm() {
         <Image
           src="/icons/icon-logo-google.svg"
           alt="구글 로고"
-          className="md:w-[72px] md:h-[72px] w-[48px] h-[48px]"
-          width={72}
-          height={72}
+          width={48}
+          height={48}
+          className="md:w-[72px] md:h-[72px]"
         />
         <Image
           src="/icons/icon-logo-kakao.svg"
           alt="카카오 로고"
-          className="md:w-[72px] md:h-[72px] w-[48px] h-[48px]"
-          width={72}
-          height={72}
+          width={48}
+          height={48}
+          className="md:w-[72px] md:h-[72px]"
         />
       </div>
     </div>

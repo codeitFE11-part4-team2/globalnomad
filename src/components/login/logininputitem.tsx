@@ -6,6 +6,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   error?: boolean;
   errorMessage?: string;
   passwordinput?: boolean;
+  labelClassName?: string; // label 스타일을 외부에서 지정할 수 있도록 추가
 }
 
 export default function InputItem({
@@ -15,15 +16,17 @@ export default function InputItem({
   passwordinput,
   errorMessage,
   className,
+  labelClassName, // labelClassName을 받아서 사용
   ...props
 }: InputProps) {
   const [isPasswordVisible, setPasswordVisible] = useState(false);
 
   return (
     <div className="gap-[8px] flex flex-col relative">
+      {/* label 스타일을 props로 받으면 이를 적용 */}
       <label
         htmlFor={id}
-        className="text-lg font-regular text-[black] font-pretendard"
+        className={`font-pretendard text-[black] ${labelClassName || 'text-lg font-regular'}`}
       >
         {label}
       </label>

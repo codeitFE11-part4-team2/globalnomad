@@ -151,7 +151,14 @@ function Myinform() {
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold">내 정보</h2>
-        <Button onClick={handleSubmit(handleProfileUpdate)}>저장하기</Button>
+        <Button
+          type="submit"
+          variant="nomad-black"
+          size="xsmall"
+          onClick={handleSubmit(handleProfileUpdate)}
+        >
+          저장하기
+        </Button>
       </div>
       <form className="gap-[28px] flex flex-col">
         <Controller
@@ -162,6 +169,7 @@ function Myinform() {
               label="닉네임"
               id="nickname"
               type="text"
+              labelClassName="text-2xl font-bold"
               placeholder="닉네임을 입력해 주세요"
               value={field.value || ''}
               onChange={(e) => {
@@ -182,6 +190,7 @@ function Myinform() {
               label="이메일"
               id="email"
               type="email"
+              labelClassName="text-2xl font-bold"
               placeholder="이메일을 입력해 주세요"
               value={field.value || ''}
               onChange={(e) => {
@@ -202,6 +211,7 @@ function Myinform() {
               label="비밀번호"
               id="password"
               type="password"
+              labelClassName="text-2xl font-bold"
               placeholder="8자 이상 입력해 주세요"
               value={field.value || ''}
               onChange={(e) => {
@@ -222,6 +232,7 @@ function Myinform() {
               label="비밀번호 확인"
               id="confirmPassword"
               type="password"
+              labelClassName="text-2xl font-bold"
               placeholder="비밀번호를 한번 더 입력해 주세요"
               value={field.value || ''}
               onChange={(e) => {
