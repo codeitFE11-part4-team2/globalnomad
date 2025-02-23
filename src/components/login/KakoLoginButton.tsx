@@ -29,8 +29,9 @@ const KakaoLoginButton = () => {
       <Image
         src="/icons/icon-logo-kakao.svg"
         alt="카카오 로고"
-        width={72}
-        height={72}
+        width={48}
+        height={48}
+        className="md:w-[72px] md:h-[72px]"
       />
     </a>
   );

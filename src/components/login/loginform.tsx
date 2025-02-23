@@ -190,7 +190,7 @@ export default function SignInForm() {
       <p className="flex gap-[10px] font-medium text-gray-900 text-[16px] mx-auto mt-8px">
         회원이 아니신가요?
         <Link href="/signup" aria-label="회원가입으로 이동">
-          <span className="text-gray-900 text-[16px] font-medium underline">
+          <span className="text-green-3 text-[16px] font-medium underline">
             회원가입 하기
           </span>
         </Link>
@@ -207,8 +207,9 @@ export default function SignInForm() {
         <Image
           src="/icons/icon-logo-google.svg"
           alt="구글 로고"
-          width={72}
-          height={72}
+          width={48}
+          height={48}
+          className="md:w-[72px] md:h-[72px]"
         />
         <KakaoLoginButton />
       </div>
