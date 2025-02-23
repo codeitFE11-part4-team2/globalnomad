@@ -12,16 +12,13 @@ import {
   SideMenuIcon4,
 } from '@/lib/constants/icons';
 import { useFixProfile } from '@/store/fixprofile';
-
 interface ProfileImage {
   file: File | null;
   preview: string;
 }
-
 export async function ProfileImageUrl(file: File, token: string | null) {
   const formData = new FormData();
   formData.append('image', file);
-
   const response = await fetch(
     'https://sp-globalnomad-api.vercel.app/11-2/users/me/image',
     {
@@ -98,20 +95,8 @@ export default function SideNavMenu() {
       reader.readAsDataURL(file);
     }
   };
-
   const handleImage = () => {
     imageRef.current?.click();
-  };
-
-  const isPathActive = (path: string) => {
-    if (path === '/myactivity') {
-      // 내 체험 관리 메뉴는 등록/수정 페이지에서도 활성화
-      return pathname === path || 
-             pathname.startsWith('/myactivity/') || 
-             pathname === '/createactivity' || 
-             pathname.includes('/createactivity/');
-    }
-    return pathname === path || pathname.startsWith(path + '/');
   };
 
   const menuItems = [
@@ -154,7 +139,7 @@ export default function SideNavMenu() {
   ];
 
   return (
-    <div className="md:w-[251px] lg:w-[384px] h-[432px] rounded-xl p-6 flex flex-col items-center gap-6 border border-gray-300 shadow-[0px_4px_16px_0px_rgba(17,34,17,0.05)]">
+    <div className="md:w-[251px] sm:w-[344px] lg:w-[384px] h-[432px] rounded-xl p-6 flex flex-col items-center gap-6 border border-gray-300 shadow-[0px_4px_16px_0px_rgba(17,34,17,0.05)]">
       <div className="w-40 h-40 relative">
         <div className="w-full h-full rounded-full overflow-hidden">
           <img
@@ -180,7 +165,7 @@ export default function SideNavMenu() {
       <div className="w-full">
         <ul className="grid gap-2">
           {menuItems.map(({ href, label, icon }) => {
-            const isActive = isPathActive(href);
+            const isActive = pathname === href;
 
             return (
               <li key={href}>
