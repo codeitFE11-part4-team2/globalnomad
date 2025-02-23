@@ -11,18 +11,14 @@ import {
   SideMenuIcon3,
   SideMenuIcon4,
 } from '@/lib/constants/icons';
-import { useFixProfile } from '@/store/fixprofile'; // useFixProfile import
-
+import { useFixProfile } from '@/store/fixprofile';
 interface ProfileImage {
   file: File | null;
   preview: string;
 }
-
-// 이미지 업로드를 처리하는 함수
-async function ProfileImageUrl(file: File, token: string | null) {
+export async function ProfileImageUrl(file: File, token: string | null) {
   const formData = new FormData();
   formData.append('image', file);
-
   const response = await fetch(
     'https://sp-globalnomad-api.vercel.app/11-2/users/me/image',
     {
@@ -49,14 +45,10 @@ async function ProfileImageUrl(file: File, token: string | null) {
   }
 }
 
-export default function SideNavMenu({
-  onMenuItemClick,
-}: {
-  onMenuItemClick: (href: string) => void; // 경로를 받는 클릭 핸들러
-}) {
+export default function SideNavMenu() {
+  const { setImageurl } = useFixProfile();
   const pathname = usePathname(); // 현재 경로 가져오기
 
-  const { setImageurl } = useFixProfile(); // useFixProfile 사용
   const [profileImage, setProfileImage] = useState<ProfileImage>({
     file: null,
     preview: '/icons/defaultuser_icon.svg',
@@ -95,7 +87,7 @@ export default function SideNavMenu({
             preview: uploadedUrl,
           }));
 
-          setImageurl(uploadedUrl); // useFixProfile의 setImageurl 사용
+          setImageurl(uploadedUrl);
         } catch (error) {
           console.error('프로필 이미지 업로드 실패:', error);
         }
@@ -103,20 +95,8 @@ export default function SideNavMenu({
       reader.readAsDataURL(file);
     }
   };
-
   const handleImage = () => {
     imageRef.current?.click();
-  };
-
-  const isPathActive = (path: string) => {
-    if (path === '/myactivity') {
-      // 내 체험 관리 메뉴는 등록/수정 페이지에서도 활성화
-      return pathname === path || 
-             pathname.startsWith('/myactivity/') || 
-             pathname === '/createactivity' || 
-             pathname.includes('/createactivity/');
-    }
-    return pathname === path || pathname.startsWith(path + '/');
   };
 
   const menuItems = [
@@ -185,13 +165,12 @@ export default function SideNavMenu({
       <div className="w-full">
         <ul className="grid gap-2">
           {menuItems.map(({ href, label, icon }) => {
-            const isActive = isPathActive(href);
+            const isActive = pathname === href;
 
             return (
               <li key={href}>
                 <Link
                   href={href}
-                  onClick={() => onMenuItemClick(href)} // Link 클릭 시 경로 전달
                   className={`flex gap-3.5 px-4 py-2.5 items-center h-11 w-full rounded-xl 
                     ${isActive ? 'bg-green-2 text-nomad-black' : 'text-gray-700'}`}
                 >

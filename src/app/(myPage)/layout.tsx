@@ -1,73 +1,31 @@
 'use client';
 
-import { ReactNode, useState, useEffect } from 'react';
+import { ReactNode } from 'react';
+import { usePathname } from 'next/navigation'; // 현재 경로를 확인하기 위한 훅
 import SideNavMenu from '@/app/(myPage)/_component/SideNavMenu';
-import { useRouter, usePathname } from 'next/navigation';
-import { Button } from '@/components/common/Button';
 
-type Props = { children: ReactNode };
+type Props = { children: ReactNode; modal: ReactNode };
 
-export default function myPageLayout({ children }: Props) {
-  const [isMenuItemClicked, setIsMenuItemClicked] = useState(false);
-  const [isSideNavVisible, setIsSideNavVisible] = useState(true);
-  const pathname = usePathname();
-  const router = useRouter();
+export default function myPageLayout({ children, modal }: Props) {
+  const pathname = usePathname(); // 현재 경로를 가져옵니다.
 
-  const handleMenuItemClick = (href: string) => {
-    setIsMenuItemClicked(false);
-    setIsSideNavVisible(false);
-    router.push(href);
-  };
-
-  useEffect(() => {
-    setIsMenuItemClicked(true);
-    setIsSideNavVisible(false);
-  }, [pathname]);
-
-  useEffect(() => {
-    const handlePopState = () => {
-      setIsSideNavVisible(true);
-      setIsMenuItemClicked(false);
-    };
-
-    window.addEventListener('popstate', handlePopState);
-
-    return () => {
-      window.removeEventListener('popstate', handlePopState);
-    };
-  }, []);
-
-  const handleShowSideNav = () => {
-    setIsSideNavVisible(true);
-    setIsMenuItemClicked(false);
-  };
-
-  const isMobileMyInformPage = pathname === '/mobilemyinform';
+  // '/mobilemyinform' 경로인 경우 레이아웃을 제외
+  if (pathname === '/mobilemyinform') {
+    return (
+      <>
+        {children}
+        {modal}
+      </>
+    ); // 이 경우는 레이아웃을 제외하고 children과 modal만 렌더링
+  }
 
   return (
-    <div className="w-[344px] md:w-[696px] lg:w-[1208px] flex md:gap-4 lg:gap-6 justify-center mx-auto mt-6 lg:mt-[72px]">
-      <div className={`md:block ${isSideNavVisible ? '' : 'hidden'}`}>
-        <SideNavMenu onMenuItemClick={handleMenuItemClick} />{' '}
+    <div className="w-full md:w-[696px] lg:w-[1200px] flex md:gap-4 lg:gap-6 justify-center mx-auto mt-6 lg:mt-[72px] px-6">
+      <div className="hidden md:block">
+        <SideNavMenu />
       </div>
-
-      <div
-        className={`flex-1 ${!isMenuItemClicked ? 'hidden' : 'block'} md:block`}
-      >
-        {children}
-
-        {!isSideNavVisible && !isMobileMyInformPage && (
-          <div className="md:hidden mt-4">
-            <Button
-              type="button"
-              variant="nomad-black"
-              size="full"
-              onClick={handleShowSideNav}
-            >
-              메뉴 보기
-            </Button>
-          </div>
-        )}
-      </div>
+      <div className="flex-1">{children}</div>
+      {modal}
     </div>
   );
 }
