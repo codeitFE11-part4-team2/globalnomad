@@ -1,12 +1,19 @@
 import { activitySchema, ActivityFormData } from '../_schemas/activitySchema';
 
+interface Schedule {
+  id?: string | number;
+  date: string;
+  startTime: string;
+  endTime: string;
+}
+
 export async function createActions(formData: FormData): Promise<void> {
   const token = formData.get('token') as string;
   if (!token) {
     console.error('인증 토큰이 없습니다.');
     return;
   }
-  let schedules = [];
+  let schedules: Schedule[] = [];
   try {
     const schedulesData = formData.get('schedules');
     console.log('Raw schedules data:', schedulesData);
@@ -14,7 +21,7 @@ export async function createActions(formData: FormData): Promise<void> {
       schedules = JSON.parse(schedulesData as string);
       console.log('Parsed schedules:', schedules);
       if (Array.isArray(schedules)) {
-        schedules = schedules.map((schedule) => {
+        schedules = schedules.map((schedule: Schedule) => {
           // 이미 YYYY-MM-DD 형식인 경우 그대로 사용
           if (schedule.date.includes('-')) {
             return schedule;
@@ -57,10 +64,20 @@ export async function createActions(formData: FormData): Promise<void> {
       JSON.parse(formData.get('currentSubImages') as string) || [];
 
     const scheduleIdsToRemove = currentSchedules
-      .filter((schedule: { id: string }) => !schedules.find((s: { id: string }) => s.id === schedule.id))
+      .filter((schedule: { id: string }) => !schedules.find((s: Schedule) => s.id === schedule.id))
       .map((schedule: { id: string }) => schedule.id);
 
-    const schedulesToAdd = schedules.filter((schedule: { id?: string }) => !schedule.id);
+    const schedulesToAdd = schedules
+      .filter((schedule: Schedule) => {
+        // 서버에서 받은 id는 number 타입이고 5자리 이하
+        // 클라이언트에서 생성한 임시 id는 13자리 이상의 number
+        return typeof schedule.id === 'number' && String(schedule.id).length > 5;
+      })
+      .map((schedule: Schedule) => ({
+        date: schedule.date,
+        startTime: schedule.startTime,
+        endTime: schedule.endTime
+      }));
 
     const subImageIdsToRemove = currentSubImages
       .filter(

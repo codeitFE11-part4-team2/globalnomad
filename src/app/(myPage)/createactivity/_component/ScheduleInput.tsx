@@ -53,21 +53,31 @@ export default function ScheduleInput({
       alert('날짜와 시간을 선택해주세요');
       return;
     }
-    const formattedDate = formatDate(dateInput);
-    if (isOverlapping(formattedDate, startTime, endTime)) {
+
+    if (isOverlapping(dateInput, startTime, endTime)) {
       alert('이미 예약된 시간과 겹칩니다. 다른 시간을 선택해주세요');
       return;
     }
-    console.log('Current schedules:', schedules);
+
     const newSchedule = {
-      id: Date.now(),
-      date: formattedDate,
+      id: Date.now(), // UI 관리용 임시 ID
+      date: dateInput,
       startTime,
       endTime,
     };
-    console.log('Adding new schedule:', newSchedule);
-    setSchedulesAction([...schedules, newSchedule]);
-    console.log('Updated schedules:', [...schedules, newSchedule]);
+
+    // 새로운 배열을 생성하여 상태 업데이트
+    const updatedSchedules = [...schedules, newSchedule];
+
+    // 디버깅을 위한 로그
+    console.log('Current schedules:', schedules);
+    console.log('New schedule to add:', newSchedule);
+    console.log('Updated schedules:', updatedSchedules);
+
+    // 부모 컴포넌트의 상태 업데이트
+    setSchedulesAction(updatedSchedules);
+
+    // 입력 필드 초기화
     if (dateInputRef.current) dateInputRef.current.value = '';
     setStartTime('');
     setEndTime('');
