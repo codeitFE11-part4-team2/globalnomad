@@ -127,8 +127,8 @@ export default function ReviewModal({ params }: ReviewModalProps) {
                 <img
                   src={
                     rating >= value
-                      ? '/icons/icon_star_on.png'
-                      : '/icons/icon_star_off.png'
+                      ? '/icons/icon_star_on.svg'
+                      : '/icons/icon_star_off.svg'
                   }
                   alt={`별점 ${value}점`}
                   width={56}
