@@ -11,6 +11,8 @@ import ScheduleInput from './ScheduleInput';
 import ImageSelector from './ImageSelector';
 import CategorySelector from './CategorySelector';
 import { Schedule, SubImage } from '@/types/activity';
+import { MY_ACTIVITY_QUERY_KEYS } from '@/services/MyActivity';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface CreateActivityFormProps {
   defaultValues?: {
@@ -32,6 +34,7 @@ export default function CreateActivityForm({
   isEdit,
   activityId,
 }: CreateActivityFormProps = {}) {
+  const queryClient = useQueryClient();
   const { token } = useAuthStore();
   const { openModal } = modalStore();
   const [schedules, setSchedules] = useState<Schedule[]>(
@@ -133,6 +136,11 @@ export default function CreateActivityForm({
 
             const result = await createActions(formData);
             console.log('Form submission result:', result);
+
+            // 쿼리 무효화 추가
+            queryClient.invalidateQueries({
+              queryKey: [MY_ACTIVITY_QUERY_KEYS.myActivities],
+            });
 
             if (isEdit) {
               window.location.href = '/myactivity';

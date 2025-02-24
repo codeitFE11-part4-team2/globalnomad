@@ -17,7 +17,7 @@ function EmptyState() {
         새로운 체험을 등록하고 예약을 받아보세요
       </p>
       <a
-        href="/host/activities/new"
+        href="/createactivity"
         className="px-6 py-3 bg-nomad-black text-white rounded-lg hover:bg-gray-900 transition-colors"
       >
         체험 등록하기
@@ -63,7 +63,7 @@ export default function ReservationStatusPage() {
   }
 
   return (
-    <div className="w-full max-w-screen-lg mx-auto px-4 py-6">
+    <div className="w-full max-w-screen-lg mx-auto">
       <h1 className="text-2xl font-bold text-black mb-6">예약 현황</h1>
       <div className="space-y-6">
         <SelectActivity

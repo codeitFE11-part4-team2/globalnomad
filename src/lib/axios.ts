@@ -1,6 +1,7 @@
 // src/lib/axios.ts
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { useAuthStore } from '@/store';
+import { emitAuthError } from './events';
 
 // config 타입 확장
 declare module 'axios' {
@@ -69,19 +70,18 @@ if (isClient) {
 
           try {
             // 현재 토큰으로 토큰 갱신 시도
-            const {
-              data: { accessToken },
-            } = await axiosInstance.post(
+            const response = await axiosInstance.post(
               `/auth/tokens`,
               {},
               {
                 headers: {
                   Authorization: `Bearer ${useAuthStore.getState().token}`,
                 },
+                retry: true, // 토큰 갱신 요청 자체가 401이 뜰 때를 위한 플래그
               }
             );
 
-            // 새 토큰 저장
+            const accessToken = response.data.accessToken;
             const { setToken } = useAuthStore.getState();
             setToken(accessToken);
 
@@ -97,10 +97,13 @@ if (isClient) {
             originalConfig.retry = true;
             return axiosInstance(originalConfig);
           } catch (refreshError) {
-            // 토큰 갱신 실패 시 로그아웃
+            console.error('Token refresh failed:', refreshError);
+            isRefreshing = false; // 반드시 플래그를 초기화
+
+            // 토큰 갱신 실패 시 즉시 로그아웃 처리
             const { logout } = useAuthStore.getState();
             logout();
-            window.location.href = '/login';
+            window.location.replace('/login'); // replace 사용
             return Promise.reject(refreshError);
           } finally {
             isRefreshing = false;
@@ -165,3 +168,12 @@ publicAxios.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => Promise.reject(error)
 );
+
+declare module 'axios' {
+  export interface AxiosRequestConfig {
+    retry?: boolean;
+  }
+  export interface InternalAxiosRequestConfig {
+    retry?: boolean;
+  }
+}

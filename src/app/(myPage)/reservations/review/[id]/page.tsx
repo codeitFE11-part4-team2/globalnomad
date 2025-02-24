@@ -8,6 +8,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { mockReservationResponse } from '@/lib/reservations/mockData';
 
+import starOnIcon from '@/../public/icons/Icon_star_on.svg';
+import starOffIcon from '@/../public/icons/Icon_star_off.svg';
+
 interface ReviewModalProps {
   params: Promise<{
     id: string;
@@ -125,11 +128,7 @@ export default function ReviewModal({ params }: ReviewModalProps) {
                 className="w-12 h-12 flex items-center justify-center transition-colors"
               >
                 <Image
-                  src={
-                    rating >= value
-                      ? '/icons/icon_star_on.png'
-                      : '/icons/icon_star_off.png'
-                  }
+                  src={rating >= value ? starOnIcon : starOffIcon}
                   alt={`별점 ${value}점`}
                   width={56}
                   height={56}

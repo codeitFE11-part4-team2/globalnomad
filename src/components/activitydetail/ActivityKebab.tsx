@@ -107,14 +107,14 @@ export default function ActivityKebab({
         >
           <ul className="text-center">
             <li
-              className="px-[46px] py-[18px] cursor-pointer hover:bg-gray-100 text-2lg font-medium"
+              className="px-7 py-[18px] cursor-pointer hover:bg-gray-100 text-2lg font-medium"
               onClick={handleEdit}
             >
               수정하기
             </li>
             <hr className="border-t border-gray-300" />
             <li
-              className="px-[46px] py-[18px] cursor-pointer hover:bg-gray-100 text-2lg font-medium"
+              className="px-7 py-[18px] cursor-pointer hover:bg-gray-100 text-2lg font-medium"
               onClick={() => setShowDeleteModal(true)}
             >
               삭제하기
