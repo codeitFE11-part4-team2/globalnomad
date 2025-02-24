@@ -46,12 +46,13 @@ export async function ProfileImageUrl(file: File, token: string | null) {
 }
 
 export default function SideNavMenu() {
+  const { user } = useAuthStore();
   const { setImageurl } = useFixProfile();
   const pathname = usePathname(); // 현재 경로 가져오기
 
   const [profileImage, setProfileImage] = useState<ProfileImage>({
     file: null,
-    preview: '/icons/defaultuser_icon.svg',
+    preview: user?.profileImageUrl || '/icons/defaultuser_icon.svg',
   });
 
   const imageRef = useRef<HTMLInputElement>(null);
