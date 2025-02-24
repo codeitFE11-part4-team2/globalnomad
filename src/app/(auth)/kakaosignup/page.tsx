@@ -35,8 +35,7 @@ const KakaoSignup = () => {
     }
     setLoading(true);
     try {
-      const redirectUri =
-        'https://globalnomad-11-2-test.vercel.app/kakaosignup';
+      const redirectUri = 'https://globalnomad-11-2.vercel.app/kakaosignup';
       console.log('카카오 간편회원가입 요청 데이터:', {
         nickname,
         redirectUri,
