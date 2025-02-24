@@ -63,7 +63,7 @@ export default function ReservationStatusPage() {
   }
 
   return (
-    <div className="w-full max-w-screen-lg mx-auto px-4 py-6">
+    <div className="w-full max-w-screen-lg mx-auto">
       <h1 className="text-2xl font-bold text-black mb-6">예약 현황</h1>
       <div className="space-y-6">
         <SelectActivity

@@ -5,6 +5,7 @@ import MyActivityCard from './_component/MyActivityCard';
 import CardModal from './_component/CardModal';
 import { useMyActivities } from '@/services/MyActivity';
 import { useRouter } from 'next/navigation';
+import NoReservations from '../reservations/history/_components/NoReservations';
 
 export default function Page() {
   const router = useRouter();
@@ -18,6 +19,8 @@ export default function Page() {
     return <div>에러가 발생했습니다.</div>;
   }
 
+  const hasActivities = data?.activities && data.activities.length > 0;
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
@@ -26,19 +29,23 @@ export default function Page() {
           체험 등록하기
         </Button>
       </div>
-      <div className="flex flex-col gap-4">
-        {data?.activities.map((activity) => (
-          <MyActivityCard
-            key={activity.id}
-            id={activity.id}
-            bannerImageUrl={activity.bannerImageUrl}
-            rating={activity.rating}
-            reviewCount={activity.reviewCount}
-            title={activity.title}
-            price={activity.price}
-          />
-        ))}
-      </div>
+      {hasActivities ? (
+        <div className="flex flex-col gap-4">
+          {data.activities.map((activity) => (
+            <MyActivityCard
+              key={activity.id}
+              id={activity.id}
+              bannerImageUrl={activity.bannerImageUrl}
+              rating={activity.rating}
+              reviewCount={activity.reviewCount}
+              title={activity.title}
+              price={activity.price}
+            />
+          ))}
+        </div>
+      ) : (
+        <NoReservations />
+      )}
       <CardModal />
     </div>
   );
