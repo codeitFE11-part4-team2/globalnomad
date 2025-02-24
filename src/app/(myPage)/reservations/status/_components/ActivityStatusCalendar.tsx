@@ -121,7 +121,7 @@ const ActivityStatusCalendar = ({
     return (
       <div
         key={idx}
-        className={`px-2 text-left h-full  ${
+        className={`px-1 text-left h-full  ${
           !day.isCurrentMonth ? 'text-gray-400' : ''
         }`}
       >
@@ -137,9 +137,9 @@ const ActivityStatusCalendar = ({
   };
 
   return (
-    <div className="p-4">
+    <div className="p-1">
       {/* 월 내비게이션 */}
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-center items-center mb-4">
         <button
           onClick={handlePrevMonth}
           className="px-4 py-2 text-gray-600 hover:text-gray-900"
@@ -164,7 +164,7 @@ const ActivityStatusCalendar = ({
           {weekDays.map((day) => (
             <div
               key={day}
-              className="text-left font-medium p-2 bg-gray-50 border border-gray-200"
+              className="text-left font-medium p-1 bg-gray-50 border border-gray-200"
             >
               {day}
             </div>
