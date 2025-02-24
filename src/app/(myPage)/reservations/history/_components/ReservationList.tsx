@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useEffect, useRef, useCallback } from 'react';
 import CancelModal from './CancelModal';
 import { useState } from 'react';
 import {
@@ -14,6 +15,8 @@ interface ReservationListProps {
   selectedStatus: string;
 }
 
+const PAGE_SIZE = 10;
+
 export default function ReservationList({
   selectedStatus,
 }: ReservationListProps) {
@@ -21,18 +24,64 @@ export default function ReservationList({
   const [selectedReservationId, setSelectedReservationId] = useState<
     number | null
   >(null);
+  const [cursorId, setCursorId] = useState<number | undefined>(undefined);
 
-  // 리액트 쿼리로 예약 목록 조회
-  const { data, isLoading, error } = useReservationList({
+  // Intersection Observer를 위한 ref
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+
+  const {
+    data,
+    isLoading,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useReservationList({
     status:
       selectedStatus === 'all'
         ? undefined
         : (selectedStatus as ReservationStatus),
+    size: PAGE_SIZE,
+    cursorId: undefined,
   });
 
-  // 예약 취소
   const { mutate: cancelReservation, isPending: isCanceling } =
     useReservationCancel();
+
+  // 무한 스크롤 구현
+  const handleObserver = useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      const [target] = entries;
+      if (target.isIntersecting && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    },
+    [fetchNextPage, hasNextPage, isFetchingNextPage]
+  );
+
+  useEffect(() => {
+    const element = loadMoreRef.current;
+
+    if (!element) return;
+
+    observerRef.current = new IntersectionObserver(handleObserver, {
+      threshold: 0.1,
+    });
+
+    observerRef.current.observe(element);
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [handleObserver]);
+
+  // selectedStatus가 변경될 때 cursorId 초기화
+  useEffect(() => {
+    setCursorId(undefined);
+  }, [selectedStatus]);
 
   const handleCancelClick = (reservationId: number) => {
     setSelectedReservationId(reservationId);
@@ -56,14 +105,16 @@ export default function ReservationList({
   if (isLoading) return <div>로딩 중...</div>;
   if (error) return <div>에러가 발생했습니다: {error.message}</div>;
 
+  const allReservations =
+    data?.pages.flatMap((page) => page.reservations) ?? [];
+
   const filteredReservations =
     selectedStatus === 'all'
-      ? data?.reservations
-      : data?.reservations.filter(
+      ? allReservations
+      : allReservations.filter(
           (reservation) => reservation.status === selectedStatus
         );
 
-  // 데이터가 없거나 필터링된 결과가 없는 경우
   if (!filteredReservations || filteredReservations.length === 0) {
     return <NoReservations />;
   }
@@ -91,7 +142,7 @@ export default function ReservationList({
   };
 
   const getActionButton = (reservation: Reservation) => {
-    const commonButtonClasses = 'px-4 py-2 rounded-lg text-sm font-medium';
+    const commonButtonClasses = 'px-2 py-1 rounded-lg text-sm font-medium';
 
     if (reservation.status === 'pending') {
       return (
@@ -140,43 +191,47 @@ export default function ReservationList({
       <div className="space-y-4">
         {filteredReservations?.map((reservation) => (
           <div key={reservation.id} className="border shadow-md rounded-3xl">
-            <div className="flex">
-              {/* 왼쪽 이미지 */}
-              <div className="relative w-48 h-48">
+            <div className="flex min-h-[8rem]">
+              {/* 이미지 컨테이너 - 반응형 조정 */}
+              <div className="relative w-32 min-h-[8rem]">
                 <Image
                   src={reservation.activity.bannerImageUrl}
                   alt={reservation.activity.title}
                   fill
-                  className="object-cover rounded-l-lg"
+                  className="object-cover rounded-l-3xl"
                 />
               </div>
 
-              {/* 오른쪽 내용 */}
+              {/* 컨텐츠 컨테이너 - 반응형 패딩 및 레이아웃 조정 */}
               <div className="relative flex-1 p-4">
                 <div className="flex flex-col h-full">
-                  {/* 상태 */}
+                  {/* 상태 표시 */}
                   <div className="flex justify-between items-start mb-2">
                     <span
-                      className={`py-1 rounded-full text-sm font-medium ${getStatusStyle(reservation.status)}`}
+                      className={`py-1 rounded-full text-sm font-medium ${getStatusStyle(
+                        reservation.status
+                      )}`}
                     >
                       {getStatusText(reservation.status)}
                     </span>
                   </div>
 
                   {/* 제목 */}
-                  <h3 className="font-semibold text-lg text-black mb-2">
+                  <h3 className="font-semibold text-lg md:text-2lg text-black mb-2">
                     {reservation.activity.title}
                   </h3>
 
-                  {/* 날짜/시간/인원 */}
-                  <div className="text-gray-900 text-md mb-2">
+                  {/* 예약 정보 - 모바일에서 더 작은 텍스트 */}
+                  <div className="text-gray-900 text-sm md:text-md mb-2">
                     {reservation.date} · {reservation.startTime}-
                     {reservation.endTime} · {reservation.headCount}명
                   </div>
 
-                  {/* 가격과 액션 버튼 */}
-                  <div className="flex justify-between items-center text-lg font-bold text-black mt-auto">
-                    <span>￦{reservation.totalPrice.toLocaleString()}</span>
+                  {/* 가격과 버튼 */}
+                  <div className="flex justify-between items-center mt-auto">
+                    <span className="text-sm sm:text-md md:text-lg font-bold text-black">
+                      ￦{reservation.totalPrice.toLocaleString()}
+                    </span>
                     <div>{getActionButton(reservation)}</div>
                   </div>
                 </div>
@@ -184,6 +239,10 @@ export default function ReservationList({
             </div>
           </div>
         ))}
+        {/* Intersection Observer를 위한 타겟 요소 */}
+        <div ref={loadMoreRef} className="h-10">
+          {isFetchingNextPage && <div>더 불러오는 중...</div>}
+        </div>
       </div>
       <CancelModal
         isOpen={isModalOpen}

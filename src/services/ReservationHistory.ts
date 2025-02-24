@@ -1,17 +1,11 @@
-// import { ReservationResponse } from '@/lib/reservations/types';
-// import { mockReservationResponse } from '@/lib/reservations/mockData';
-
-// export async function fetchReservations(): Promise<ReservationResponse> {
-//   // mock 데이터를 사용하여 API 호출 시뮬레이션
-//   return new Promise((resolve) => {
-//     setTimeout(() => {
-//       resolve(mockReservationResponse);
-//     }, 1000); // 1초 딜레이
-//   });
-// }
-
 import { api } from '@/lib/axios';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  InfiniteData,
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 
 // 공통 에러 타입
 interface ApiError {
@@ -124,7 +118,7 @@ interface UpdateReservationRequest {
 
 export const cancelReservation = async (reservationId: number) => {
   try {
-    const { data } = await api.put<ReservationDetail>(
+    const { data } = await api.patch<ReservationDetail>(
       `/my-reservations/${reservationId}`,
       { status: 'canceled' } as UpdateReservationRequest
     );
@@ -158,7 +152,7 @@ export const createReservationReview = async (
 ) => {
   try {
     const { data } = await api.post<Review>(
-      `/my-reservations/${reservationId}/review`,
+      `/my-reservations/${reservationId}/reviews`,
       reviewData
     );
     return data;
@@ -188,9 +182,21 @@ export const createReservationReview = async (
 
 // 리액트 쿼리 커스텀 훅
 export const useReservationList = (params: ReservationListParams) => {
-  return useQuery({
+  return useInfiniteQuery<
+    ReservationListResponse,
+    Error,
+    InfiniteData<ReservationListResponse>,
+    (string | ReservationListParams)[],
+    number | undefined
+  >({
     queryKey: ['reservations', params],
-    queryFn: () => getMyReservations(params),
+    queryFn: ({ pageParam = undefined }) =>
+      getMyReservations({
+        ...params,
+        cursorId: pageParam,
+      }),
+    initialPageParam: undefined,
+    getNextPageParam: (lastPage) => lastPage.cursorId || undefined,
     staleTime: 1000 * 60 * 5, // 5분
   });
 };

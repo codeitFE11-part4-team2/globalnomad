@@ -11,18 +11,20 @@ interface Schedule {
 
 interface Props {
   schedules: Schedule[];
-  setSchedules: React.Dispatch<React.SetStateAction<Schedule[]>>;
+  setSchedulesAction: (schedules: Schedule[]) => void;
 }
 
-export default function ScheduleInput({ schedules, setSchedules }: Props) {
+export default function ScheduleInput({
+  schedules,
+  setSchedulesAction,
+}: Props) {
   const dateInputRef = useRef<HTMLInputElement>(null);
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
 
   const formatDate = (date: string) => {
     if (!date) return '';
-    const [year, month, day] = date.split('-');
-    return `${year.slice(2)}/${month}/${day}`;
+    return date; // HTML date input이 이미 YYYY-MM-DD 형식을 사용하므로 그대로 반환
   };
   const timeToMinutes = (time: string) => {
     const [h, m] = time.split(':').map(Number);
@@ -51,56 +53,73 @@ export default function ScheduleInput({ schedules, setSchedules }: Props) {
       alert('날짜와 시간을 선택해주세요');
       return;
     }
-    const formattedDate = formatDate(dateInput);
-    if (isOverlapping(formattedDate, startTime, endTime)) {
+
+    if (isOverlapping(dateInput, startTime, endTime)) {
       alert('이미 예약된 시간과 겹칩니다. 다른 시간을 선택해주세요');
       return;
     }
-    setSchedules([
-      ...schedules,
-      {
-        id: Date.now(),
-        date: formattedDate,
-        startTime,
-        endTime,
-      },
-    ]);
+
+    const newSchedule = {
+      id: Date.now(), // UI 관리용 임시 ID
+      date: dateInput,
+      startTime,
+      endTime,
+    };
+
+    // 새로운 배열을 생성하여 상태 업데이트
+    const updatedSchedules = [...schedules, newSchedule];
+
+    // 디버깅을 위한 로그
+    console.log('Current schedules:', schedules);
+    console.log('New schedule to add:', newSchedule);
+    console.log('Updated schedules:', updatedSchedules);
+
+    // 부모 컴포넌트의 상태 업데이트
+    setSchedulesAction(updatedSchedules);
+
+    // 입력 필드 초기화
     if (dateInputRef.current) dateInputRef.current.value = '';
     setStartTime('');
     setEndTime('');
   };
   const removeSchedule = (id: number) => {
-    setSchedules(schedules.filter((schedule) => schedule.id !== id));
+    setSchedulesAction(schedules.filter((schedule) => schedule.id !== id));
   };
   return (
     <>
-      <span className="text-black text-2xl font-bold mt-6">
+      <span className="mt-6 hidden text-2xl font-bold text-black md:block">
         예약 가능한 시간대
       </span>
       <div className="w-full mt-6">
         <div className="flex items-end">
-          <div className="flex flex-col gap-2.5 w-[379px] mr-5 relative">
-            <label className="text-xl font-medium">날짜</label>
-            <input
-              type="date"
-              ref={dateInputRef}
-              className="border h-14 border-gray-800 rounded-md text-lg peer pl-4"
-            />
-            <div
-              className="absolute bottom-3 right-3 cursor-pointer"
-              onClick={() => dateInputRef.current?.showPicker()}
-            >
-              <div className="relative w-8 h-8">
-                <Image src="icons/calendar_icon.svg" alt="달력아이콘" fill />
+          <div className="relative flex w-[130px] flex-col gap-2.5 mr-[5px] md:w-[149px] lg:w-[379px] lg:mr-5">
+            <label className="font-pretendard text-base font-medium leading-[26px] text-[#4B4B4B]">
+              날짜
+            </label>
+            <div className="relative">
+              <input
+                type="date"
+                ref={dateInputRef}
+                className="h-[44px] w-full border border-[#A1A1A1] rounded-md text-lg peer pl-2 md:h-14"
+              />
+              <div
+                className="absolute top-1/2 -translate-y-1/2 right-3 cursor-pointer"
+                onClick={() => dateInputRef.current?.showPicker()}
+              >
+                <div className="relative w-6 h-6 md:w-8 md:h-8">
+                  <Image src="/icons/calendar_icon.svg" alt="달력아이콘" fill />
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="flex flex-col gap-2.5 w-[140px] ">
-            <span className="text-xl font-medium">시작 시간</span>
+          <div className="flex w-[79px] flex-col gap-2.5 md:w-[104px] lg:w-[140px]">
+            <span className="font-pretendard text-base font-medium leading-[26px] text-[#4B4B4B]">
+              시작 시간
+            </span>
             <select
               name="new_schedule_start"
-              className="border h-14 border-gray-800 rounded-md pl-4"
+              className="h-[44px] rounded-md border border-[#A1A1A1] pl-2 md:h-14"
               value={startTime}
               onChange={(e) => {
                 setStartTime(e.target.value);
@@ -117,12 +136,14 @@ export default function ScheduleInput({ schedules, setSchedules }: Props) {
               ))}
             </select>
           </div>
-          <span className="mx-3 pb-4 text-xl font-bold">~</span>
-          <div className="flex flex-col gap-2.5 w-[140px]">
-            <span className="text-xl font-medium">종료 시간</span>
+          <span className="mx-3 hidden pb-4 text-xl font-bold md:block">~</span>
+          <div className="ml-[5px] flex w-[79px] flex-col gap-2.5 md:w-[104px] lg:w-[140px] lg:ml-0">
+            <span className="font-pretendard text-base font-medium leading-[26px] text-[#4B4B4B]">
+              종료 시간
+            </span>
             <select
               name="new_schedule_end"
-              className="border h-14 border-gray-800 rounded-md pl-4"
+              className="h-[44px] rounded-md border border-[#A1A1A1] pl-2 md:h-14"
               value={endTime || ''}
               onChange={(e) => setEndTime(e.target.value)}
             >
@@ -145,35 +166,36 @@ export default function ScheduleInput({ schedules, setSchedules }: Props) {
             </select>
           </div>
           <div
-            className="relative h-14 w-14 ml-5 cursor-pointer"
+            className="relative ml-[5px] h-[44px] w-[44px] cursor-pointer md:h-14 md:w-14 lg:ml-5"
             onClick={addSchedule}
           >
             <Image src="/icons/plusbtn_icon.svg" fill alt="추가버튼" />
           </div>
         </div>
 
-        <div className="w-full border my-5 border-gray-300"></div>
-        <input
-          type="hidden"
-          name="schedules"
-          value={JSON.stringify(schedules)}
-        />
+        <div className="w-full border-[1px] my-5 border-[#DDD]"></div>
 
         {schedules.map((schedule) => (
           <div key={schedule.id} className="w-full flex items-center mb-5">
-            <div className="border h-14 border-gray-800 rounded-md text-lg w-[379px] flex items-center pl-4 mr-5">
-              <span className="text-lg text-black">{schedule.date}</span>
+            <div className="w-[130px] md:w-[149px] lg:w-[379px] mr-[5px] lg:mr-5">
+              <div className="h-[44px] md:h-14 border border-[#A1A1A1] rounded-md text-lg flex items-center pl-4 bg-white">
+                <span className="text-lg text-black">{schedule.date}</span>
+              </div>
             </div>
 
-            <div className="border h-14 border-gray-800 rounded-md text-lg w-[140px] flex items-center pl-4">
-              <span>{schedule.startTime}</span>
+            <div className="w-[79px] md:w-[104px] lg:w-[140px]">
+              <div className="h-[44px] md:h-14 border border-[#A1A1A1] rounded-md text-lg flex items-center pl-4 bg-white">
+                <span>{schedule.startTime}</span>
+              </div>
             </div>
-            <span className="mx-3 text-xl font-bold">~</span>
-            <div className="border h-14 border-gray-800 rounded-md text-lg w-[140px] flex items-center pl-4">
-              <span>{schedule.endTime}</span>
+            <span className="mx-3 hidden md:block text-xl font-bold">~</span>
+            <div className="ml-[5px] w-[79px] md:w-[104px] lg:w-[140px] lg:ml-0">
+              <div className="h-[44px] md:h-14 border border-[#A1A1A1] rounded-md text-lg flex items-center pl-4 bg-white">
+                <span>{schedule.endTime}</span>
+              </div>
             </div>
             <div
-              className="relative h-14 w-14 ml-5 cursor-pointer"
+              className="relative ml-[5px] h-[44px] w-[44px] cursor-pointer md:h-14 md:w-14 lg:ml-5"
               onClick={() => removeSchedule(schedule.id)}
             >
               <Image src="/icons/minusbtn_icon.svg" fill alt="삭제버튼" />

@@ -23,6 +23,7 @@ interface User {
 interface LoginResponse {
   user: User;
   accessToken: string;
+  refreshToken: string;
 }
 
 interface FormData {
@@ -71,8 +72,8 @@ export default function SignInForm() {
         password: data.password,
       });
 
-      const { user, accessToken } = response.data;
-      login(user, accessToken);
+      const { user, accessToken, refreshToken } = response.data;
+      login(user, accessToken, refreshToken);
 
       if (isMounted) {
         router.push('/');
@@ -206,8 +207,9 @@ export default function SignInForm() {
         <Image
           src="/icons/icon-logo-google.svg"
           alt="구글 로고"
-          width={72}
-          height={72}
+          width={48}
+          height={48}
+          className="md:w-[72px] md:h-[72px]"
         />
         <KakaoLoginButton />
       </div>

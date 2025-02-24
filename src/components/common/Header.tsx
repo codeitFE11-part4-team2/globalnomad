@@ -3,8 +3,9 @@
 import Image from 'next/image';
 import { useAuthStore } from '@/store';
 import Link from 'next/link';
-import { useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { useState, useRef, useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation'; // useRouter 추가
+import useOutsideClick from '@/hooks/useOutsideClick'; // 커스텀 훅 import
 import logo from '../../../public/icons/icon-logomd.svg';
 import NotificationPopup from './NotificationPopup';
 
@@ -16,7 +17,28 @@ export default function Header() {
   const { user, isAuthenticated, logout } = useAuthStore();
   const [isNotificationOpen, setNotificationOpen] = useState(false);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const pathname = usePathname();
+  const router = useRouter(); // useRouter 추가
+
+  const notificationRef = useRef(null);
+  const dropdownRef = useRef(null);
+
+  useOutsideClick(notificationRef, () => setNotificationOpen(false));
+
+  useOutsideClick(dropdownRef, () => setDropdownOpen(false));
+
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth <= 425); // 모바일 화면 크기 설정 (425px 이하)
+    };
+
+    checkIfMobile();
+
+    window.addEventListener('resize', checkIfMobile);
+
+    return () => window.removeEventListener('resize', checkIfMobile);
+  }, []);
 
   if (
     pathname === '/login' ||
@@ -26,16 +48,14 @@ export default function Header() {
     return null;
   }
 
-  const toggleNotification = () => {
-    setNotificationOpen((prev) => !prev);
-  };
-
-  const toggleDropdown = () => {
-    setDropdownOpen((prev) => !prev);
+  // 로그아웃 후 홈으로 리디렉션하는 함수
+  const handleLogout = () => {
+    logout(); // 로그아웃 처리
+    router.push('/'); // 홈으로 리디렉션
   };
 
   return (
-    <header className="w-full h-[70px] p-[10px] flex justify-center items-center border-b border-gray-300 gap-0">
+    <header className="w-full h-[70px] p-[10px] flex justify-center items-center border-b border-gray-300 gap-0 bg-white">
       <nav className="w-[1200px] h-[30px] flex justify-between items-center">
         <Link href="/" onClick={handleLogoClick}>
           <Image width={172} height={30} src={logo} alt="노마드 로고" />
@@ -45,7 +65,8 @@ export default function Header() {
           <div className="flex items-center gap-6">
             {/* 알림 아이콘 */}
             <div
-              onClick={toggleNotification}
+              ref={notificationRef} // ref 적용
+              onClick={() => setNotificationOpen((prev) => !prev)}
               className="relative cursor-pointer"
             >
               <Image
@@ -62,7 +83,7 @@ export default function Header() {
             <div className="h-[22px] border-r border-gray-300" />
 
             {/* 사용자 프로필 사진과 닉네임 */}
-            <div className="relative flex items-center gap-5">
+            <div ref={dropdownRef} className="relative flex items-center gap-5">
               {user?.profileImageUrl ? (
                 <Image
                   src={user.profileImageUrl}
@@ -79,7 +100,7 @@ export default function Header() {
 
               <span
                 className="cursor-pointer text-black text-md font-medium font-pretendard"
-                onClick={toggleDropdown}
+                onClick={() => setDropdownOpen((prev) => !prev)}
               >
                 {user?.nickname}
               </span>
@@ -87,16 +108,17 @@ export default function Header() {
               {isDropdownOpen && (
                 <div
                   className="absolute top-full right-0 w-[160px] bg-white border border-gray-300 rounded-[6px] 
-                py-2 mt-2 text-center font-mediume text-2lg font-pretendard z-20"
+                py-2 mt-2 text-center font-medium text-2lg font-pretendard z-20"
                 >
                   <Link
-                    href="/myinformation"
+                    href={isMobile ? '/mobilemyinform' : '/myinformation'}
                     className="block px-4 py-2 text-gray-900 hover:bg-gray-200"
                   >
                     마이페이지
                   </Link>
+                  {/* 로그아웃 버튼 클릭 시 홈으로 리디렉션 */}
                   <button
-                    onClick={logout}
+                    onClick={handleLogout}
                     className="block w-full px-4 py-2 text-gray-900 hover:bg-gray-200 "
                   >
                     로그아웃

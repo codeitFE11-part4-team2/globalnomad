@@ -1,13 +1,15 @@
 import { useRef, useEffect } from 'react';
 
 interface DropdownMenuProps {
+  activityId: number;
   isOpen: boolean;
   onClose: () => void;
-  onEdit: () => void;
-  onDelete: () => void;
+  onEdit: (id: number) => void;
+  onDelete: (id: number) => void;
 }
 
 export default function CardDropdown({
+  activityId,
   isOpen,
   onClose,
   onEdit,
@@ -43,14 +45,14 @@ export default function CardDropdown({
     >
       <button
         className="w-full py-2 md:py-3 lg:py-4 hover:bg-gray-100 flex justify-center"
-        onClick={onEdit}
+        onClick={() => onEdit(activityId)}
       >
         수정하기
       </button>
       <div className="w-full h-px bg-gray-200"></div>
       <button
         className="w-full py-2 md:py-3 lg:py-4 hover:bg-gray-100 flex justify-center "
-        onClick={onDelete}
+        onClick={() => onDelete(activityId)}
       >
         삭제하기
       </button>

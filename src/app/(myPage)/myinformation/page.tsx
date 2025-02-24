@@ -1,5 +1,4 @@
 'use client';
-
 import { useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import InputItem from '@/components/login/logininputitem';
@@ -7,7 +6,6 @@ import { useAuthStore } from '@/store/auth'; // Zustand store
 import { Button } from '@/components/common/Button';
 import { useRouter } from 'next/navigation';
 import { useFixProfile } from '@/store/fixprofile';
-
 interface FormData {
   email: string;
   nickname: string;
@@ -15,14 +13,22 @@ interface FormData {
   confirmPassword: string;
 }
 
+interface ProfileUpdateBody {
+  nickname?: string;
+  profileImageUrl?: string;
+  newPassword?: string;
+}
+
 function Myinform() {
   const [isClient, setIsClient] = useState(false);
-  const { user, setUser, token } = useAuthStore((state) => state); // user, setUser, token 가져오기
+  const { user, setUser, token } = useAuthStore((state) => state);
   const router = useRouter();
 
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  const isKakaoUser = user?.email?.endsWith('@kakao.com');
 
   const {
     control,
@@ -42,7 +48,6 @@ function Myinform() {
     mode: 'onChange',
     reValidateMode: 'onChange',
   });
-
   const validateEmail = (email: string) => {
     const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
     if (!emailRegex.test(email)) {
@@ -54,9 +59,7 @@ function Myinform() {
       clearErrors('email');
     }
   };
-
   const imageurl = useFixProfile((state) => state.imageurl);
-
   const validateNickname = (nickname: string) => {
     if (nickname.length > 10) {
       setError('nickname', {
@@ -67,7 +70,6 @@ function Myinform() {
       clearErrors('nickname');
     }
   };
-
   const validatePassword = (password: string) => {
     if (password.length < 8) {
       setError('password', {
@@ -78,7 +80,6 @@ function Myinform() {
       clearErrors('password');
     }
   };
-
   const validateConfirmPassword = (confirmPassword: string) => {
     const password = getValues('password');
     if (confirmPassword !== password) {
@@ -92,6 +93,11 @@ function Myinform() {
   };
 
   const handleProfileUpdate = async (data: FormData) => {
+    if (isKakaoUser && data.password) {
+      alert('카카오 계정은 비밀번호를 변경할 수 없습니다.');
+      return;
+    }
+
     const { nickname, password } = data;
 
     if (!user) {
@@ -99,12 +105,18 @@ function Myinform() {
       return;
     }
 
-    const body = {
-      nickname,
-      profileImageUrl: imageurl,
-      newPassword: password,
-    };
+    const body: ProfileUpdateBody = {};
 
+    // 변경된 값만 추가
+    if (nickname !== user.nickname) {
+      body.nickname = nickname;
+    }
+    if (imageurl !== user.profileImageUrl) {
+      body.profileImageUrl = imageurl;
+    }
+    if (password) {
+      body.newPassword = password;
+    }
     try {
       const response = await fetch(
         'https://sp-globalnomad-api.vercel.app/11-2/users/me',
@@ -117,16 +129,12 @@ function Myinform() {
           body: JSON.stringify(body),
         }
       );
-
       if (!response.ok) {
         throw new Error('프로필 업데이트 실패');
       }
-
       const result = await response.json();
       console.log('프로필 업데이트 성공:', result);
 
-      // 서버에서 프로필 업데이트가 완료된 후, 상태를 갱신합니다.
-      // 만약 서버 응답에 수정된 사용자 정보가 포함되어 있다면, 그 값을 상태에 반영할 수 있습니다.
       setUser({
         ...user,
         nickname: result.nickname || user.nickname,
@@ -134,31 +142,34 @@ function Myinform() {
       });
       console.log('업데이트된 사용자 정보:', user);
 
-      // 성공적으로 업데이트되었으면 페이지를 리디렉션할 수 있습니다.
       router.push('/');
     } catch (error) {
       console.error('프로필 업데이트 중 오류 발생:', error);
     }
   };
-
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <h2 className="text-3xl font-bold">내 정보</h2>
-        <Button onClick={handleSubmit(handleProfileUpdate)}>저장하기</Button>
+        <Button
+          type="submit"
+          variant="nomad-black"
+          size="xsmall"
+          onClick={handleSubmit(handleProfileUpdate)}
+        >
+          저장하기
+        </Button>
       </div>
       <form className="gap-[28px] flex flex-col">
         <Controller
           name="nickname"
           control={control}
-          rules={{
-            required: '닉네임은 필수 입력 사항입니다.',
-          }}
           render={({ field }) => (
             <InputItem
               label="닉네임"
               id="nickname"
               type="text"
+              labelClassName="text-2xl font-bold"
               placeholder="닉네임을 입력해 주세요"
               value={field.value || ''}
               onChange={(e) => {
@@ -174,14 +185,12 @@ function Myinform() {
         <Controller
           name="email"
           control={control}
-          rules={{
-            required: '이메일은 필수 입력 사항입니다.',
-          }}
           render={({ field }) => (
             <InputItem
               label="이메일"
               id="email"
               type="email"
+              labelClassName="text-2xl font-bold"
               placeholder="이메일을 입력해 주세요"
               value={field.value || ''}
               onChange={(e) => {
@@ -197,14 +206,12 @@ function Myinform() {
         <Controller
           name="password"
           control={control}
-          rules={{
-            required: '비밀번호는 필수 입력 사항입니다.',
-          }}
           render={({ field }) => (
             <InputItem
               label="비밀번호"
               id="password"
               type="password"
+              labelClassName="text-2xl font-bold"
               placeholder="8자 이상 입력해 주세요"
               value={field.value || ''}
               onChange={(e) => {
@@ -220,14 +227,12 @@ function Myinform() {
         <Controller
           name="confirmPassword"
           control={control}
-          rules={{
-            required: '비밀번호 확인은 필수 입력 사항입니다.',
-          }}
           render={({ field }) => (
             <InputItem
               label="비밀번호 확인"
               id="confirmPassword"
               type="password"
+              labelClassName="text-2xl font-bold"
               placeholder="비밀번호를 한번 더 입력해 주세요"
               value={field.value || ''}
               onChange={(e) => {
@@ -244,5 +249,4 @@ function Myinform() {
     </div>
   );
 }
-
 export default Myinform;
