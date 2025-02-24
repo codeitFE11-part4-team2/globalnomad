@@ -110,7 +110,7 @@ export default function ReviewModal({ params }: ReviewModalProps) {
                 onClick={() => setRating(value)}
                 className="w-12 h-12 flex items-center justify-center transition-colors"
               >
-                <Image
+                <img
                   src={
                     rating >= value
                       ? '/icons/icon_star_on.png'
